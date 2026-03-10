@@ -1,0 +1,14 @@
+{
+  "name": "alnitar-api",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Alnitar Cloudflare Worker (D1 + R2 + auth)",
+  "scripts": {
+    "deploy": "npx wrangler deploy",
+    "dev": "npx wrangler dev",
+    "db:push": "npx wrangler d1 execute alnitar-db --remote --file=./schema.sql"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

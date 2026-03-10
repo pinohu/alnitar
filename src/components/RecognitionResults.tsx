@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConstellationDiagram } from "./ConstellationDiagram";
 import { type RecognitionOutput, type RecognitionResult } from "@/lib/recognition";
-import { addJournalEntry } from "@/lib/journal";
+import { addJournalEntry, getJournalEntries } from "@/lib/journal";
+import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -18,12 +20,17 @@ interface Props {
 export function RecognitionResults({ output, imageUrl, onReset }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [saved, setSaved] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
 
   const topResult = output.results[0];
   const otherResults = output.results.slice(1);
   const isLowConfidence = topResult && topResult.confidence < 50;
 
   const saveToJournal = (r: RecognitionResult) => {
+    if (!user && getJournalEntries().length >= GUEST_JOURNAL_ENTRY_LIMIT) {
+      toast.error(`Sign up to save more than ${GUEST_JOURNAL_ENTRY_LIMIT} journal entries.`);
+      return;
+    }
     addJournalEntry({
       date: new Date().toISOString().split("T")[0],
       constellationId: r.constellation.id,

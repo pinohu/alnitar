@@ -14,14 +14,19 @@ interface Props {
 export function ShareCard({ constellation, confidence, date }: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const shareUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const shareTitle = `I found ${constellation.name} in the night sky! 🌌`;
+  const shareText = `Just pointed my phone at the sky and Alnitar told me it was ${constellation.name}. Mind-blown.\n\n✨ ${constellation.funFact}\n\nTry it free — identify any constellation in seconds 👇`;
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `I found ${constellation.name}!`,
-          text: `I identified ${constellation.name} with ${confidence}% confidence using Alnitar! ${constellation.funFact}`,
-          url: window.location.origin,
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
         });
+        toast.success("Shared! Your friends can try Alnitar free.");
       } catch {
         copyToClipboard();
       }
@@ -31,9 +36,9 @@ export function ShareCard({ constellation, confidence, date }: Props) {
   };
 
   const copyToClipboard = () => {
-    const text = `🔭 I found ${constellation.name} (${constellation.alternateNames[0]}) with ${confidence}% confidence using Alnitar!\n\n✨ ${constellation.funFact}\n\n${window.location.origin}`;
+    const text = `${shareTitle}\n\n${shareText}\n\n${shareUrl}`;
     navigator.clipboard.writeText(text);
-    toast.success("Discovery copied to clipboard!");
+    toast.success("Copied! Paste anywhere to share. Your link brings friends to Alnitar.");
   };
 
   return (
@@ -66,9 +71,9 @@ export function ShareCard({ constellation, confidence, date }: Props) {
           )}
         </div>
       </div>
-      <Button onClick={handleShare} variant="outline" size="sm" className="w-full border-border/50">
+      <Button onClick={handleShare} variant="outline" size="sm" className="w-full border-primary/40 text-primary hover:bg-primary/10">
         <Share2 className="w-4 h-4 mr-2" />
-        Share Discovery
+        Share with friends — they can try free
       </Button>
     </div>
   );

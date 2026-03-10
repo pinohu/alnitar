@@ -8,6 +8,14 @@ import { recognizeImage, type RecognitionOutput } from "@/lib/recognition";
 import { trackEvent } from "@/lib/analytics";
 import { CosmicReveal } from "@/components/CosmicReveal";
 import { SkyStoryMode } from "@/components/SkyStoryMode";
+import { RegisterGate } from "@/components/RegisterGate";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  canGuestRecognize,
+  incrementGuestRecognitionCount,
+  getGuestRecognitionCount,
+  GUEST_RECOGNITION_LIMIT_PER_DAY,
+} from "@/lib/featureAccess";
 import { type Constellation } from "@/data/constellations";
 
 export default function RecognizePage() {
@@ -18,8 +26,12 @@ export default function RecognizePage() {
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [storyConstellation, setStoryConstellation] = useState<Constellation | null>(null);
+  const { user } = useAuth();
+  const guestCount = getGuestRecognitionCount();
+  const atLimit = !user && !canGuestRecognize();
 
   const handleFile = useCallback(async (f: File) => {
+    if (atLimit) return;
     if (!f.type.startsWith("image/")) {
       setError("Please upload an image file (JPG, PNG, etc.)");
       return;
@@ -34,6 +46,7 @@ export default function RecognizePage() {
 
     try {
       const output = await recognizeImage(f);
+      if (!user) incrementGuestRecognitionCount();
       setResults(output);
       trackEvent("recognition_completed", {
         starCount: output.detectedStarCount,
@@ -45,7 +58,7 @@ export default function RecognizePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user, atLimit]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -75,10 +88,31 @@ export default function RecognizePage() {
                 Cosmic <span className="gradient-text">Camera</span>
               </h1>
             </div>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-4">
               Point. Capture. Discover what's hidden in your sky.
             </p>
+            {!user && (
+              <p className="text-sm text-muted-foreground/90 mb-6">
+                {guestCount < GUEST_RECOGNITION_LIMIT_PER_DAY
+                  ? `${GUEST_RECOGNITION_LIMIT_PER_DAY - guestCount} of ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans left today. Create a free account anytime for unlimited.`
+                  : "You're on a roll! Create a free account to keep scanning with no limits."}
+              </p>
+            )}
           </motion.div>
+
+          {atLimit && (
+            <RegisterGate
+              variant="card"
+              title="You're clearly into the sky — take it to the next level"
+              description={`You've used your ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans for today. Join thousands of stargazers with a free account: unlimited scans, cloud journal, and your progress saved everywhere.`}
+              benefits={[
+                "Unlimited Cosmic Camera — scan as many skies as you want",
+                "Every discovery saved to your journal & the global network",
+                "Personalized Tonight recommendations for your location",
+                "Badges and progress that follow you on every device",
+              ]}
+            />
+          )}
 
           <AnimatePresence mode="wait">
             {/* Sky Story Mode */}
@@ -92,7 +126,7 @@ export default function RecognizePage() {
             )}
 
             {/* Upload zone */}
-            {!results && !loading && !storyConstellation && (
+            {!atLimit && !results && !loading && !storyConstellation && (
               <motion.div key="upload" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <div
                   onDragOver={e => { e.preventDefault(); setDragActive(true); }}

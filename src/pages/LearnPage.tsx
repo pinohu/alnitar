@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { constellations, searchConstellations, getConstellationsByFilter } from "@/data/constellations";
@@ -8,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Filter } from "lucide-react";
 import { trackEvent } from "@/lib/analytics";
+import { useAuth } from "@/contexts/AuthContext";
+import { RegisterGate } from "@/components/RegisterGate";
 
 const seasons = ["All", "Winter", "Spring", "Summer", "Autumn"];
 const hemispheres = ["All", "northern", "southern", "both"];
@@ -16,6 +19,7 @@ export default function LearnPage() {
   const [query, setQuery] = useState("");
   const [season, setSeason] = useState("All");
   const [hemisphere, setHemisphere] = useState("All");
+  const { user } = useAuth();
 
   const filtered = useMemo(() => {
     let results = constellations;
@@ -42,9 +46,16 @@ export default function LearnPage() {
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Constellation <span className="gradient-text">Library</span>
             </h1>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-6">
               Explore {constellations.length} famous constellations — mythology, stars, and spotting tips.
             </p>
+            {!user && (
+              <RegisterGate
+                variant="banner"
+                title="Love what you're learning? Save your progress"
+                description="Create a free account to track every constellation you find, earn badges, and get recommendations tailored to your journey."
+              />
+            )}
           </motion.div>
 
           {/* Filters */}

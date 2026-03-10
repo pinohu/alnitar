@@ -11,8 +11,11 @@ import { DiscoveryPanel } from "@/components/DiscoveryPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Moon, Eye, Globe, Calendar, Gauge } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { RegisterGate } from "@/components/RegisterGate";
 
 export default function TonightPage() {
+  const { user } = useAuth();
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [latitude, setLatitude] = useState(40);
 
@@ -44,7 +47,14 @@ export default function TonightPage() {
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Tonight's <span className="gradient-text">Sky</span>
             </h1>
-            <p className="text-muted-foreground mb-6">Your personalized sky intelligence for tonight.</p>
+            <p className="text-muted-foreground mb-4">Your personalized sky intelligence for tonight.</p>
+            {!user && (
+              <RegisterGate
+                variant="banner"
+                title="Make Tonight yours"
+                description="Sign up to save your location and get recommendations based on what you've already found — so every night is perfectly tailored to you."
+              />
+            )}
           </motion.div>
 
           {/* Controls */}

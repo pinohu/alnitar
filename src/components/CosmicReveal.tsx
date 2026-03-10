@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Telescope, MapPin, Sparkles, Eye, Share2, ChevronRight, Zap, Save } from "lucide-react";
+import { Star, Telescope, MapPin, Sparkles, Eye, Share2, ChevronRight, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConstellationDiagram } from "./ConstellationDiagram";
@@ -8,6 +9,10 @@ import { type RecognitionOutput, type RecognitionResult } from "@/lib/recognitio
 import { type Constellation } from "@/data/constellations";
 import { deepSkyCatalog } from "@/data/deepSkyObjects";
 import { ShareCard } from "./ShareCard";
+import { useAuth } from "@/contexts/AuthContext";
+import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
+import { getJournalEntries, addJournalEntry } from "@/lib/journal";
+import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
 import { toast } from "sonner";
@@ -26,32 +31,70 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [saved, setSaved] = useState(false);
+  const [journalSaved, setJournalSaved] = useState(false);
   const top = output.results[0];
   const constellation = top?.constellation;
 
+  const { user } = useAuth();
+
+  const saveToJournal = () => {
+    if (!top || !constellation) return;
+    if (!user && getJournalEntries().length >= GUEST_JOURNAL_ENTRY_LIMIT) {
+      toast.error(`Sign up for a free account to save more than ${GUEST_JOURNAL_ENTRY_LIMIT} journal entries and sync across devices.`);
+      return;
+    }
+    addJournalEntry({
+      date: new Date().toISOString().split("T")[0],
+      constellationId: constellation.id,
+      constellationName: constellation.name,
+      confidence: top.confidence,
+      notes: "",
+      location: "Unknown",
+      imageThumbnail: imageUrl ?? undefined,
+    });
+    setJournalSaved(true);
+    toast.success("Saved to your journal");
+  };
+
   const saveObservation = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error("Sign in to save observations to the global network");
       return;
     }
     try {
       const brightestStar = constellation?.stars?.sort((a, b) => a.magnitude - b.magnitude)[0];
-      const payload: TablesInsert<"observations"> = {
-        user_id: user.id,
-        constellation_id: constellation?.id ?? "unknown",
-        constellation_name: constellation?.name ?? "Unknown",
-        confidence: top.confidence,
-        equipment: "phone",
-        device_type: "phone",
-        brightness_estimate: brightestStar?.magnitude ?? undefined,
-        alternate_matches: output.results.slice(1, 4).map(r => ({
-          id: r.constellation.id,
-          name: r.constellation.name,
-          confidence: r.confidence,
-        })),
-      };
-      await supabase.from("observations").insert(payload);
+      const alternate_matches = output.results.slice(1, 4).map(r => ({
+        id: r.constellation.id,
+        name: r.constellation.name,
+        confidence: r.confidence,
+      }));
+      if (isCloudflareConfigured) {
+        const res = await cfFetch("api/observations", {
+          method: "POST",
+          body: JSON.stringify({
+            constellation_id: constellation?.id ?? "unknown",
+            constellation_name: constellation?.name ?? "Unknown",
+            confidence: top.confidence,
+            equipment: "phone",
+            device_type: "phone",
+            brightness_estimate: brightestStar?.magnitude,
+            alternate_matches,
+          }),
+        });
+        if (!res.ok) throw new Error((await res.json()).error || "Failed");
+      } else {
+        const payload: TablesInsert<"observations"> = {
+          user_id: user.id,
+          constellation_id: constellation?.id ?? "unknown",
+          constellation_name: constellation?.name ?? "Unknown",
+          confidence: top.confidence,
+          equipment: "phone",
+          device_type: "phone",
+          brightness_estimate: brightestStar?.magnitude ?? undefined,
+          alternate_matches,
+        };
+        await supabase.from("observations").insert(payload);
+      }
       setSaved(true);
       toast.success("Observation saved to the global sky network! 🌌");
     } catch {
@@ -364,10 +407,18 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           )}
-          <Button variant="outline" className="border-border/50" onClick={() => setShowShare(!showShare)}>
+          <Button variant="outline" className="border-primary/40 text-primary hover:bg-primary/10" onClick={() => setShowShare(!showShare)}>
             <Share2 className="w-4 h-4 mr-2" />
-            Share Discovery
+            Share with friends
           </Button>
+          {!journalSaved ? (
+            <Button variant="outline" className="border-primary/30 text-primary" onClick={saveToJournal}>
+              <Save className="w-4 h-4 mr-2" />
+              Save to Journal
+            </Button>
+          ) : (
+            <Badge className="bg-primary/10 text-primary border-0 py-2 px-3">✓ In Journal</Badge>
+          )}
           {!saved ? (
             <Button variant="outline" className="border-primary/30 text-primary" onClick={saveObservation}>
               <Save className="w-4 h-4 mr-2" />
@@ -379,6 +430,31 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
           <Button variant="ghost" className="text-muted-foreground" onClick={onReset}>
             New Scan
           </Button>
+        </motion.div>
+      )}
+
+      {/* Guest: celebratory signup CTA — you just had a wow moment */}
+      {step >= 4 && !user && constellation && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+          className="rounded-xl border border-primary/30 bg-gradient-to-br from-primary/10 to-primary/5 p-5 mt-6"
+        >
+          <p className="font-display font-semibold text-foreground mb-1">
+            You found {constellation.name}! 🌟
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Create a free account to save every discovery forever, get unlimited sky scans, and join stargazers worldwide.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm" className="btn-glow">
+              <Link to="/signup">Create free account</Link>
+            </Button>
+            <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" onClick={onReset}>
+              Maybe later — scan again
+            </Button>
+          </div>
         </motion.div>
       )}
 

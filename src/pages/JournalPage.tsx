@@ -8,13 +8,19 @@ import { Badge } from "@/components/ui/badge";
 import { NotebookPen, Trash2, Calendar, MapPin, Star, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { RegisterGate } from "@/components/RegisterGate";
+import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     setEntries(getJournalEntries());
   }, []);
+
+  const isGuestAtLimit = !user && entries.length >= GUEST_JOURNAL_ENTRY_LIMIT;
 
   const handleDelete = (id: string) => {
     deleteJournalEntry(id);
@@ -32,12 +38,29 @@ export default function JournalPage() {
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Observation <span className="gradient-text">Journal</span>
             </h1>
-            <p className="text-muted-foreground mb-8">
+            <p className="text-muted-foreground mb-4">
               Your personal stargazing history.
             </p>
+            {!user && (
+              <p className="text-sm text-muted-foreground/90 mb-6">
+                {entries.length >= 3
+                  ? "You're building a real stargazing history! Sign up to keep every observation forever and get unlimited entries."
+                  : `Save up to ${GUEST_JOURNAL_ENTRY_LIMIT} entries free. Create an account for unlimited + cloud backup.`}{" "}
+                <Link to="/signup" className="text-primary font-medium hover:underline">Create free account</Link>
+              </p>
+            )}
           </motion.div>
 
-          {entries.length === 0 ? (
+          {isGuestAtLimit && (
+            <RegisterGate
+              variant="card"
+              title="Your journal is getting good — don't lose it"
+              description={`You've saved ${GUEST_JOURNAL_ENTRY_LIMIT} observations. Create a free account to add unlimited entries and sync your journal everywhere.`}
+              benefits={["Unlimited journal entries", "Cloud backup — never lose a discovery", "Same journal on phone, tablet, and desktop"]}
+            />
+          )}
+
+          {entries.length === 0 && !isGuestAtLimit ? (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-12 text-center">
               <NotebookPen className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-display text-lg font-semibold mb-2">No observations yet</h3>

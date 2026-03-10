@@ -6,6 +6,7 @@ import { StarField } from "@/components/StarField";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Telescope, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,12 +15,17 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedToTerms) {
+      toast.error("Please agree to the Terms of Service and Privacy Policy.");
+      return;
+    }
     setLoading(true);
     const { error } = await signUp(email, password, name);
     setLoading(false);
@@ -45,8 +51,8 @@ export default function SignupPage() {
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <Telescope className="w-6 h-6 text-primary" />
             </div>
-            <h1 className="font-display text-2xl font-bold">Create account</h1>
-            <p className="text-sm text-muted-foreground mt-1">Join Alnitar and start exploring</p>
+            <h1 className="font-display text-2xl font-bold">Create your free account</h1>
+            <p className="text-sm text-muted-foreground mt-1">Unlimited sky scans, cloud journal, progress everywhere. Join stargazers worldwide.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -71,7 +77,19 @@ export default function SignupPage() {
                 <Input id="password" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-10 bg-muted/30 border-border/40" required minLength={6} />
               </div>
             </div>
-            <Button type="submit" className="w-full btn-glow" disabled={loading}>
+            <div className="flex items-start gap-3">
+              <Checkbox
+                id="terms"
+                checked={agreedToTerms}
+                onCheckedChange={(v) => setAgreedToTerms(v === true)}
+                className="mt-0.5"
+                aria-describedby="terms-desc"
+              />
+              <Label id="terms-desc" htmlFor="terms" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                I agree to the <Link to="/terms" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.
+              </Label>
+            </div>
+            <Button type="submit" className="w-full btn-glow" disabled={loading || !agreedToTerms}>
               {loading ? "Creating account…" : "Create Account"}
             </Button>
           </form>

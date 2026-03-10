@@ -16,7 +16,7 @@
 ## Tech stack
 
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS, shadcn/ui, Framer Motion
-- **Backend:** Supabase (auth, database, storage, edge functions)
+- **Backend:** **Supabase** (auth, database, storage) or **Cloudflare** (D1 + R2 + Workers) — set `VITE_CF_API_URL` to use Cloudflare; see [docs/CLOUDFLARE_SETUP.md](docs/CLOUDFLARE_SETUP.md).
 - **Data:** Star catalog, deep-sky catalog, constellation seed data, visibility engine
 
 ## Platforms

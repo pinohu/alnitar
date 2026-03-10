@@ -72,6 +72,12 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link to="/signup" className="text-primary hover:underline">Sign up</Link>
           </p>
+          <p className="text-xs text-center text-muted-foreground/80 mt-3">
+            By signing in you agree to our{" "}
+            <Link to="/terms" className="text-primary hover:underline">Terms</Link>
+            {" and "}
+            <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>.
+          </p>
         </motion.div>
       </div>
     </div>

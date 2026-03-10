@@ -22,6 +22,8 @@ import LiveSkyPage from "./pages/LiveSkyPage.tsx";
 import SkyNetworkPage from "./pages/SkyNetworkPage.tsx";
 import SkyThroughTimePage from "./pages/SkyThroughTimePage.tsx";
 import SkyDataPage from "./pages/SkyDataPage.tsx";
+import SupportPage from "./pages/SupportPage.tsx";
+import LegalPage from "./pages/LegalPage.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,10 @@ const App = () => (
               <Route path="/sky-network" element={<SkyNetworkPage />} />
               <Route path="/time-travel" element={<SkyThroughTimePage />} />
               <Route path="/sky-data" element={<SkyDataPage />} />
+              <Route path="/support" element={<SupportPage />} />
+              <Route path="/privacy" element={<LegalPage />} />
+              <Route path="/terms" element={<LegalPage />} />
+              <Route path="/disclaimer" element={<LegalPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
