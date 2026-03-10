@@ -1,0 +1,13 @@
+---
+description: Push to origin after every code update
+alwaysApply: true
+---
+
+# Push After Every Update
+
+After making any code changes (edits, new files, or deletions) in this project:
+
+1. **Stage and commit** all relevant changes with a clear, conventional-commit style message (e.g. `feat:`, `fix:`, `docs:`).
+2. **Push** to the remote: `git push origin main` (or the current branch).
+
+Do this in the same turn as the update when possible, so the repo is always in sync with the remote after each change.
