@@ -7,7 +7,9 @@ import { getTonightSkyData } from "@/lib/tonight";
 import { getDiscoveryRecommendations } from "@/lib/discovery";
 import { getLocalProgress } from "@/lib/gamification";
 import { useAtmosphere } from "@/hooks/use-atmosphere";
+import { useCountry } from "@/hooks/use-country";
 import { weatherCodeLabel } from "@/lib/atmosphere";
+import { getUnitSystem, formatTemperature, formatWind, formatVisibility, formatPressure } from "@/lib/units";
 import { ConstellationDiagram } from "@/components/ConstellationDiagram";
 import { DiscoveryPanel } from "@/components/DiscoveryPanel";
 import { Badge } from "@/components/ui/badge";
@@ -110,6 +112,8 @@ export default function TonightPage() {
   const observationTime = useMemo(() => new Date(date + "T20:00:00"), [date]);
   const data = useMemo(() => getTonightSkyData(observationTime, latitude), [observationTime, latitude]);
   const { loading: atmosphereLoading, error: atmosphereError, data: atmosphere } = useAtmosphere(latitude, longitude);
+  const { countryCode } = useCountry(latitude, longitude);
+  const unitSystem = getUnitSystem(countryCode);
 
   const discovery = useMemo(() => {
     const progress = getLocalProgress();
@@ -189,7 +193,7 @@ export default function TonightPage() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Thermometer className="w-4 h-4 text-primary shrink-0" />
-                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.temperatureC)}°C</span><span className="text-muted-foreground block text-[10px]">Temp</span></div>
+                  <div><span className="font-semibold tabular-nums">{formatTemperature(atmosphere.temperatureC, unitSystem)}</span><span className="text-muted-foreground block text-[10px]">Temp</span></div>
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Droplets className="w-4 h-4 text-primary shrink-0" />
@@ -197,7 +201,7 @@ export default function TonightPage() {
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Activity className="w-4 h-4 text-primary shrink-0" />
-                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.pressureHpa)} hPa</span><span className="text-muted-foreground block text-[10px]">Pressure</span></div>
+                  <div><span className="font-semibold tabular-nums">{formatPressure(atmosphere.pressureHpa, unitSystem)}</span><span className="text-muted-foreground block text-[10px]">Pressure</span></div>
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Cloud className="w-4 h-4 text-primary shrink-0" />
@@ -205,11 +209,11 @@ export default function TonightPage() {
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Eye className="w-4 h-4 text-primary shrink-0" />
-                  <div><span className="font-semibold tabular-nums">{atmosphere.visibilityKm} km</span><span className="text-muted-foreground block text-[10px]">Visibility</span></div>
+                  <div><span className="font-semibold tabular-nums">{formatVisibility(atmosphere.visibilityKm, unitSystem)}</span><span className="text-muted-foreground block text-[10px]">Visibility</span></div>
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2">
                   <Wind className="w-4 h-4 text-primary shrink-0" />
-                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.windSpeedKmh)} km/h</span><span className="text-muted-foreground block text-[10px]">Wind</span></div>
+                  <div><span className="font-semibold tabular-nums">{formatWind(atmosphere.windSpeedKmh, unitSystem)}</span><span className="text-muted-foreground block text-[10px]">Wind</span></div>
                 </div>
                 <div className="glass-card p-3 flex items-center gap-2 col-span-2 sm:col-span-1">
                   <Sun className="w-4 h-4 text-primary shrink-0" aria-hidden />
