@@ -6,12 +6,14 @@ import { StarField } from "@/components/StarField";
 import { getTonightSkyData } from "@/lib/tonight";
 import { getDiscoveryRecommendations } from "@/lib/discovery";
 import { getLocalProgress } from "@/lib/gamification";
+import { useAtmosphere } from "@/hooks/use-atmosphere";
+import { weatherCodeLabel } from "@/lib/atmosphere";
 import { ConstellationDiagram } from "@/components/ConstellationDiagram";
 import { DiscoveryPanel } from "@/components/DiscoveryPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2 } from "lucide-react";
+import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2, Thermometer, Droplets, Cloud, Wind, Activity, Sun } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { toast } from "sonner";
@@ -52,7 +54,28 @@ export default function TonightPage() {
     if (stored) {
       setLatitude(stored.lat);
       setLongitude(stored.lng);
+      return;
     }
+    if (!navigator.geolocation) return;
+    const t = setTimeout(() => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = Math.round(pos.coords.latitude * 10) / 10;
+          const lng = Math.round(pos.coords.longitude * 10) / 10;
+          setLatitude(lat);
+          setLongitude(lng);
+          try {
+            localStorage.setItem(STORAGE_LAT_KEY, String(lat));
+            localStorage.setItem(STORAGE_LNG_KEY, String(lng));
+          } catch {
+            //
+          }
+        },
+        () => {},
+        { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
+      );
+    }, 500);
+    return () => clearTimeout(t);
   }, []);
 
   const requestLocation = () => {
@@ -86,6 +109,7 @@ export default function TonightPage() {
 
   const observationTime = useMemo(() => new Date(date + "T20:00:00"), [date]);
   const data = useMemo(() => getTonightSkyData(observationTime, latitude), [observationTime, latitude]);
+  const { loading: atmosphereLoading, error: atmosphereError, data: atmosphere } = useAtmosphere(latitude, longitude);
 
   const discovery = useMemo(() => {
     const progress = getLocalProgress();
@@ -144,9 +168,56 @@ export default function TonightPage() {
               <span className="ml-1.5">{locationLoading ? "Getting…" : "Use my location"}</span>
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mb-8">
+          <p className="text-xs text-muted-foreground mb-4">
             Showing for <strong>{date}</strong> at 8 PM · {latitude >= 0 ? `${latitude}°N` : `${-latitude}°S`}, {longitude >= 0 ? `${longitude}°E` : `${-longitude}°W`}. Change the date or location above to update.
           </p>
+
+          {/* Sensed: location, time, atmosphere */}
+          <div className="mb-8">
+            <h2 className="text-sm font-semibold text-muted-foreground mb-3">Sensed at your location</h2>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-3">
+              <span><Globe className="w-3.5 h-3.5 inline mr-1" aria-hidden />{latitude.toFixed(1)}°, {longitude.toFixed(1)}°</span>
+              <span aria-label="Local time"><Calendar className="w-3.5 h-3.5 inline mr-1" aria-hidden />{new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })} local</span>
+            </div>
+            {atmosphereLoading && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1.5"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Sensing temperature, humidity & conditions…</p>
+            )}
+            {atmosphereError && (
+              <p className="text-xs text-destructive">{atmosphereError}</p>
+            )}
+            {atmosphere && !atmosphereLoading && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Thermometer className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.temperatureC)}°C</span><span className="text-muted-foreground block text-[10px]">Temp</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Droplets className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{atmosphere.humidityPercent}%</span><span className="text-muted-foreground block text-[10px]">Humidity</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.pressureHpa)} hPa</span><span className="text-muted-foreground block text-[10px]">Pressure</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Cloud className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{atmosphere.cloudCoverPercent}%</span><span className="text-muted-foreground block text-[10px]">Clouds</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{atmosphere.visibilityKm} km</span><span className="text-muted-foreground block text-[10px]">Visibility</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2">
+                  <Wind className="w-4 h-4 text-primary shrink-0" />
+                  <div><span className="font-semibold tabular-nums">{Math.round(atmosphere.windSpeedKmh)} km/h</span><span className="text-muted-foreground block text-[10px]">Wind</span></div>
+                </div>
+                <div className="glass-card p-3 flex items-center gap-2 col-span-2 sm:col-span-1">
+                  <Sun className="w-4 h-4 text-primary shrink-0" aria-hidden />
+                  <div><span className="font-semibold">{weatherCodeLabel(atmosphere.weatherCode)}</span><span className="text-muted-foreground block text-[10px]">Conditions</span></div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Sky Score + Moon */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
