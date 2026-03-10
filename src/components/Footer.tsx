@@ -5,6 +5,8 @@ const footerLinks = [
   { to: "/learn", label: "Learn" },
   { to: "/sky", label: "Sky Map" },
   { to: "/journal", label: "Journal" },
+  { to: "/pricing", label: "Pricing" },
+  { to: "/partners", label: "For organizations" },
   { to: "/support", label: "Support" },
   { to: "/privacy", label: "Privacy" },
   { to: "/terms", label: "Terms" },

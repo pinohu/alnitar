@@ -12,7 +12,7 @@ export default function SupportPage() {
         <div className="container max-w-2xl">
           <h1 className="font-display text-3xl font-bold mb-2">Support Alnitar</h1>
           <p className="text-muted-foreground mb-8">
-            Alnitar stays free for everyone. These are optional ways to help keep it that way.
+            Alnitar is your sky life, expert planning, and credibility in one place. We stay free for everyone; these are optional ways to help keep it that way.
           </p>
 
           <div className="flex flex-col gap-6">
@@ -51,9 +51,12 @@ export default function SupportPage() {
                 <Star className="w-5 h-5 text-primary" aria-hidden />
                 <h2 className="font-display text-lg font-semibold">Alnitar Pro (coming later)</h2>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Optional paid tier for power users: more cloud history, sync, export, and API access. The core app stays free.
+              <p className="text-sm text-muted-foreground mb-3">
+                Optional paid tier: unlimited sky life (cloud, export, backup), expert session planner, verified logs for clubs and schools, and sky identity (badges, challenges). The core app stays free.
               </p>
+              <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-ring rounded">
+                See pricing and roadmap →
+              </Link>
             </section>
           </div>
 

@@ -16,8 +16,9 @@ const features = [
   { icon: Eye, title: "Constellation Recognition", desc: "Upload a sky photo and instantly identify constellations with pattern matching and confidence scores." },
   { icon: Compass, title: "Sky Simulator", desc: "Interactive planetarium and sky map. Explore stars, constellations, planets, and deep-sky objects." },
   { icon: Sparkles, title: "Deep Sky Detection", desc: "Detect nebulae, galaxies, and clusters. Messier and NGC catalogs with visibility and spotting tips." },
-  { icon: Star, title: "Observation Journal", desc: "Log dates, locations, conditions, and objects observed. Build your personal stargazing history." },
-  { icon: BookOpen, title: "AI Astronomy Tutor", desc: "Learn constellations, star brightness, and celestial coordinates with guided lessons and recommendations." },
+  { icon: Star, title: "Your Sky Life", desc: "Every observation in one place — searchable, exportable, story-able. Build your permanent observatory log and sky résumé." },
+  { icon: BookOpen, title: "Expert Planning", desc: "Tonight's sky tailored to your location and gear. Know what to look at and when, so every session counts." },
+  { icon: Zap, title: "Credibility That Counts", desc: "Optional verified logs for clubs, schools, and programs. Your observations can matter to others." },
 ];
 
 function getConstellationOfTheNight() {
@@ -53,7 +54,7 @@ export default function Index() {
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4" />
-              The sky in your pocket
+              Your sky life, expert planning, credibility
             </div>
             <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold leading-tight tracking-tight mb-6">
               Point at the sky.
@@ -61,10 +62,10 @@ export default function Index() {
               <span className="gradient-text">Know what you're looking at.</span>
             </h1>
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 leading-relaxed">
-              Upload a photo or point your phone — identify constellations, stars, and deep-sky objects in seconds. No telescope required.
+              Identify constellations in seconds — then build a permanent, searchable observatory log and get expert planning for every session. Not just another star app.
             </p>
             <p className="text-sm text-muted-foreground/80 mb-10">
-              Join stargazers worldwide. Try free — no signup required.
+              Try free. Create an account for unlimited sky life, cloud sync, and verified logs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="btn-glow text-base font-semibold px-8">
@@ -169,11 +170,11 @@ export default function Index() {
         <div className="container max-w-5xl">
           <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
             className="font-display text-3xl font-bold text-center mb-4">
-            The most useful stargazing app in your pocket
+            Your sky life, expert planning, credibility — in one place
           </motion.h2>
           <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
             className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-            From your first "what's that star?" to a full observation journal — all in one place.
+            From "what's that star?" to a permanent observatory log, verified for clubs and schools, with planning that makes every session count.
           </motion.p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((f, i) => (
@@ -195,7 +196,7 @@ export default function Index() {
         <div className="container max-w-2xl text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <h2 className="font-display text-3xl font-bold mb-4">Your next clear night starts here</h2>
-            <p className="text-muted-foreground mb-6">Point at the sky and discover. Free to try — create an account when you're ready for unlimited.</p>
+            <p className="text-muted-foreground mb-6">Build your sky life with expert planning and logs that count. Free to try — create an account for unlimited observations and cloud sync.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button asChild size="lg" className="btn-glow text-base font-semibold px-8">
                 <Link to="/recognize">Try it free <ArrowRight className="w-5 h-5 ml-2" /></Link>

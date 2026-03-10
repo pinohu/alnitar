@@ -25,6 +25,8 @@ const SkyNetworkPage = lazy(() => import("./pages/SkyNetworkPage.tsx"));
 const SkyThroughTimePage = lazy(() => import("./pages/SkyThroughTimePage.tsx"));
 const SkyDataPage = lazy(() => import("./pages/SkyDataPage.tsx"));
 const SupportPage = lazy(() => import("./pages/SupportPage.tsx"));
+const PricingPage = lazy(() => import("./pages/PricingPage.tsx"));
+const PartnersPage = lazy(() => import("./pages/PartnersPage.tsx"));
 const LegalPage = lazy(() => import("./pages/LegalPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -68,6 +70,8 @@ const App = () => (
                 <Route path="/time-travel" element={<SkyThroughTimePage />} />
                 <Route path="/sky-data" element={<SkyDataPage />} />
                 <Route path="/support" element={<SupportPage />} />
+                <Route path="/pricing" element={<PricingPage />} />
+                <Route path="/partners" element={<PartnersPage />} />
                 <Route path="/privacy" element={<LegalPage />} />
                 <Route path="/terms" element={<LegalPage />} />
                 <Route path="/disclaimer" element={<LegalPage />} />

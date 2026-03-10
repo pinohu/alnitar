@@ -12,6 +12,7 @@ import { ShareCard } from "./ShareCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
 import { getJournalEntries, addJournalEntry } from "@/lib/journal";
+import { getItem, STORAGE_KEYS } from "@/lib/clientStorage";
 import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
@@ -43,17 +44,23 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
       toast.error(`Sign up for a free account to save more than ${GUEST_JOURNAL_ENTRY_LIMIT} journal entries and sync across devices.`);
       return;
     }
+    const lat = getItem(STORAGE_KEYS.TONIGHT_LAT);
+    const lng = getItem(STORAGE_KEYS.TONIGHT_LNG);
+    const location =
+      lat != null && lng != null && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))
+        ? `${Number(lat) >= 0 ? `${lat}°N` : `${-Number(lat)}°S`}, ${Number(lng) >= 0 ? `${lng}°E` : `${-Number(lng)}°W`}`
+        : "Unknown";
     addJournalEntry({
       date: new Date().toISOString().split("T")[0],
       constellationId: constellation.id,
       constellationName: constellation.name,
       confidence: top.confidence,
       notes: "",
-      location: "Unknown",
+      location,
       imageThumbnail: imageUrl ?? undefined,
     });
     setJournalSaved(true);
-    toast.success("Saved to your journal");
+    toast.success(location !== "Unknown" ? "Saved to your journal (verified)" : "Saved to your journal");
   };
 
   const saveObservation = async () => {
