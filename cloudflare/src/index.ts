@@ -118,15 +118,25 @@ export default {
     try {
       // ——— Auth ———
       if (path === "api/auth/signup" && request.method === "POST") {
-        const body = (await request.json()) as { email?: string; password?: string; name?: string };
+        let body: { email?: string; password?: string; name?: string };
+        try {
+          body = (await request.json()) as { email?: string; password?: string; name?: string };
+        } catch {
+          return err("Invalid request body", 400);
+        }
         const { email, password, name } = body;
-        if (!email || !password) return err("Email and password required", 400);
+        if (!email || typeof email !== "string" || !email.trim()) return err("Email is required", 400);
+        if (!password || typeof password !== "string") return err("Password is required", 400);
+        if (password.length < 6) return err("Password must be at least 6 characters", 400);
+        if (!env.JWT_SECRET || !env.JWT_SECRET.trim()) return err("Server misconfiguration: JWT_SECRET is not set. Add it in Cloudflare Worker settings.", 500);
+        const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email.trim().toLowerCase()).first();
+        if (existing) return err("Email already registered. Sign in or use a different email.", 400);
         const id = uuid();
         const { hash, salt } = await hashPassword(password);
         await env.DB.prepare(
           "INSERT INTO users (id, email, password_hash, name, created_at) VALUES (?, ?, ?, ?, datetime('now'))"
         )
-          .bind(id, email, `${salt}:${hash}`, name || email.split("@")[0])
+          .bind(id, email.trim().toLowerCase(), `${salt}:${hash}`, (name || email.split("@")[0] || "").trim().slice(0, 200))
           .run();
         await env.DB.prepare(
           "INSERT INTO profiles (id, display_name, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))"
@@ -146,10 +156,15 @@ export default {
       }
 
       if (path === "api/auth/login" && request.method === "POST") {
-        const body = (await request.json()) as { email?: string; password?: string };
+        let body: { email?: string; password?: string };
+        try {
+          body = (await request.json()) as { email?: string; password?: string };
+        } catch {
+          return err("Invalid request body", 400);
+        }
         const { email, password } = body;
         if (!email || !password) return err("Email and password required", 400);
-        const row = await env.DB.prepare("SELECT id, password_hash, name FROM users WHERE email = ?").bind(email).first();
+        const row = await env.DB.prepare("SELECT id, password_hash, name FROM users WHERE email = ?").bind(String(email).trim().toLowerCase()).first();
         if (!row || typeof row.password_hash !== "string") return err("Invalid email or password", 401);
         const [storedSalt, storedHash] = (row.password_hash as string).split(":");
         if (!(await verifyPassword(storedHash, storedSalt, password))) return err("Invalid email or password", 401);
@@ -231,7 +246,13 @@ export default {
       return err("Not found", 404);
     } catch (e) {
       console.error(e);
-      return Response.json({ error: "Internal error" }, { status: 500, headers: cors });
+      const errMessage = e instanceof Error ? e.message : String(e);
+      // Surface real error so user sees "table users does not exist" or "JWT_SECRET not set" instead of "Internal error"
+      const safeMessage =
+        errMessage.includes("no such table") || errMessage.includes("SQLITE_ERROR")
+          ? "Database not set up. Run the schema (see docs/CLOUDFLARE_SETUP.md)."
+          : errMessage;
+      return Response.json({ error: safeMessage }, { status: 500, headers: cors });
     }
   },
 };

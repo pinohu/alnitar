@@ -56,12 +56,22 @@ export const cfAuth = {
         method: "POST",
         body: JSON.stringify({ email, password, name }),
       });
-      const data = await res.json();
-      if (!res.ok) return { data: { user: null!, session: null! }, error: new Error(data.error || "Sign up failed") };
+      const text = await res.text();
+      let data: { user?: CfUser; session?: CfSession; error?: string } = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        // non-JSON response (e.g. 502 HTML)
+      }
+      if (!res.ok) {
+        const message = data?.error || (res.status === 500 ? "Server error. Please try again." : "Sign up failed.");
+        return { data: { user: null!, session: null! }, error: new Error(message) };
+      }
       setToken(data.session?.access_token ?? null);
-      return { data: { user: data.user, session: data.session }, error: null };
+      return { data: { user: data.user!, session: data.session! }, error: null };
     } catch (e) {
-      return { data: { user: null!, session: null! }, error: e instanceof Error ? e : new Error("Sign up failed") };
+      const message = e instanceof Error ? e.message : "Sign up failed. Check your connection.";
+      return { data: { user: null!, session: null! }, error: new Error(message) };
     }
   },
 
@@ -71,12 +81,22 @@ export const cfAuth = {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) return { data: { user: null!, session: null! }, error: new Error(data.error || "Login failed") };
+      const text = await res.text();
+      let data: { user?: CfUser; session?: CfSession; error?: string } = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        //
+      }
+      if (!res.ok) {
+        const message = data?.error || (res.status === 500 ? "Server error. Please try again." : "Invalid email or password.");
+        return { data: { user: null!, session: null! }, error: new Error(message) };
+      }
       setToken(data.session?.access_token ?? null);
-      return { data: { user: data.user, session: data.session }, error: null };
+      return { data: { user: data.user!, session: data.session! }, error: null };
     } catch (e) {
-      return { data: { user: null!, session: null! }, error: e instanceof Error ? e : new Error("Login failed") };
+      const message = e instanceof Error ? e.message : "Login failed. Check your connection.";
+      return { data: { user: null!, session: null! }, error: new Error(message) };
     }
   },
 

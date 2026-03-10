@@ -190,8 +190,25 @@ export default function RecognizePage() {
               </motion.div>
             )}
 
+            {/* No constellation found (daytime / too few stars) */}
+            {results && results.noConstellationFound && (
+              <motion.div key="no-match" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-8 text-center">
+                <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-display text-xl font-semibold mb-2">No constellation identified</h3>
+                <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                  {results.noMatchMessage ?? "Point your camera at a clear night sky with visible stars for best results."}
+                </p>
+                <p className="text-xs text-muted-foreground mb-4">
+                  {results.detectedStarCount} star{results.detectedStarCount !== 1 ? "s" : ""} detected in this image.
+                </p>
+                <Button onClick={reset} variant="outline" className="border-border/50">
+                  Try another photo
+                </Button>
+              </motion.div>
+            )}
+
             {/* Cosmic Reveal */}
-            {results && !storyConstellation && (
+            {results && !storyConstellation && !results.noConstellationFound && (
               <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <CosmicReveal
                   output={results}

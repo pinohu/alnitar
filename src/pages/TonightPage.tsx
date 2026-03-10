@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
@@ -10,30 +10,96 @@ import { ConstellationDiagram } from "@/components/ConstellationDiagram";
 import { DiscoveryPanel } from "@/components/DiscoveryPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Moon, Eye, Globe, Calendar, Gauge } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
+import { toast } from "sonner";
+
+const STORAGE_LAT_KEY = "alnitar_tonight_lat";
+const STORAGE_LNG_KEY = "alnitar_tonight_lng";
+
+function getStoredLocation(): { lat: number; lng: number } | null {
+  try {
+    const lat = localStorage.getItem(STORAGE_LAT_KEY);
+    const lng = localStorage.getItem(STORAGE_LNG_KEY);
+    if (lat != null && lng != null) {
+      const latNum = Number.parseFloat(lat);
+      const lngNum = Number.parseFloat(lng);
+      if (Number.isFinite(latNum) && latNum >= -90 && latNum <= 90 && Number.isFinite(lngNum)) return { lat: latNum, lng: lngNum };
+    }
+  } catch {
+    //
+  }
+  return null;
+}
 
 export default function TonightPage() {
   const { user } = useAuth();
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [latitude, setLatitude] = useState(40);
+  const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [latitude, setLatitude] = useState(() => {
+    const stored = getStoredLocation();
+    return stored ? stored.lat : 40;
+  });
+  const [longitude, setLongitude] = useState(() => {
+    const stored = getStoredLocation();
+    return stored ? stored.lng : 0;
+  });
+  const [locationLoading, setLocationLoading] = useState(false);
 
-  const data = useMemo(() => getTonightSkyData(new Date(date + "T20:00:00"), latitude), [date, latitude]);
+  useEffect(() => {
+    const stored = getStoredLocation();
+    if (stored) {
+      setLatitude(stored.lat);
+      setLongitude(stored.lng);
+    }
+  }, []);
+
+  const requestLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = Math.round(pos.coords.latitude * 10) / 10;
+        const lng = Math.round(pos.coords.longitude * 10) / 10;
+        setLatitude(lat);
+        setLongitude(lng);
+        try {
+          localStorage.setItem(STORAGE_LAT_KEY, String(lat));
+          localStorage.setItem(STORAGE_LNG_KEY, String(lng));
+        } catch {
+          //
+        }
+        setLocationLoading(false);
+        toast.success("Location updated for tonight's sky.");
+      },
+      () => {
+        setLocationLoading(false);
+        toast.error("Could not get your location. Check permissions or enter it manually.");
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+    );
+  };
+
+  const observationTime = useMemo(() => new Date(date + "T20:00:00"), [date]);
+  const data = useMemo(() => getTonightSkyData(observationTime, latitude), [observationTime, latitude]);
 
   const discovery = useMemo(() => {
     const progress = getLocalProgress();
     return getDiscoveryRecommendations({
       latitude,
-      longitude: 0,
-      date: new Date(date + "T20:00:00"),
+      longitude,
+      date: observationTime,
       equipment: 'naked-eye',
       experienceLevel: 'beginner',
       constellationsFound: progress.constellationsFound,
       dsosObserved: [],
       totalObservations: progress.totalObservations,
     });
-  }, [date, latitude]);
+  }, [date, latitude, longitude, observationTime]);
 
   const scoreColor = data.skyScore >= 70 ? "text-green-400" : data.skyScore >= 40 ? "text-accent" : "text-destructive";
 
@@ -58,19 +124,29 @@ export default function TonightPage() {
           </motion.div>
 
           {/* Controls */}
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="flex flex-wrap gap-3 mb-4">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
+              <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
               <Input type="date" value={date} onChange={e => setDate(e.target.value)}
-                className="w-40 bg-card/60 border-border/40 text-sm" />
+                className="w-40 bg-card/60 border-border/40 text-sm" aria-label="Date" />
             </div>
             <div className="flex items-center gap-2">
-              <Globe className="w-4 h-4 text-muted-foreground" />
+              <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
               <Input type="number" value={latitude} onChange={e => setLatitude(Number(e.target.value))}
-                className="w-24 bg-card/60 border-border/40 text-sm" min={-90} max={90} placeholder="Lat" />
-              <span className="text-xs text-muted-foreground">°N</span>
+                className="w-20 bg-card/60 border-border/40 text-sm" min={-90} max={90} step={0.1} placeholder="Lat" aria-label="Latitude" />
+              <span className="text-xs text-muted-foreground">°</span>
+              <Input type="number" value={longitude} onChange={e => setLongitude(Number(e.target.value))}
+                className="w-20 bg-card/60 border-border/40 text-sm" min={-180} max={180} step={0.1} placeholder="Lng" aria-label="Longitude" />
+              <span className="text-xs text-muted-foreground">°</span>
             </div>
+            <Button type="button" variant="outline" size="sm" className="border-border/50 shrink-0" onClick={requestLocation} disabled={locationLoading}>
+              {locationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+              <span className="ml-1.5">{locationLoading ? "Getting…" : "Use my location"}</span>
+            </Button>
           </div>
+          <p className="text-xs text-muted-foreground mb-8">
+            Showing for <strong>{date}</strong> at 8 PM · {latitude >= 0 ? `${latitude}°N` : `${-latitude}°S`}, {longitude >= 0 ? `${longitude}°E` : `${-longitude}°W`}. Change the date or location above to update.
+          </p>
 
           {/* Sky Score + Moon */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">

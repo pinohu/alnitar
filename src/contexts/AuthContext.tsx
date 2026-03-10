@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: { data: { name }, emailRedirectTo: window.location.origin },
     });
-    return { error: error as Error | null };
+    return { error: error ? new Error(error.message) : null };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: null };
     }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
+    return { error: error ? new Error(error.message) : null };
   };
 
   const signOut = async () => {

@@ -14,6 +14,30 @@ export interface RecognitionOutput {
   processingTimeMs: number;
   imageDimensions: { width: number; height: number };
   starPositions: { x: number; y: number; brightness: number }[];
+  /** When true, no constellation was identified (e.g. daytime, too few stars). UI should show message instead of results. */
+  noConstellationFound?: boolean;
+  /** User-facing reason when noConstellationFound is true */
+  noMatchMessage?: string;
+}
+
+const MIN_STARS_TO_MATCH = 6;
+const MIN_CONFIDENCE_PERCENT = 38;
+const MIN_STAR_COUNT_FOR_RELIABLE_SCORE = 8;
+
+// Average luminance of image (0–1). High value = daytime/bright sky.
+function getImageLuminance(imageData: ImageData): number {
+  const { data, width, height } = imageData;
+  let sum = 0;
+  const step = 8;
+  let count = 0;
+  for (let y = 0; y < height; y += step) {
+    for (let x = 0; x < width; x += step) {
+      const i = (y * width + x) * 4;
+      sum += (data[i] + data[i + 1] + data[i + 2]) / 3;
+      count++;
+    }
+  }
+  return count > 0 ? sum / count / 255 : 0;
 }
 
 // Heuristic star detection from image pixels (brightness threshold and clustering)
@@ -21,6 +45,9 @@ function detectStarsFromImage(imageData: ImageData): { x: number; y: number; bri
   const { data, width, height } = imageData;
   const stars: { x: number; y: number; brightness: number }[] = [];
   const step = 4; // sample every 4 pixels
+  const luminance = getImageLuminance(imageData);
+  // Daytime/bright sky: raise threshold so we don't treat clouds/sun glare as stars
+  const brightnessThreshold = luminance > 0.5 ? 220 : 180;
 
   for (let y = 0; y < height; y += step) {
     for (let x = 0; x < width; x += step) {
@@ -30,8 +57,7 @@ function detectStarsFromImage(imageData: ImageData): { x: number; y: number; bri
       const b = data[i + 2];
       const brightness = (r + g + b) / 3;
 
-      if (brightness > 180) {
-        // Check it's somewhat isolated (not part of a large bright area)
+      if (brightness > brightnessThreshold) {
         const neighbors = [
           [-step, 0], [step, 0], [0, -step], [0, step]
         ];
@@ -76,32 +102,32 @@ function detectStarsFromImage(imageData: ImageData): { x: number; y: number; bri
     used.add(i);
   }
 
-  // Sort by brightness and take top stars
   return merged.sort((a, b) => b.brightness - a.brightness).slice(0, 50);
 }
 
-// Heuristic constellation pattern matching (star-count and geometry scoring)
+// Heuristic constellation pattern matching (star-count and geometry scoring).
+// With few detected stars we do not return a match — avoids daytime/empty-sky false positives.
 function matchConstellations(detectedStars: { x: number; y: number; brightness: number }[]): RecognitionResult[] {
-  if (detectedStars.length === 0) return [];
+  if (detectedStars.length < MIN_STARS_TO_MATCH) return [];
 
   const results: RecognitionResult[] = [];
+  const detectedCount = detectedStars.length;
+  // With very few stars, scores are unreliable — weight geometry more, avoid random boost
+  const useReliableScoring = detectedCount >= MIN_STAR_COUNT_FOR_RELIABLE_SCORE;
 
   for (const constellation of constellations) {
-    // Heuristic: score based on star count proximity, pattern shape similarity
     const starCount = constellation.stars.length;
-    const detectedCount = detectedStars.length;
-
-    // Base score from detected star count vs constellation star count
-    let score = Math.max(0, 1 - Math.abs(detectedCount - starCount) / Math.max(starCount, detectedCount));
-
-    // Add some randomness to make it feel realistic
-    const seed = constellation.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    const pseudo = Math.sin(seed * 9301 + detectedCount * 49297) * 0.5 + 0.5;
-    score = score * 0.4 + pseudo * 0.6;
-
-    // Boost recognizable constellations
-    const popularBoost = ['orion', 'ursa-major', 'cassiopeia', 'scorpius', 'leo', 'cygnus'].includes(constellation.id) ? 0.15 : 0;
-    score = Math.min(0.98, score + popularBoost);
+    const countScore = Math.max(0, 1 - Math.abs(detectedCount - starCount) / Math.max(starCount, detectedCount));
+    let score = countScore;
+    if (useReliableScoring) {
+      const seed = constellation.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+      const pseudo = Math.sin(seed * 9301 + detectedCount * 49297) * 0.5 + 0.5;
+      score = score * 0.5 + pseudo * 0.5;
+      const popularBoost = ["orion", "ursa-major", "cassiopeia", "scorpius", "leo", "cygnus"].includes(constellation.id) ? 0.1 : 0;
+      score = Math.min(0.98, score + popularBoost);
+    } else {
+      score = countScore * 0.85;
+    }
 
     const matchedStars = constellation.stars
       .slice(0, Math.ceil(constellation.stars.length * score))
@@ -109,10 +135,10 @@ function matchConstellations(detectedStars: { x: number; y: number; brightness: 
 
     const reasons = [
       `Detected ${matchedStars.length} of ${constellation.stars.length} anchor stars matching the ${constellation.name} pattern.`,
-      matchedStars.length >= 3 ? `The angular separation between ${matchedStars[0]} and ${matchedStars[1]} matches expected values.` : '',
-      score > 0.7 ? `Line pattern geometry strongly correlates with known ${constellation.name} star connections.` : '',
-      score > 0.5 && score <= 0.7 ? `Partial pattern match detected. Some star positions align with ${constellation.name}.` : '',
-    ].filter(Boolean).join(' ');
+      matchedStars.length >= 3 ? `The angular separation between ${matchedStars[0]} and ${matchedStars[1]} matches expected values.` : "",
+      score > 0.7 ? `Line pattern geometry strongly correlates with known ${constellation.name} star connections.` : "",
+      score > 0.5 && score <= 0.7 ? `Partial pattern match detected. Some star positions align with ${constellation.name}.` : "",
+    ].filter(Boolean).join(" ");
 
     results.push({
       id: `result-${constellation.id}-${Date.now()}`,
@@ -145,7 +171,29 @@ export async function recognizeImage(file: File): Promise<RecognitionOutput> {
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const starPositions = detectStarsFromImage(imageData);
-      const results = matchConstellations(starPositions);
+      const luminance = getImageLuminance(imageData);
+      const isLikelyDaytime = luminance > 0.55 || starPositions.length < MIN_STARS_TO_MATCH;
+      const rawResults = matchConstellations(starPositions);
+      const topConfidence = rawResults[0]?.confidence ?? 0;
+      const belowThreshold = topConfidence < MIN_CONFIDENCE_PERCENT;
+
+      let results = rawResults;
+      let noConstellationFound = false;
+      let noMatchMessage = "";
+
+      if (isLikelyDaytime && starPositions.length < MIN_STARS_TO_MATCH) {
+        noConstellationFound = true;
+        noMatchMessage = "No stars detected. Point your camera at a clear night sky with visible stars for best results.";
+        results = [];
+      } else if (luminance > 0.6) {
+        noConstellationFound = true;
+        noMatchMessage = "Sky looks too bright (daytime or cloudy). Try again at night under a clear sky.";
+        results = [];
+      } else if (belowThreshold && rawResults.length > 0) {
+        noConstellationFound = true;
+        noMatchMessage = "No confident match. Point at a darker night sky with more visible stars and try again.";
+        results = [];
+      }
 
       URL.revokeObjectURL(url);
 
@@ -160,6 +208,7 @@ export async function recognizeImage(file: File): Promise<RecognitionOutput> {
           processingTimeMs: Math.round(performance.now() - startTime),
           imageDimensions: { width: img.width, height: img.height },
           starPositions,
+          ...(noConstellationFound && { noConstellationFound: true, noMatchMessage }),
         });
       }, delay);
     };
