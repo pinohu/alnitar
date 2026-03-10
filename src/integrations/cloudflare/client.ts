@@ -3,25 +3,19 @@
  * When VITE_CF_API_URL is set, the app uses this instead of Supabase for auth and data.
  */
 
+import { STORAGE_KEYS, getItem, setItem, removeItem } from "@/lib/clientStorage";
+
 const CF_API_URL = (import.meta.env.VITE_CF_API_URL ?? "").replace(/\/$/, "");
 
 export const isCloudflareConfigured = Boolean(CF_API_URL);
 
 function getToken(): string | null {
-  try {
-    return localStorage.getItem("alnitar_cf_token");
-  } catch {
-    return null;
-  }
+  return getItem(STORAGE_KEYS.CF_TOKEN);
 }
 
 function setToken(token: string | null): void {
-  try {
-    if (token) localStorage.setItem("alnitar_cf_token", token);
-    else localStorage.removeItem("alnitar_cf_token");
-  } catch {
-    //
-  }
+  if (token) setItem(STORAGE_KEYS.CF_TOKEN, token);
+  else removeItem(STORAGE_KEYS.CF_TOKEN);
 }
 
 export async function cfFetch(

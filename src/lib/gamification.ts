@@ -1,4 +1,5 @@
 import { constellations } from "@/data/constellations";
+import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
 
 export interface Badge {
   id: string;
@@ -34,11 +35,9 @@ export interface UserProgressLocal {
   badgesEarned: string[];
 }
 
-const PROGRESS_KEY = "alnitar_progress";
-
 export function getLocalProgress(): UserProgressLocal {
   try {
-    const raw = localStorage.getItem(PROGRESS_KEY);
+    const raw = getItem(STORAGE_KEYS.PROGRESS);
     if (raw) return JSON.parse(raw);
   } catch {
     // localStorage unavailable (private mode, etc.)
@@ -47,7 +46,7 @@ export function getLocalProgress(): UserProgressLocal {
 }
 
 export function saveLocalProgress(progress: UserProgressLocal) {
-  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+  setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
 }
 
 export function checkNewBadges(constellationId: string, progress: UserProgressLocal): string[] {

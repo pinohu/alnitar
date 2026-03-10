@@ -201,11 +201,19 @@ alnitar/
 
 ## 11. Gaps & recommendations
 
-### High impact
+### Addressed (2026-03-10)
+
+- **CI** — GitHub Actions workflow (`.github/workflows/ci.yml`) runs lint, test, build on push/PR.
+- **Route code splitting** — All page components use `React.lazy()` with `Suspense` and a loading fallback in App.tsx.
+- **Centralized localStorage** — `src/lib/clientStorage.ts` defines `STORAGE_KEYS` and `getItem`/`setItem`/`removeItem`; featureAccess, journal, gamification, TonightPage, Cloudflare client, NightVisionContext use it.
+- **Worker request validation** — Cloudflare Worker uses Zod to validate `api/observations` and `api/upload/url` bodies; returns 400 with message on invalid input.
+- **Test coverage** — `npm run test:coverage` and Vitest coverage config (v8, text/html); CI runs tests (coverage optional).
+- **CORS** — `docs/CLOUDFLARE_SETUP.md` recommends setting `CORS_ORIGIN` in production.
+- **Lint errors** — `@ts-ignore` in `src/content/legal.ts` replaced with `@ts-expect-error`.
+
+### High impact (remaining)
 
 1. **TypeScript strictness** — Enable `strict: true`, `strictNullChecks: true`, `noImplicitAny: true` and fix types incrementally; reduces runtime bugs and improves refactors.
-2. **CI** — Add GitHub Actions (or similar): `lint`, `test`, `build` on push/PR; optionally deploy preview or production.
-3. **Route code splitting** — Use `React.lazy()` for page components and `Suspense` in App.tsx to shrink initial bundle and improve LCP.
 
 ### Medium impact
 

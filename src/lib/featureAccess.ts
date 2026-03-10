@@ -1,18 +1,14 @@
 // src/lib/featureAccess.ts — Free vs registered feature access (guests get basic; registered get full value)
 
+import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
+
 const GUEST_RECOGNITION_LIMIT = 5;
 const GUEST_JOURNAL_LIMIT = 15;
-const RECOGNITION_COUNT_KEY = "alnitar_guest_recognition_count";
-const RECOGNITION_DATE_KEY = "alnitar_guest_recognition_date";
 
 function getStoredRecognitionCount(): { count: number; date: string } {
-  try {
-    const count = parseInt(localStorage.getItem(RECOGNITION_COUNT_KEY) ?? "0", 10);
-    const date = localStorage.getItem(RECOGNITION_DATE_KEY) ?? "";
-    return { count: Number.isNaN(count) ? 0 : count, date };
-  } catch {
-    return { count: 0, date: "" };
-  }
+  const count = parseInt(getItem(STORAGE_KEYS.RECOGNITION_COUNT) ?? "0", 10);
+  const date = getItem(STORAGE_KEYS.RECOGNITION_DATE) ?? "";
+  return { count: Number.isNaN(count) ? 0 : count, date };
 }
 
 function todayKey(): string {
@@ -37,8 +33,8 @@ export function incrementGuestRecognitionCount(): void {
   const today = todayKey();
   const { count, date } = getStoredRecognitionCount();
   const newCount = date === today ? count + 1 : 1;
-  localStorage.setItem(RECOGNITION_COUNT_KEY, String(newCount));
-  localStorage.setItem(RECOGNITION_DATE_KEY, today);
+  setItem(STORAGE_KEYS.RECOGNITION_COUNT, String(newCount));
+  setItem(STORAGE_KEYS.RECOGNITION_DATE, today);
 }
 
 export const GUEST_RECOGNITION_LIMIT_PER_DAY = GUEST_RECOGNITION_LIMIT;

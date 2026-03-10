@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
 
 interface NightVisionContextType {
   nightVision: boolean;
@@ -11,13 +12,11 @@ const NightVisionContext = createContext<NightVisionContextType>({
 });
 
 export function NightVisionProvider({ children }: { children: ReactNode }) {
-  const [nightVision, setNightVision] = useState(() => {
-    try { return localStorage.getItem("alnitar_night_vision") === "true"; } catch { return false; }
-  });
+  const [nightVision, setNightVision] = useState(() => getItem(STORAGE_KEYS.NIGHT_VISION) === "true");
 
   useEffect(() => {
     document.documentElement.classList.toggle("night-vision", nightVision);
-    localStorage.setItem("alnitar_night_vision", String(nightVision));
+    setItem(STORAGE_KEYS.NIGHT_VISION, String(nightVision));
   }, [nightVision]);
 
   return (

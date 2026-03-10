@@ -1,7 +1,10 @@
 /**
  * Alnitar API Worker — auth (JWT), D1 (CRUD), R2 (upload URLs).
  * CORS and JWT_SECRET must be set via env/secret.
+ * In production set CORS_ORIGIN to your front-end origin (e.g. https://alnitar.com).
  */
+
+import { z } from "zod";
 
 export interface Env {
   DB: D1Database;
@@ -197,20 +200,43 @@ export default {
       if (path === "api/observations" && request.method === "POST") {
         const auth = await getAuth(request, env);
         if (!auth) return err("Unauthorized", 401);
-        const body = (await request.json()) as Record<string, unknown>;
+        let raw: unknown;
+        try {
+          raw = await request.json();
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const observationSchema = z.object({
+          constellation_id: z.string().optional().default(""),
+          constellation_name: z.string().optional().default(""),
+          confidence: z.number().min(0).max(100).optional().default(0),
+          notes: z.string().optional().default(""),
+          location: z.string().optional().default(""),
+          date: z.string().optional(),
+          equipment: z.string().optional().default("phone"),
+          image_url: z.string().nullable().optional(),
+          device_type: z.string().optional().default("phone"),
+          alternate_matches: z.unknown().optional(),
+        });
+        const parsed = observationSchema.safeParse(raw);
+        if (!parsed.success) {
+          const msg = parsed.error.errors.map((e) => e.message).join("; ") || "Invalid request body";
+          return err(msg, 400);
+        }
+        const body = parsed.data;
         const id = uuid();
         const obs = {
           id,
           user_id: auth.userId,
-          constellation_id: body.constellation_id ?? "",
-          constellation_name: body.constellation_name ?? "",
-          confidence: typeof body.confidence === "number" ? body.confidence : 0,
-          notes: (body.notes as string) ?? "",
-          location: (body.location as string) ?? "",
-          date: (body.date as string) ?? new Date().toISOString().slice(0, 10),
-          equipment: (body.equipment as string) ?? "phone",
-          image_url: (body.image_url as string) ?? null,
-          device_type: (body.device_type as string) ?? "phone",
+          constellation_id: body.constellation_id,
+          constellation_name: body.constellation_name,
+          confidence: body.confidence,
+          notes: body.notes,
+          location: body.location,
+          date: body.date ?? new Date().toISOString().slice(0, 10),
+          equipment: body.equipment,
+          image_url: body.image_url ?? null,
+          device_type: body.device_type,
           alternate_matches: typeof body.alternate_matches === "object" ? JSON.stringify(body.alternate_matches) : "[]",
         };
         await env.DB.prepare(
@@ -238,8 +264,16 @@ export default {
       if (path === "api/upload/url" && request.method === "POST") {
         const auth = await getAuth(request, env);
         if (!auth) return err("Unauthorized", 401);
-        const body = (await request.json()) as { key?: string; contentType?: string };
-        const key = body.key || `uploads/${auth.userId}/${uuid()}.jpg`;
+        let raw: unknown;
+        try {
+          raw = await request.json();
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const uploadUrlSchema = z.object({ key: z.string().optional(), contentType: z.string().optional() });
+        const parsed = uploadUrlSchema.safeParse(raw);
+        if (!parsed.success) return err("Invalid request body", 400);
+        const key = parsed.data.key || `uploads/${auth.userId}/${uuid()}.jpg`;
         return json({ key, url: key });
       }
 

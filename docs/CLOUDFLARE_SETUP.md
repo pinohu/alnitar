@@ -101,6 +101,8 @@ npx wrangler secret put CORS_ORIGIN
 
 When prompted, enter your frontend URL, e.g. `https://alnitar.vercel.app` or `https://alnitar.com`.
 
+**Production:** Set `CORS_ORIGIN` to your production front-end origin (e.g. `https://alnitar.com`) so the Worker only accepts requests from your app. Leaving it unset uses the request `Origin` header; avoid `*` in production for security.
+
 ---
 
 ## Step 6 — Deploy the Worker

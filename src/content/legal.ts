@@ -1,10 +1,9 @@
 // src/content/legal.ts — Legal document text (canonical source: docs/*.md; sync when you update)
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment -- Vite ?raw import
-// @ts-ignore
+// @ts-expect-error — Vite ?raw import (no type for .md?raw)
 import privacyRaw from "../../docs/PRIVACY_POLICY.md?raw";
-// @ts-ignore
+// @ts-expect-error — Vite ?raw import (no type for .md?raw)
 import termsRaw from "../../docs/TERMS_OF_SERVICE.md?raw";
-// @ts-ignore
+// @ts-expect-error — Vite ?raw import (no type for .md?raw)
 import disclaimerRaw from "../../docs/DISCLAIMER.md?raw";
 
 export const PRIVACY_POLICY = (privacyRaw as string) ?? "";

@@ -19,21 +19,15 @@ import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2, Thermometer, Drople
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { toast } from "sonner";
-
-const STORAGE_LAT_KEY = "alnitar_tonight_lat";
-const STORAGE_LNG_KEY = "alnitar_tonight_lng";
+import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
 
 function getStoredLocation(): { lat: number; lng: number } | null {
-  try {
-    const lat = localStorage.getItem(STORAGE_LAT_KEY);
-    const lng = localStorage.getItem(STORAGE_LNG_KEY);
-    if (lat != null && lng != null) {
-      const latNum = Number.parseFloat(lat);
-      const lngNum = Number.parseFloat(lng);
-      if (Number.isFinite(latNum) && latNum >= -90 && latNum <= 90 && Number.isFinite(lngNum)) return { lat: latNum, lng: lngNum };
-    }
-  } catch {
-    //
+  const lat = getItem(STORAGE_KEYS.TONIGHT_LAT);
+  const lng = getItem(STORAGE_KEYS.TONIGHT_LNG);
+  if (lat != null && lng != null) {
+    const latNum = Number.parseFloat(lat);
+    const lngNum = Number.parseFloat(lng);
+    if (Number.isFinite(latNum) && latNum >= -90 && latNum <= 90 && Number.isFinite(lngNum)) return { lat: latNum, lng: lngNum };
   }
   return null;
 }
@@ -66,13 +60,9 @@ export default function TonightPage() {
           const lng = Math.round(pos.coords.longitude * 10) / 10;
           setLatitude(lat);
           setLongitude(lng);
-          try {
-            localStorage.setItem(STORAGE_LAT_KEY, String(lat));
-            localStorage.setItem(STORAGE_LNG_KEY, String(lng));
-          } catch {
-            //
-          }
-        },
+          setItem(STORAGE_KEYS.TONIGHT_LAT, String(lat));
+            setItem(STORAGE_KEYS.TONIGHT_LNG, String(lng));
+          },
         () => {},
         { enableHighAccuracy: false, timeout: 6000, maximumAge: 300000 }
       );
@@ -92,12 +82,8 @@ export default function TonightPage() {
         const lng = Math.round(pos.coords.longitude * 10) / 10;
         setLatitude(lat);
         setLongitude(lng);
-        try {
-          localStorage.setItem(STORAGE_LAT_KEY, String(lat));
-          localStorage.setItem(STORAGE_LNG_KEY, String(lng));
-        } catch {
-          //
-        }
+        setItem(STORAGE_KEYS.TONIGHT_LAT, String(lat));
+        setItem(STORAGE_KEYS.TONIGHT_LNG, String(lng));
         setLocationLoading(false);
         toast.success("Location updated for tonight's sky.");
       },

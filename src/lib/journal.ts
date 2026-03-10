@@ -1,3 +1,5 @@
+import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
+
 export interface JournalEntry {
   id: string;
   date: string;
@@ -10,11 +12,9 @@ export interface JournalEntry {
   createdAt: string;
 }
 
-const JOURNAL_KEY = 'alnitar_journal';
-
 export function getJournalEntries(): JournalEntry[] {
   try {
-    const data = localStorage.getItem(JOURNAL_KEY);
+    const data = getItem(STORAGE_KEYS.JOURNAL);
     return data ? JSON.parse(data) : [];
   } catch {
     return [];
@@ -29,18 +29,18 @@ export function addJournalEntry(entry: Omit<JournalEntry, 'id' | 'createdAt'>): 
     createdAt: new Date().toISOString(),
   };
   entries.unshift(newEntry);
-  localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries));
+  setItem(STORAGE_KEYS.JOURNAL, JSON.stringify(entries));
   return newEntry;
 }
 
 export function deleteJournalEntry(id: string): void {
   const entries = getJournalEntries().filter(e => e.id !== id);
-  localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries));
+  setItem(STORAGE_KEYS.JOURNAL, JSON.stringify(entries));
 }
 
 export function updateJournalEntry(id: string, updates: Partial<JournalEntry>): void {
   const entries = getJournalEntries().map(e =>
     e.id === id ? { ...e, ...updates } : e
   );
-  localStorage.setItem(JOURNAL_KEY, JSON.stringify(entries));
+  setItem(STORAGE_KEYS.JOURNAL, JSON.stringify(entries));
 }
