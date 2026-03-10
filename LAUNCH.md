@@ -6,19 +6,19 @@ Use this when pushing to GitHub and going live.
 
 ## 1. Push to GitHub
 
-```powershell
-# If you haven't initialized git yet:
-git init
-git add .
-git commit -m "chore: initial commit — Alnitar production-ready"
+Git is initialized and the initial commit is done. Next:
 
-# Create a new repository on GitHub (github.com → New repository), then:
+1. **Create a new repository on GitHub** — [github.com/new](https://github.com/new), name it `alnitar` (or another name), leave it empty (no README, no .gitignore).
+
+2. **Add the remote and push** (replace `YOUR_USERNAME` with your GitHub username):
+
+```powershell
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/alnitar.git
 git push -u origin main
 ```
 
-Replace `YOUR_USERNAME` with your GitHub username (or org) and `alnitar` with your repo name if different.
+If you use SSH: `git remote add origin git@github.com:YOUR_USERNAME/alnitar.git`
 
 ---
 

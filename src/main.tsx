@@ -5,7 +5,11 @@ import App from "./App.tsx";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import "./index.css";
 
-registerSW({ immediate: true });
+try {
+  registerSW({ immediate: true });
+} catch {
+  // PWA registration optional; app must render even if SW fails
+}
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Root element #root not found");
