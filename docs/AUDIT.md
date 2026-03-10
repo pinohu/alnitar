@@ -1,120 +1,233 @@
-# Full audit — Alnitar
+# Full codebase audit — Alnitar
 
-**Date:** 2025-03-10  
-**Scope:** Post-push deployment readiness, security, quality, and docs.
-
----
-
-## 1. Push & deploy
-
-- **Git:** All changes committed and pushed to `origin/main` (repo: `github.com/pinohu/alnitar`).
-- **Deploy:** If the repo is connected to Vercel, Netlify, or Cloudflare Pages, a new deployment should trigger automatically on push. Confirm in the host dashboard that the latest commit built successfully.
-- **Manual deploy:** Otherwise run `npm run build` and upload the `dist/` folder, or connect the repo to a host and redeploy.
+**Date:** 2026-03-10  
+**Scope:** Repository structure, architecture, design, code quality, security, performance, and recommendations.
 
 ---
 
-## 2. Build, lint, tests
+## 1. Executive summary
 
-| Check        | Status |
-|-------------|--------|
-| `npm run build` | ✅ Passes |
-| `npm run lint`  | ✅ Passes (ESLint) |
-| `npm run test`  | ✅ 40 tests pass (10 files) |
-
-**Notes:**
-- One test was updated to match the new hero copy ("Point at the sky. Know what you're looking at.").
-- React Router v7 future-flag warnings and AuthProvider `act(...)` warnings in tests are non-blocking; can be addressed later.
+Alnitar is a **Vite + React SPA** for night-sky exploration: photograph the sky, identify constellations, and use Tonight’s Sky, journal, and learn features. It supports **two backends**: Supabase (auth, Postgres, Edge Functions, storage) or **Cloudflare** (Worker + D1 + R2). The codebase is organized, documented, and deployable. Main gaps: **TypeScript is not strict**, **no route-level code splitting**, **no CI**, and **dual-backend** logic is spread across the app. Security and auth are sound; performance is adequate with room for optimization.
 
 ---
 
-## 3. Security
+## 2. Repository structure
 
-| Item | Status |
+```
+alnitar/
+├── src/                    # Frontend (Vite + React)
+│   ├── main.tsx, App.tsx   # Entry, router, providers
+│   ├── pages/              # Route-level components (~20 pages)
+│   ├── components/         # Shared + ui/ (shadcn-style)
+│   ├── contexts/           # AuthContext, NightVisionContext
+│   ├── lib/                # Core logic: recognition, tonight, discovery, adapters, services
+│   ├── data/               # Static: constellations, deepSkyObjects
+│   ├── integrations/       # supabase/client, cloudflare/client
+│   ├── hooks/              # use-atmosphere, use-country, use-mobile, use-toast
+│   ├── content/            # Legal copy, legal.ts
+│   └── test/               # Vitest setup
+├── cloudflare/             # Worker (auth, D1, R2)
+│   ├── src/index.ts        # Single fetch handler
+│   ├── wrangler.toml
+│   └── schema.sql (ref in docs)
+├── supabase/               # Supabase project
+│   ├── config.toml
+│   ├── migrations/
+│   └── functions/          # sky-data-api, aggregate-observations
+├── public/                 # Static assets, _redirects (SPA fallback)
+├── docs/                   # Setup, legal, monetization, this audit
+├── ios/, android/          # Capacitor (optional native)
+├── package.json, vite.config.ts, tailwind.config.ts, tsconfig*.json
+└── eslint.config.js, vitest.config.ts, playwright.config.ts
+```
+
+**Entry:** `index.html` → `src/main.tsx` (ErrorBoundary, App). Build: `vite build` → `dist/`. Base path: `VITE_BASE_PATH` or `/`.
+
+---
+
+## 3. Tech stack & dependencies
+
+| Layer | Choice |
+|-------|--------|
+| Build | Vite 5, @vitejs/plugin-react-swc |
+| UI | React 18, react-router-dom 6, Radix UI set, Tailwind 3, framer-motion, lucide-react |
+| Forms | react-hook-form, @hookform/resolvers, zod |
+| Data | @supabase/supabase-js, @tanstack/react-query |
+| PWA | vite-plugin-pwa (Workbox, autoUpdate) |
+| Mobile | Capacitor 8 (ios, android) |
+| Backend | Supabase and/or Cloudflare Worker (D1, R2) |
+
+**Notable:** No Redux/Zustand; React Context only. No Next.js; pure SPA. Dependencies use `^`; versions are recent. No `npm audit` or Dependabot in repo.
+
+---
+
+## 4. Architecture
+
+### 4.1 High-level flow
+
+```
+[Browser] ←→ [Vite SPA] ←→ [Supabase]   (auth, observations, storage, Edge Functions)
+                ↓
+                ←→ [Cloudflare Worker]   (when VITE_CF_API_URL set: auth, observations, upload URL)
+                ←→ [Open-Meteo]          (weather by lat/lng)
+                ←→ [Nominatim]           (reverse geocode → country for units)
+```
+
+- **Auth:** Either Supabase Auth or Cloudflare Worker (JWT in localStorage, PBKDF2 + HS256). Chosen at runtime via `VITE_CF_API_URL`.
+- **Observations / journal:** Supabase adapter (`lib/adapters/database.ts`) or Cloudflare `POST api/observations`. Journal also has local-only path (`lib/journal.ts`, localStorage).
+- **Sky data (trending, regions, etc.):** Supabase Edge Function `sky-data-api` invoked from `lib/skyDataApi.ts`; fallback to direct table when function fails.
+
+### 4.2 Routing
+
+- **React Router v6**, `BrowserRouter` with `basename` from `import.meta.env.BASE_URL`.
+- All routes declared in `App.tsx` (no file-based routing). ~22 routes: `/`, `/recognize`, `/sky`, `/learn`, `/learn/:slug`, `/journal`, `/login`, `/signup`, `/profile`, `/tonight`, `/compare`, `/astro`, `/planetarium`, `/live-sky`, `/sky-network`, `/time-travel`, `/sky-data`, `/support`, `/privacy`, `/terms`, `/disclaimer`, `*` (NotFound).
+- **No route guards:** every route is reachable unauthenticated. Soft gates via `RegisterGate` and guest limits in `featureAccess.ts`.
+
+### 4.3 State & data
+
+- **Global state:** `AuthContext` (user, session, signUp, signIn, signOut), `NightVisionContext` (theme toggle). No global store.
+- **Server state:** TanStack Query used in places; much data is direct `fetch` or Supabase/Cloudflare client calls.
+- **Persistence:** localStorage for: JWT (Cloudflare), journal (guest), gamification progress, night vision, recognition count, Tonight lat/lng.
+
+### 4.4 Backend surface
+
+**Cloudflare Worker** (`cloudflare/src/index.ts`):
+
+- `POST api/auth/signup` — email/password, duplicate check, JWT_SECRET required.
+- `POST api/auth/login` — verify password, return JWT.
+- `GET api/auth/session` — validate JWT, return user.
+- `POST api/auth/logout` — client-side token clear.
+- `POST api/observations` — auth required; body → D1 insert.
+- `POST api/upload/url` — auth required; returns key/url for R2.
+
+**Supabase:**
+
+- Auth: standard signUp/signIn/signOut.
+- Edge: `sky-data-api` (summary, trending, alerts, regions), `aggregate-observations` (cron-style aggregation).
+
+### 4.5 Feature ownership
+
+| Feature | Core logic | UI |
+|--------|------------|-----|
+| Recognition | `lib/recognition.ts` (stars, match, no fake Cassiopeia) | RecognizePage, CosmicReveal |
+| Tonight’s Sky | `lib/tonight.ts`, `lib/discovery`, `lib/atmosphere`, `lib/units` | TonightPage |
+| Journal | `lib/journal.ts`, `lib/adapters`, `services/journalService` | JournalPage |
+| Learn | `data/constellations`, `services/learningService` | LearnPage, ConstellationDetailPage |
+| Legal | `content/legal.ts`, `docs/*.md` | LegalPage |
+| Sky data (network/trending) | `lib/skyDataApi.ts` | SkyDataPage, etc. |
+
+---
+
+## 5. Design & UI
+
+- **Design system:** Tailwind + Radix (shadcn-style components in `components/ui/`). Theming via CSS variables; `next-themes` for light/dark.
+- **Layout:** Navbar (responsive, mobile menu, ARIA), footer (legal, support), safe-area and 44px touch targets noted in prior audit.
+- **Accessibility:** ARIA on nav, labels on forms, semantic structure on legal; no systematic a11y audit or axe in CI.
+- **Chart:** `components/ui/chart.tsx` uses `dangerouslySetInnerHTML` for **theme CSS variables** (generated from internal THEMES object, not user content) — acceptable with current usage.
+- **Consistency:** Shared “glass-card” and gradient-text patterns; multiple distinct page layouts (Recognize, Tonight, Learn, Journal) are coherent.
+
+---
+
+## 6. Code quality
+
+### 6.1 TypeScript
+
+- **Config:** `strict: false`, `noImplicitAny: false`, `strictNullChecks: false` (tsconfig + tsconfig.app.json). User rules ask for strict mode; current codebase does not use it.
+- **Escapes:** `(supabase.from as any)` in `lib/adapters/database.ts` for dynamic table names (documented). Grep shows ~20+ uses of `any` or similar across ~10 files; a few `@ts-ignore`/`@ts-expect-error` in content/tests.
+- **Paths:** `@/*` → `./src/*`; used consistently.
+
+### 6.2 Patterns
+
+- **Components:** Functional components, named exports. No class components.
+- **Data layer:** Adapter pattern for DB (Supabase impl); Cloudflare path is separate in integrations. Dual-backend logic lives in AuthContext and anywhere that checks `isCloudflareConfigured` or calls `cfAuth`/`cfFetch`.
+- **Errors:** Error boundaries (ErrorBoundary, NotFound); API errors surfaced in UI (e.g. signup/login messages from Worker). No global error reporting (e.g. Sentry).
+
+### 6.3 Testing
+
+- **Vitest** (unit/component), **Playwright** (e2e via Lovable). Setup: `src/test/setup.ts`, jsdom.
+- **Test files:** App.test.tsx, recognition.test.ts, constellations.test.ts, skyDataApi.test.ts, client.test.ts (Supabase), tonight.test.ts, gamification.test.ts, learningService.test.ts, recommendationEngine.test.ts, example.test.ts (~10 files, ~40 tests).
+- **No coverage script or threshold** in package.json. No CI to run tests on push.
+
+### 6.4 Duplication & debt
+
+- **Backend branching:** Auth and observations have two code paths (Supabase vs Cloudflare); could be abstracted behind a single “auth service” and “observations service” interface.
+- **localStorage keys** scattered (`alnitar_cf_token`, `alnitar_journal`, `alnitar_progress`, `alnitar_night_vision`, `alnitar_tonight_lat/lng`, recognition count keys). Could centralize in a small “client storage” module.
+- **No route-level code splitting:** All page components are imported statically in App.tsx; no `React.lazy` or Suspense for routes. First-load bundle includes every page.
+
+---
+
+## 7. Security
+
+| Area | Status |
 |------|--------|
-| `.env` / `.env.local` in `.gitignore` | ✅ Not committed |
-| No secrets in source (API keys, passwords) | ✅ Only `import.meta.env.VITE_*` and user input |
-| Auth: passwords sent to backend only (Supabase/Cloudflare) | ✅ No client-side storage of secrets |
-| Legal: Privacy, Terms, Disclaimer, signup agreement | ✅ In place |
+| Secrets | No secrets in repo; only `VITE_*` and user input. Worker uses `JWT_SECRET` (secret). |
+| Auth | Passwords only sent to backend; PBKDF2 100k + JWT (Worker); Supabase handles its own. |
+| CORS | Worker sets Allow-Origin (env or `*`); origin should be restricted in production. |
+| Input (Worker) | signup/login: email/password validated (type, length ≥6, duplicate email). observations: body fields coerced with defaults; no strict schema. |
+| XSS | No user HTML rendered raw except chart theme CSS (internal data). |
+| Storage | JWT and progress in localStorage (XSS could steal token; standard SPA tradeoff). |
 
-**Recommendations:**
-- Keep Supabase anon key and Cloudflare Worker URL as public/env-only; never commit server-side secrets.
-- Replace `YYYY-MM-DD` in legal docs with the real publication date before going live.
-
----
-
-## 4. Environment & config
-
-| Variable | Purpose |
-|----------|--------|
-| `VITE_SUPABASE_URL` | Supabase project URL (optional if using Cloudflare only) |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase anon key (optional if using Cloudflare only) |
-| `VITE_CF_API_URL` | Cloudflare Worker URL for auth/observations (optional) |
-| `VITE_BASE_PATH` | Base path for subpath deploy (e.g. `/alnitar/`) |
-
-- **`.env.example`** documents Supabase vars; Cloudflare is documented in `docs/CLOUDFLARE_SETUP.md`.
-- Host (e.g. Vercel) must have the chosen env vars set for auth and data to work.
+**Recommendations:** Restrict CORS to your app origin in production. Consider Zod (or similar) on Worker for `api/observations` and upload body. Add rate limiting on auth endpoints if not provided by the platform.
 
 ---
 
-## 5. Routing & SPA
+## 8. Performance
 
-- **`public/_redirects`** present: `/* /index.html 200` (Netlify-style SPA fallback).
-- **Vite `base`:** Uses `VITE_BASE_PATH` or `/` so subpath deploys work.
-- **React Router** `basename` set from `import.meta.env.BASE_URL` in `App.tsx`.
-
----
-
-## 6. Accessibility & UX
-
-- **Navbar:** `aria-label`, `aria-expanded`, `aria-controls` on menu; 44px+ touch targets; safe-area insets.
-- **Footer:** Semantic `<footer>`, nav `aria-label`, 44px tap targets.
-- **Legal pages:** Semantic `<article>`, headings and structure.
-- **Forms:** Labels, required, minLength on password; Terms/Privacy agreement on signup.
+- **Build:** Chunk splitting (vendor-react, vendor-router, vendor-ui); target es2020; chunk size warning 600 KB.
+- **Runtime:** No route-level lazy loading; all pages in main bundle. PWA: Service worker, Workbox cache for assets and image URL pattern.
+- **Data:** Atmosphere and country fetched when Tonight’s Sky is shown (Open-Meteo, Nominatim); no global prefetch.
+- **Images:** No `next/image`-style optimizer (Vite SPA); consider image optimization if adding many assets.
 
 ---
 
-## 7. Performance
+## 9. Environment & deployment
 
-- **Build:** Chunk splitting (vendor-react, vendor-router, vendor-ui); ~595 KB main JS (gzip ~165 KB).
-- **PWA:** Service worker precache; Workbox for caching.
-- **Images:** Logo and assets in `dist`; consider `next/image`-style optimization if adding more images later.
-
----
-
-## 8. Documentation
-
-| Doc | Purpose |
-|-----|--------|
-| `README.md` | Project overview, stack, run/deploy |
-| `LAUNCH.md` | Pre-launch checklist, push, deploy, env |
-| `docs/CLOUDFLARE_SETUP.md` | Cloudflare D1 + R2 + Worker setup |
-| `docs/SUPABASE_SETUP.md` | Supabase setup |
-| `docs/PLATFORMS.md` | PWA, Capacitor, platforms |
-| `docs/MONETIZATION.md` | Revenue options while staying free |
-| `docs/PRIVACY_POLICY.md` | Privacy policy (canonical) |
-| `docs/TERMS_OF_SERVICE.md` | Terms of service (canonical) |
-| `docs/DISCLAIMER.md` | General disclaimer |
-| `docs/LEGAL_INDEX.md` | Index of legal docs |
-| `docs/AUDIT.md` | This audit |
+- **Env:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_CF_API_URL`, `VITE_BASE_PATH`. `.env.example` covers Supabase; Cloudflare in `docs/CLOUDFLARE_SETUP.md`.
+- **Deploy:** Static host for `dist/` (e.g. Vercel, Netlify, Cloudflare Pages); `_redirects` for SPA. Worker: `wrangler deploy` from `cloudflare/`; D1/R2 and secrets in wrangler.
+- **CI:** No `.github/workflows` or other CI; deploy is assumed via host “deploy on push” or manual build/upload.
 
 ---
 
-## 9. Feature summary
+## 10. Documentation
 
-- **Free (no account):** 5 sky scans/day, 15 journal entries (local), full Learn, Tonight, Sky Map, etc.
-- **Registered:** Unlimited scans, unlimited journal, save to network, progress/badges, personalized Tonight.
-- **Legal:** Privacy, Terms, Disclaimer linked in footer and at signup.
-- **Backend:** Supabase or Cloudflare (Worker + D1 + R2) via env.
-
----
-
-## 10. Post-audit actions (optional)
-
-1. **Deploy:** Confirm the latest commit deployed on your host; check build logs and live URL.
-2. **Legal:** Replace `YYYY-MM-DD` in Privacy, Terms, and Disclaimer with the real date; have an attorney review if needed.
-3. **Cloudflare:** If using Workers, run `npm run deploy` from `cloudflare/` (with `npx wrangler`) after setting `database_id` and secrets.
-4. **Monitoring:** Add error tracking (e.g. Sentry) and analytics if desired; see `LAUNCH.md` and `docs/MONETIZATION.md`.
+- **README, LAUNCH.md** — run, build, deploy, overview.
+- **docs/CLOUDFLARE_SETUP.md, SUPABASE_SETUP.md** — backend setup.
+- **docs/PLATFORMS.md** — PWA, Capacitor.
+- **docs/MONETIZATION.md** — revenue options.
+- **docs/PRIVACY_POLICY.md, TERMS_OF_SERVICE.md, DISCLAIMER.md, LEGAL_INDEX.md** — legal.
+- **docs/AUDIT.md** — this document.
 
 ---
 
-*Audit complete. The codebase is in a deployable state; deploy is triggered by your host on push or can be run manually.*
+## 11. Gaps & recommendations
+
+### High impact
+
+1. **TypeScript strictness** — Enable `strict: true`, `strictNullChecks: true`, `noImplicitAny: true` and fix types incrementally; reduces runtime bugs and improves refactors.
+2. **CI** — Add GitHub Actions (or similar): `lint`, `test`, `build` on push/PR; optionally deploy preview or production.
+3. **Route code splitting** — Use `React.lazy()` for page components and `Suspense` in App.tsx to shrink initial bundle and improve LCP.
+
+### Medium impact
+
+4. **Single auth/observations interface** — Abstract Supabase vs Cloudflare behind one “auth provider” and one “observations API” so pages don’t branch on `isCloudflareConfigured`.
+5. **Centralize localStorage keys** — One module (e.g. `lib/clientStorage.ts`) with key constants and get/set helpers; easier to document and change.
+6. **Worker request validation** — Validate `api/observations` and `api/upload/url` bodies with Zod (or equivalent) and return 400 on invalid payloads.
+7. **Test coverage** — Add `vitest --coverage` script and a minimum coverage gate in CI; focus on recognition, auth, and tonight/discovery first.
+8. **CORS** — Set `CORS_ORIGIN` in Worker to the production front-end origin; avoid `*` in production.
+
+### Lower priority
+
+9. **Error monitoring** — Integrate Sentry (or similar) for unhandled errors and failed API calls.
+10. **Accessibility** — Run axe (or similar) in CI or manually; fix critical a11y issues and document baseline.
+11. **Legal dates** — Replace placeholder dates in legal docs with real publication dates before launch.
+12. **Dependency audit** — Run `npm audit` and Dependabot (or Renovate); address critical/high vulnerabilities.
+
+---
+
+## 12. Conclusion
+
+The codebase is **well-structured**, **documented**, and **deployable**, with clear separation between frontend, Supabase, and Cloudflare Worker. **Design and UX** are consistent; **security** is solid for an SPA with dual backends. The largest opportunities are **stricter TypeScript**, **CI + tests**, **route-level code splitting**, and **unifying the dual-backend story** behind a single set of interfaces. Addressing the high-impact items will improve maintainability, safety, and performance without changing product behavior.
+
+---
+
+*Audit complete. Last updated 2026-03-10.*
