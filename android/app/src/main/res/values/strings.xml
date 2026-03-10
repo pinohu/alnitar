@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Alnitar</string>
+    <string name="title_activity_main">Alnitar</string>
+    <string name="package_name">com.alnitar.app</string>
+    <string name="custom_url_scheme">com.alnitar.app</string>
+</resources>

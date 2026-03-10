@@ -1,0 +1,223 @@
+export interface DeepSkyCatalogObject {
+  id: string;
+  name: string;
+  catalog: string; // Messier, NGC, IC
+  type: 'nebula' | 'cluster' | 'galaxy' | 'planetary-nebula' | 'supernova-remnant';
+  constellation: string; // constellation id
+  magnitude: number;
+  distance: string;
+  visibility: 'naked-eye' | 'binocular' | 'telescope';
+  description: string;
+  rightAscension: string;
+  declination: string;
+  size?: string; // angular size
+  bestMonths: string[];
+  photographyTips?: string;
+}
+
+export const deepSkyCatalog: DeepSkyCatalogObject[] = [
+  {
+    id: "m42",
+    name: "Orion Nebula",
+    catalog: "M42",
+    type: "nebula",
+    constellation: "orion",
+    magnitude: 4.0,
+    distance: "1,344 ly",
+    visibility: "naked-eye",
+    description: "The brightest diffuse nebula in the sky, a massive star-forming region containing the Trapezium cluster. Visible to the naked eye as a fuzzy patch in Orion's sword.",
+    rightAscension: "5h 35m",
+    declination: "-5° 23'",
+    size: "85' × 60'",
+    bestMonths: ["December", "January", "February"],
+    photographyTips: "Great beginner target. Try 30-second exposures at ISO 1600. Stack multiple exposures for detail in both the bright core and faint outer regions.",
+  },
+  {
+    id: "m31",
+    name: "Andromeda Galaxy",
+    catalog: "M31",
+    type: "galaxy",
+    constellation: "andromeda",
+    magnitude: 3.4,
+    distance: "2.5 Mly",
+    visibility: "naked-eye",
+    description: "Our nearest major galactic neighbor, spanning about 220,000 light-years across. Contains roughly one trillion stars and is approaching the Milky Way.",
+    rightAscension: "0h 42m",
+    declination: "+41° 16'",
+    size: "190' × 60'",
+    bestMonths: ["October", "November", "December"],
+    photographyTips: "Use a wide-field lens to capture the full extent. Try 60-second tracked exposures at ISO 800 for detail in the spiral arms.",
+  },
+  {
+    id: "m45",
+    name: "Pleiades",
+    catalog: "M45",
+    type: "cluster",
+    constellation: "taurus",
+    magnitude: 1.6,
+    distance: "444 ly",
+    visibility: "naked-eye",
+    description: "The 'Seven Sisters' — one of the most famous star clusters, containing hot blue stars wrapped in reflection nebulosity.",
+    rightAscension: "3h 47m",
+    declination: "+24° 07'",
+    size: "110'",
+    bestMonths: ["November", "December", "January"],
+    photographyTips: "Long exposures reveal beautiful blue reflection nebulae around the stars. Try 2-minute tracked exposures at ISO 800.",
+  },
+  {
+    id: "m13",
+    name: "Great Hercules Cluster",
+    catalog: "M13",
+    type: "cluster",
+    constellation: "hercules",
+    magnitude: 5.8,
+    distance: "22,200 ly",
+    visibility: "naked-eye",
+    description: "One of the finest globular clusters visible from the Northern Hemisphere, containing about 300,000 stars packed into a sphere 145 light-years across.",
+    rightAscension: "16h 41m",
+    declination: "+36° 27'",
+    size: "20'",
+    bestMonths: ["June", "July", "August"],
+    photographyTips: "Needs moderate focal length (500mm+) to resolve individual stars. Try 30-second exposures at ISO 1600.",
+  },
+  {
+    id: "m57",
+    name: "Ring Nebula",
+    catalog: "M57",
+    type: "planetary-nebula",
+    constellation: "lyra",
+    magnitude: 8.8,
+    distance: "2,300 ly",
+    visibility: "telescope",
+    description: "A striking planetary nebula resembling a cosmic smoke ring. The central star shed its outer layers, creating this glowing shell of gas.",
+    rightAscension: "18h 53m",
+    declination: "+33° 01'",
+    size: "1.4' × 1.0'",
+    bestMonths: ["July", "August", "September"],
+    photographyTips: "Small target — needs long focal length (1000mm+). Try narrow-band filters for dramatic results.",
+  },
+  {
+    id: "m8",
+    name: "Lagoon Nebula",
+    catalog: "M8",
+    type: "nebula",
+    constellation: "sagittarius",
+    magnitude: 6.0,
+    distance: "5,200 ly",
+    visibility: "naked-eye",
+    description: "A giant interstellar cloud and emission nebula. One of only two star-forming nebulae faintly visible to the naked eye from mid-northern latitudes.",
+    rightAscension: "18h 03m",
+    declination: "-24° 23'",
+    size: "90' × 40'",
+    bestMonths: ["June", "July", "August"],
+    photographyTips: "Wide-field target near the Milky Way center. H-alpha filters dramatically enhance the nebulosity.",
+  },
+  {
+    id: "omega-centauri",
+    name: "Omega Centauri",
+    catalog: "NGC 5139",
+    type: "cluster",
+    constellation: "centaurus",
+    magnitude: 3.7,
+    distance: "15,800 ly",
+    visibility: "naked-eye",
+    description: "The largest and brightest globular cluster in the Milky Way, containing an estimated 10 million stars. Some astronomers believe it's the remnant core of a dwarf galaxy.",
+    rightAscension: "13h 26m",
+    declination: "-47° 28'",
+    size: "36'",
+    bestMonths: ["April", "May", "June"],
+    photographyTips: "Stunning through binoculars or telephoto lens. Southern hemisphere target — needs clear southern horizon from northern latitudes.",
+  },
+  {
+    id: "m1",
+    name: "Crab Nebula",
+    catalog: "M1",
+    type: "supernova-remnant",
+    constellation: "taurus",
+    magnitude: 8.4,
+    distance: "6,500 ly",
+    visibility: "telescope",
+    description: "The remnant of a supernova observed in 1054 AD. Contains a rapidly spinning neutron star (pulsar) at its center that rotates 30 times per second.",
+    rightAscension: "5h 34m",
+    declination: "+22° 00'",
+    size: "6' × 4'",
+    bestMonths: ["December", "January", "February"],
+    photographyTips: "Moderate difficulty. Long exposures at high focal length reveal the filamentary structure.",
+  },
+  {
+    id: "m44",
+    name: "Beehive Cluster",
+    catalog: "M44",
+    type: "cluster",
+    constellation: "cancer",
+    magnitude: 3.7,
+    distance: "577 ly",
+    visibility: "naked-eye",
+    description: "Also known as Praesepe, this is one of the nearest open clusters to our solar system. Contains about 1,000 stars in a swarm-like arrangement.",
+    rightAscension: "8h 40m",
+    declination: "+19° 59'",
+    size: "95'",
+    bestMonths: ["February", "March", "April"],
+    photographyTips: "Wide-field binocular target. Beautiful in short telephoto exposures.",
+  },
+  {
+    id: "double-cluster",
+    name: "Double Cluster",
+    catalog: "NGC 869/884",
+    type: "cluster",
+    constellation: "perseus",
+    magnitude: 4.3,
+    distance: "7,500 ly",
+    visibility: "naked-eye",
+    description: "A stunning pair of open clusters side by side, each containing hundreds of young supergiant stars. One of the finest naked-eye deep sky objects.",
+    rightAscension: "2h 20m",
+    declination: "+57° 08'",
+    size: "30' × 30'",
+    bestMonths: ["October", "November", "December"],
+    photographyTips: "Beautiful with telephoto lenses (200-400mm). Both clusters fit nicely in the same field of view.",
+  },
+  {
+    id: "m87",
+    name: "Virgo A",
+    catalog: "M87",
+    type: "galaxy",
+    constellation: "virgo",
+    magnitude: 8.6,
+    distance: "53 Mly",
+    visibility: "telescope",
+    description: "A supergiant elliptical galaxy at the heart of the Virgo Cluster. Home to the first black hole ever directly imaged by the Event Horizon Telescope in 2019.",
+    rightAscension: "12h 30m",
+    declination: "+12° 23'",
+    size: "8.3' × 6.6'",
+    bestMonths: ["April", "May", "June"],
+    photographyTips: "The relativistic jet is visible in long exposures with moderate aperture telescopes.",
+  },
+  {
+    id: "ngc7293",
+    name: "Helix Nebula",
+    catalog: "NGC 7293",
+    type: "planetary-nebula",
+    constellation: "aquarius",
+    magnitude: 7.6,
+    distance: "655 ly",
+    visibility: "binocular",
+    description: "One of the nearest planetary nebulae to Earth, sometimes called the 'Eye of God' for its striking appearance. Spans about half a degree — nearly the apparent size of the full Moon.",
+    rightAscension: "22h 29m",
+    declination: "-20° 50'",
+    size: "25'",
+    bestMonths: ["September", "October", "November"],
+    photographyTips: "Large angular size makes it a good wide-field target. Narrow-band imaging reveals stunning detail.",
+  },
+];
+
+export function getDeepSkyObjectsByConstellation(constellationId: string): DeepSkyCatalogObject[] {
+  return deepSkyCatalog.filter(o => o.constellation === constellationId);
+}
+
+export function getDeepSkyObjectsByVisibility(visibility: 'naked-eye' | 'binocular' | 'telescope'): DeepSkyCatalogObject[] {
+  return deepSkyCatalog.filter(o => o.visibility === visibility);
+}
+
+export function getDeepSkyObjectsForTonight(month: string): DeepSkyCatalogObject[] {
+  return deepSkyCatalog.filter(o => o.bestMonths.includes(month));
+}

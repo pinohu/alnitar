@@ -1,0 +1,26 @@
+{
+  "name": "Alnitar — Discover the Night Sky",
+  "short_name": "Alnitar",
+  "description": "Photograph the sky and instantly identify constellations, stars, planets, and deep-sky objects.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#0a0a0f",
+  "background_color": "#0a0a0f",
+  "categories": ["education", "utilities", "weather"],
+  "icons": [
+    {
+      "src": "/alnitar-favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/alnitar-favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
