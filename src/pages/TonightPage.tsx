@@ -116,6 +116,7 @@ export default function TonightPage() {
   }, [date, latitude, longitude, observationTime]);
 
   const scoreColor = data.skyScore >= 70 ? "text-green-400" : data.skyScore >= 40 ? "text-accent" : "text-destructive";
+  const scoreLabel = data.skyScore >= 70 ? "Good" : data.skyScore >= 40 ? "Fair" : "Poor";
 
   return (
     <div className="relative min-h-screen">
@@ -127,12 +128,12 @@ export default function TonightPage() {
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Tonight's <span className="gradient-text">Sky</span>
             </h1>
-            <p className="text-muted-foreground mb-4">Your personalized sky intelligence for tonight.</p>
+            <p className="text-muted-foreground mb-4">What's up tonight for your location — conditions, best targets, and when to look. One place so you can plan and go.</p>
             {!user && (
               <RegisterGate
                 variant="banner"
                 title="Make Tonight yours"
-                description="Sign up to save your location and get recommendations based on what you've already found — so every night is perfectly tailored to you."
+                description="Create a free account to save your location and get recommendations based on what you've already found — so every clear night is tailored to you."
               />
             )}
           </motion.div>
@@ -209,22 +210,25 @@ export default function TonightPage() {
             )}
           </div>
 
-          {/* Sky Score + Moon */}
+          {/* Sky Score + Moon + Dark sky — clear labels so meaning is obvious */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-6 text-center">
-              <Gauge className="w-6 h-6 mx-auto mb-2 text-primary" />
+              <Gauge className="w-6 h-6 mx-auto mb-2 text-primary" aria-hidden />
               <div className={`text-4xl font-display font-bold ${scoreColor}`}>{data.skyScore}</div>
-              <p className="text-xs text-muted-foreground mt-1">Tonight's Sky Score</p>
+              <p className="text-xs font-medium text-foreground/90 mt-1">Tonight's Sky Score</p>
+              <p className="text-xs text-muted-foreground mt-0.5">0–100 · {scoreLabel} for stargazing</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="glass-card p-6 text-center">
-              <Moon className="w-6 h-6 mx-auto mb-2 text-accent" />
+              <Moon className="w-6 h-6 mx-auto mb-2 text-accent" aria-hidden />
               <div className="text-lg font-display font-bold">{data.moonPhase}</div>
-              <p className="text-xs text-muted-foreground mt-1">{data.moonBrightness}% brightness</p>
+              <p className="text-xs text-muted-foreground mt-1">{data.moonBrightness}% illuminated</p>
+              <p className="text-xs text-muted-foreground/80 mt-0.5">Less moon = darker sky = better for stars</p>
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="glass-card p-6 text-center">
-              <Eye className="w-6 h-6 mx-auto mb-2 text-secondary" />
+              <Eye className="w-6 h-6 mx-auto mb-2 text-secondary" aria-hidden />
               <div className="text-lg font-display font-bold">{data.darkness}%</div>
-              <p className="text-xs text-muted-foreground mt-1">Sky Darkness</p>
+              <p className="text-xs font-medium text-foreground/90 mt-1">Dark sky quality</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Higher = better for seeing faint stars</p>
             </motion.div>
           </div>
 

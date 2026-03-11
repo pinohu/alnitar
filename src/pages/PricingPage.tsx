@@ -12,20 +12,20 @@ import { isPro } from "@/lib/featureAccess";
 import { toast } from "sonner";
 
 const freeFeatures = [
-  "Constellation recognition (5 scans/day guest)",
+  "Constellation recognition (5 scans/day without account)",
   "Sky Map, Planetarium, Tonight's Sky",
   "Learn — all 88 constellations",
-  "Up to 15 journal entries (local)",
-  "Progress and badges on this device",
+  "Up to 15 journal entries on this device",
+  "Progress and badges here",
 ];
 
 const proFeatures = [
-  "Unlimited sky life — cloud backup, never lose a log",
-  "Export your observatory log (PDF, CSV) for clubs or archive",
-  "Expert session planner — what to look at now, with your gear",
-  "Verified observations — timestamp + location for clubs and schools",
-  "Sky identity — badges, streaks, shareable sky résumé",
-  "Challenges and programs (Messier marathon, seasonal, club-linked)",
+  "Unlimited scans and cloud journal — your log everywhere",
+  "Export your log (PDF, CSV) for your club or records",
+  "Session planner — what to look at now, for your gear and time",
+  "Verified observations — timestamp and location for clubs and programs",
+  "Badges, streaks, shareable sky résumé",
+  "Challenges and programs (Messier, seasonal, club-linked)",
   "Priority support",
 ];
 
@@ -65,7 +65,7 @@ export default function PricingPage() {
           <div className="text-center mb-12">
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">Pricing</h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Your sky life, expert planning, and credibility. The core app stays free forever; Pro is for those who want the full observatory.
+              Identify, plan, and log for free. Pro adds exports, session planning, and verified logs so your observations count for clubs and programs.
             </p>
           </div>
 
@@ -126,7 +126,7 @@ export default function PricingPage() {
             <div>
               <h2 className="font-display font-semibold mb-1">Why Pro?</h2>
               <p className="text-sm text-muted-foreground">
-                Sky life = your permanent, searchable observatory log. Expert planning = what to do in the next 90 minutes with your gear. Credibility = verified logs for clubs, schools, and programs.
+                Pro gives you a permanent, exportable log; a session planner that knows your gear and time; and verified records so your observations count for your club or program.
               </p>
             </div>
             <Button asChild variant="outline" size="sm" className="shrink-0">

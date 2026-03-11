@@ -85,12 +85,12 @@ export default function JournalPage() {
               Observation <span className="gradient-text">Journal</span>
             </h1>
             <p className="text-muted-foreground mb-4">
-              Your sky life — every observation in one place. Export for clubs or science with verification.
+              Every observation in one place — searchable and exportable. Build a permanent log you can share with your club or use for programs.
             </p>
             {entries.length > 0 && (
               <div className="space-y-4 mb-6">
-                <div className="flex flex-wrap gap-2 items-center">
-                  <div className="relative flex-1 min-w-[200px]">
+                <div className="flex flex-wrap gap-2 items-center min-w-0">
+                  <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder="Search by constellation, notes, location..."
@@ -123,7 +123,7 @@ export default function JournalPage() {
                     aria-label="Filter by location"
                   />
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 min-w-0">
                 <Button
                   variant="outline"
                   size="sm"
@@ -138,7 +138,7 @@ export default function JournalPage() {
                   }}
                 >
                   <Download className="w-4 h-4 mr-1" />
-                  Export JSON (club/science)
+                  Export JSON
                 </Button>
                 <Button
                   variant="outline"
@@ -154,7 +154,7 @@ export default function JournalPage() {
                   }}
                 >
                   <Download className="w-4 h-4 mr-1" />
-                  Export CSV (club/science)
+                  Export CSV
                 </Button>
                 <Button variant="outline" size="sm" className="border-border/50" asChild>
                   <Link to="/journal/year-in-review">
@@ -184,8 +184,8 @@ export default function JournalPage() {
             {!user && (
               <p className="text-sm text-muted-foreground/90 mb-6">
                 {entries.length >= 3
-                  ? "You're building a real stargazing history! Sign up to keep every observation forever and get unlimited entries."
-                  : `Save up to ${GUEST_JOURNAL_ENTRY_LIMIT} entries free. Create an account for unlimited + cloud backup.`}{" "}
+                  ? "You're building a real log. Create a free account to keep every observation forever and sync your journal everywhere."
+                  : `Save up to ${GUEST_JOURNAL_ENTRY_LIMIT} entries on this device. Create a free account for unlimited entries and cloud backup.`}{" "}
                 <Link to="/signup" className="text-primary font-medium hover:underline">Create free account</Link>
               </p>
             )}
@@ -194,9 +194,9 @@ export default function JournalPage() {
           {isGuestAtLimit && (
             <RegisterGate
               variant="card"
-              title="Your journal is getting good — don't lose it"
-              description={`You've saved ${GUEST_JOURNAL_ENTRY_LIMIT} observations. Create a free account to add unlimited entries and sync your journal everywhere.`}
-              benefits={["Unlimited journal entries", "Cloud backup — never lose a discovery", "Same journal on phone, tablet, and desktop"]}
+              title="Don't lose what you've logged"
+              description={`You've saved ${GUEST_JOURNAL_ENTRY_LIMIT} observations. Create a free account to add unlimited entries and sync your journal to every device.`}
+              benefits={["Unlimited journal entries", "Cloud backup — your log follows you", "One journal on phone, tablet, and desktop"]}
             />
           )}
 
@@ -205,11 +205,11 @@ export default function JournalPage() {
               <NotebookPen className="w-10 h-10 text-muted-foreground mx-auto mb-4" />
               <h3 className="font-display text-lg font-semibold mb-2">No observations yet</h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Upload a sky photo to identify constellations and save them to your journal.
+                Identify a sky photo and save the result here. Your first entry is one tap away.
               </p>
               <Button asChild className="btn-glow">
                 <Link to="/recognize">
-                  Start Recognizing <ArrowRight className="w-4 h-4 ml-2" />
+                  Identify a photo <ArrowRight className="w-4 h-4 ml-2" />
                 </Link>
               </Button>
             </motion.div>
@@ -217,7 +217,7 @@ export default function JournalPage() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-8 text-center">
               <Search className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <h3 className="font-display text-lg font-semibold mb-1">No matches</h3>
-              <p className="text-sm text-muted-foreground mb-4">Try different search or date filters.</p>
+              <p className="text-sm text-muted-foreground mb-4">Try different search terms or date range.</p>
               <Button variant="outline" size="sm" onClick={() => { setSearchQuery(""); setDateFrom(""); setDateTo(""); setLocationFilter(""); }}>
                 Clear filters
               </Button>

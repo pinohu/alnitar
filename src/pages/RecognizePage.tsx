@@ -89,13 +89,13 @@ export default function RecognizePage() {
               </h1>
             </div>
             <p className="text-muted-foreground mb-4">
-              Point. Capture. Discover what's hidden in your sky.
+              Upload a sky photo — we'll tell you which constellations are in it. Save results to your journal and build a log that counts.
             </p>
             {!user && (
               <p className="text-sm text-muted-foreground/90 mb-6">
                 {guestCount < GUEST_RECOGNITION_LIMIT_PER_DAY
-                  ? `${GUEST_RECOGNITION_LIMIT_PER_DAY - guestCount} of ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans left today. Create a free account anytime for unlimited.`
-                  : "You're on a roll! Create a free account to keep scanning with no limits."}
+                  ? `${GUEST_RECOGNITION_LIMIT_PER_DAY - guestCount} of ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans left today. Create a free account for unlimited scans and cloud journal.`
+                  : "You've used today's free scans. Create a free account for unlimited scans and to keep every observation in your journal."}
               </p>
             )}
           </motion.div>

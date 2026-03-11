@@ -181,6 +181,28 @@ After this, sign up and login use the Worker (D1 + JWT); saving observations use
 
 ---
 
+## Troubleshooting: "Database not set up" or "Schema out of date"
+
+If sign-in or sign-up fails with a database message:
+
+1. **If you have never run the schema:** run the full schema to create all tables:
+   ```powershell
+   cd cloudflare
+   npx wrangler d1 execute alnitar-db --remote --file=./schema.sql
+   ```
+
+2. **If you already ran the schema earlier (before plan/role columns were added):** run the migrations so the `users` table has `plan` and `role`:
+   ```powershell
+   cd cloudflare
+   npx wrangler d1 execute alnitar-db --remote --file=./migrations/002_add_plan.sql
+   npx wrangler d1 execute alnitar-db --remote --file=./migrations/003_add_role.sql
+   ```
+   If you see "duplicate column name", that column already exists — skip that migration and run the other.
+
+3. **Redeploy** the Worker after changing the database is not required; try signing in again.
+
+---
+
 ## Optional: Stripe Pro subscriptions
 
 To enable “Upgrade to Pro” and Stripe Checkout:

@@ -32,7 +32,7 @@ export default function SignupPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Account created! You can sign in now.");
+      toast.success("You're in. Sign in to start logging your sky.");
       navigate("/login");
     }
   };
@@ -52,7 +52,7 @@ export default function SignupPage() {
               <Telescope className="w-6 h-6 text-primary" />
             </div>
             <h1 className="font-display text-2xl font-bold">Create your free account</h1>
-            <p className="text-sm text-muted-foreground mt-1">Unlimited sky scans, cloud journal, progress everywhere. Join stargazers worldwide.</p>
+            <p className="text-sm text-muted-foreground mt-1">Unlimited scans, a journal that syncs everywhere, and tonight's sky tailored to you. One account — your sky on every device.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -96,7 +96,7 @@ export default function SignupPage() {
 
           <p className="text-sm text-center text-muted-foreground mt-6">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+            <Link to="/login" className="text-primary hover:underline">Sign in here</Link>
           </p>
         </motion.div>
       </div>

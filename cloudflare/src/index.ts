@@ -65,8 +65,11 @@ async function verifyPassword(storedHash: string, storedSalt: string, password: 
   return hash === storedHash;
 }
 
-// Simple JWT (HS256) — sign and verify
+// Simple JWT (HS256) — sign and verify (secret must be non-empty for Web Crypto HMAC)
 async function signJWT(payload: Record<string, unknown>, secret: string): Promise<string> {
+  if (!secret || secret.length === 0) {
+    throw new Error("JWT_SECRET is not set or empty. Add it in Cloudflare Worker secrets (wrangler secret put JWT_SECRET).");
+  }
   const header = { alg: "HS256", typ: "JWT" };
   const enc = (x: object) => btoa(JSON.stringify(x)).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
   const msg = `${enc(header)}.${enc(payload)}`;
@@ -83,6 +86,7 @@ async function signJWT(payload: Record<string, unknown>, secret: string): Promis
 }
 
 async function verifyJWT(token: string, secret: string): Promise<Record<string, unknown> | null> {
+  if (!secret || secret.length === 0) return null;
   try {
     const parts = token.split(".");
     if (parts.length !== 3) return null;
@@ -167,6 +171,9 @@ export default {
       }
 
       if (path === "api/auth/login" && request.method === "POST") {
+        if (!env.JWT_SECRET?.trim()) {
+          return err("Server misconfiguration: JWT_SECRET is not set. Add it in Cloudflare Worker secrets (wrangler secret put JWT_SECRET).", 500);
+        }
         let body: { email?: string; password?: string };
         try {
           body = (await request.json()) as { email?: string; password?: string };
@@ -446,8 +453,14 @@ export default {
       const errMessage = e instanceof Error ? e.message : String(e);
       // Surface real error so user sees "table users does not exist" or "JWT_SECRET not set" instead of "Internal error"
       const safeMessage =
-        errMessage.includes("no such table") || errMessage.includes("SQLITE_ERROR")
+        errMessage.includes("no such table")
           ? "Database not set up. Run the schema (see docs/CLOUDFLARE_SETUP.md)."
+          : errMessage.includes("no such column") || (errMessage.includes("SQLITE_ERROR") && errMessage.includes("users"))
+          ? "Schema out of date. Run migrations 002_add_plan.sql and 003_add_role.sql (see docs/CLOUDFLARE_SETUP.md)."
+          : errMessage.includes("key length") || errMessage.includes("key legnth") || errMessage.includes("JWT_SECRET")
+          ? "JWT_SECRET is not set or empty. In Cloudflare: Workers & Pages → your worker → Settings → Variables and Secrets → add secret JWT_SECRET (or run: npx wrangler secret put JWT_SECRET)."
+          : errMessage.includes("SQLITE_ERROR")
+          ? "Database error. Check schema and migrations (see docs/CLOUDFLARE_SETUP.md)."
           : errMessage;
       return Response.json({ error: safeMessage }, { status: 500, headers: cors });
     }

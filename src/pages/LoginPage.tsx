@@ -45,7 +45,7 @@ export default function LoginPage() {
               <Telescope className="w-6 h-6 text-primary" />
             </div>
             <h1 className="font-display text-2xl font-bold">Welcome back</h1>
-            <p className="text-sm text-muted-foreground mt-1">Sign in to your Alnitar account</p>
+            <p className="text-sm text-muted-foreground mt-1">Sign in to access your journal, tonight's plan, and progress on any device.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,8 +69,8 @@ export default function LoginPage() {
           </form>
 
           <p className="text-sm text-center text-muted-foreground mt-6">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-primary hover:underline">Sign up</Link>
+            New to Alnitar?{" "}
+            <Link to="/signup" className="text-primary hover:underline">Create a free account</Link>
           </p>
           <p className="text-xs text-center text-muted-foreground/80 mt-3">
             By signing in you agree to our{" "}

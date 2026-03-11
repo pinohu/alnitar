@@ -37,9 +37,9 @@ export default function PartnersPage() {
       <div className="relative z-10 pt-24 pb-16 px-4">
         <div className="container max-w-4xl">
           <div className="text-center mb-12">
-            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">For organizations</h1>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold mb-3">Clubs & organizations</h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Alnitar as the platform for guided nights, education, and visitor experience — not just an app you recommend. Licensing, API, and partnerships.
+              Use Alnitar for guided observing nights, education, and visitor programs. Verified logs, session tools, and options for clubs, schools, parks, and partners.
             </p>
           </div>
 

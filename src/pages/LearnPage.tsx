@@ -47,13 +47,13 @@ export default function LearnPage() {
               Constellation <span className="gradient-text">Library</span>
             </h1>
             <p className="text-muted-foreground mb-6">
-              Explore {constellations.length} famous constellations — mythology, stars, and spotting tips.
+              All {constellations.length} constellations — mythology, key stars, and how to spot them. Learn at your pace.
             </p>
             {!user && (
               <RegisterGate
                 variant="banner"
-                title="Love what you're learning? Save your progress"
-                description="Create a free account to track every constellation you find, earn badges, and get recommendations tailored to your journey."
+                title="Save your progress"
+                description="Create a free account to track what you've found, earn badges, and get tonight's recommendations based on your journey."
               />
             )}
           </motion.div>

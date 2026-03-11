@@ -10,7 +10,7 @@ interface ProGateProps {
 }
 
 const defaultTitle = "Alnitar Pro";
-const defaultDescription = "Session planner, observing programs, year in review, shareable résumé, and challenges are part of Pro. Upgrade to get the full observatory experience.";
+const defaultDescription = "Session planner, observing programs, year in review, and exportable logs are part of Pro. Upgrade when you're ready to plan every session and share your log with your club or program.";
 
 export function ProGate({ title = defaultTitle, description = defaultDescription, variant = "card" }: ProGateProps) {
   if (variant === "inline") {
