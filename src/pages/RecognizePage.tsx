@@ -1,12 +1,14 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Image, Loader2, AlertCircle, Camera } from "lucide-react";
+import { Upload, Image, Loader2, AlertCircle, Camera, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { recognizeImage, type RecognitionOutput } from "@/lib/recognition";
 import { trackEvent } from "@/lib/analytics";
 import { CosmicReveal } from "@/components/CosmicReveal";
+import { CosmicCameraLiveView } from "@/components/CosmicCameraLiveView";
+import { CameraCaptureView } from "@/components/CameraCaptureView";
 import { SkyStoryMode } from "@/components/SkyStoryMode";
 import { RegisterGate } from "@/components/RegisterGate";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +19,8 @@ import {
   GUEST_RECOGNITION_LIMIT_PER_DAY,
 } from "@/lib/featureAccess";
 import { type Constellation } from "@/data/constellations";
+import { useGeolocation } from "@/hooks/use-geolocation";
+import { getTonightSkyData } from "@/lib/tonight";
 
 export default function RecognizePage() {
   const [file, setFile] = useState<File | null>(null);
@@ -26,7 +30,10 @@ export default function RecognizePage() {
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [storyConstellation, setStoryConstellation] = useState<Constellation | null>(null);
+  const [mode, setMode] = useState<"upload" | "live">("upload");
+  const [showCameraCapture, setShowCameraCapture] = useState(false);
   const { user } = useAuth();
+  const { latitude, longitude } = useGeolocation();
   const guestCount = getGuestRecognitionCount();
   const atLimit = !user && !canGuestRecognize();
 
@@ -45,7 +52,15 @@ export default function RecognizePage() {
     trackEvent("upload_started", { fileSize: f.size, fileType: f.type });
 
     try {
-      const output = await recognizeImage(f);
+      const now = new Date();
+      const tonight = getTonightSkyData(now, latitude, longitude);
+      const visibleConstellationIds = tonight.bestConstellations.map((c) => c.id);
+      const output = await recognizeImage(f, {
+        latitude,
+        longitude,
+        date: now,
+        visibleConstellationIds,
+      });
       if (!user) incrementGuestRecognitionCount();
       setResults(output);
       trackEvent("recognition_completed", {
@@ -89,8 +104,28 @@ export default function RecognizePage() {
               </h1>
             </div>
             <p className="text-muted-foreground mb-4">
-              Upload a sky photo — we'll tell you which constellations are in it. Save results to your journal and build a log that counts.
+              Upload a sky photo or use live camera — we'll identify constellations and overlay them in real time with confidence %.
             </p>
+            <div className="flex gap-2 mb-4">
+              <Button
+                variant={mode === "upload" ? "default" : "outline"}
+                size="sm"
+                className={mode === "upload" ? "btn-glow" : "border-border/50"}
+                onClick={() => setMode("upload")}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Upload photo
+              </Button>
+              <Button
+                variant={mode === "live" ? "default" : "outline"}
+                size="sm"
+                className={mode === "live" ? "btn-glow" : "border-border/50"}
+                onClick={() => setMode("live")}
+              >
+                <Video className="w-4 h-4 mr-2" />
+                Live camera
+              </Button>
+            </div>
             {!user && (
               <p className="text-sm text-muted-foreground/90 mb-6">
                 {guestCount < GUEST_RECOGNITION_LIMIT_PER_DAY
@@ -115,8 +150,18 @@ export default function RecognizePage() {
           )}
 
           <AnimatePresence mode="wait">
+            {/* Live camera AR */}
+            {mode === "live" && !atLimit && (
+              <motion.div key="live" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+                <CosmicCameraLiveView onClose={() => setMode("upload")} />
+                <p className="text-xs text-muted-foreground text-center">
+                  Constellation lines and match % update in real time. Point at the night sky for best results.
+                </p>
+              </motion.div>
+            )}
+
             {/* Sky Story Mode */}
-            {storyConstellation && results && (
+            {mode === "upload" && storyConstellation && results && (
               <motion.div key="story" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <SkyStoryMode
                   output={results}
@@ -125,23 +170,37 @@ export default function RecognizePage() {
               </motion.div>
             )}
 
+            {/* Take Photo: device camera capture */}
+            {mode === "upload" && showCameraCapture && !atLimit && (
+              <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+                <CameraCaptureView
+                  onCapture={(file) => {
+                    setShowCameraCapture(false);
+                    handleFile(file);
+                  }}
+                  onClose={() => setShowCameraCapture(false)}
+                />
+                <p className="text-xs text-muted-foreground text-center">
+                  Point your device at the night sky and tap the camera button to capture.
+                </p>
+              </motion.div>
+            )}
+
             {/* Upload zone */}
-            {!atLimit && !results && !loading && !storyConstellation && (
+            {mode === "upload" && !atLimit && !results && !loading && !storyConstellation && !showCameraCapture && (
               <motion.div key="upload" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <div
                   onDragOver={e => { e.preventDefault(); setDragActive(true); }}
                   onDragLeave={() => setDragActive(false)}
                   onDrop={handleDrop}
-                  className={`glass-card border-2 border-dashed p-12 sm:p-16 text-center cursor-pointer transition-all ${
+                  className={`glass-card border-2 border-dashed p-12 sm:p-16 text-center transition-all ${
                     dragActive ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/40"
                   }`}
-                  onClick={() => document.getElementById("file-input")?.click()}
                 >
                   <input
                     id="file-input"
                     type="file"
                     accept="image/*"
-                    capture="environment"
                     className="hidden"
                     onChange={e => e.target.files?.[0] && handleFile(e.target.files[0])}
                   />
@@ -150,18 +209,29 @@ export default function RecognizePage() {
                     Point at the sky & capture
                   </h3>
                   <p className="text-sm text-muted-foreground mb-6">
-                    Take a photo or drop an image · Alnitar reveals what's hidden
+                    Take a photo with your camera or upload an image · Alnitar reveals what's hidden
                   </p>
                   <div className="flex gap-3 justify-center">
-                    <Button variant="default" size="sm" className="btn-glow">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="btn-glow"
+                      onClick={(e) => { e.stopPropagation(); setShowCameraCapture(true); }}
+                    >
                       <Camera className="w-4 h-4 mr-2" />
                       Take Photo
                     </Button>
-                    <Button variant="outline" size="sm" className="border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-border/50"
+                      onClick={(e) => { e.stopPropagation(); document.getElementById("file-input")?.click(); }}
+                    >
                       <Image className="w-4 h-4 mr-2" />
                       Upload
                     </Button>
                   </div>
+                  <p className="text-xs text-muted-foreground mt-4">or drop an image here</p>
                 </div>
 
                 {error && (
@@ -174,7 +244,7 @@ export default function RecognizePage() {
             )}
 
             {/* Loading */}
-            {loading && (
+            {mode === "upload" && loading && (
               <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 className="glass-card p-12 sm:p-16 text-center">
                 <Loader2 className="w-10 h-10 text-primary mx-auto mb-4 animate-spin" />
@@ -190,25 +260,29 @@ export default function RecognizePage() {
               </motion.div>
             )}
 
-            {/* No constellation found (daytime / too few stars) */}
-            {results && results.noConstellationFound && (
+            {/* No constellation found (daytime / too few stars / not celestial) */}
+            {mode === "upload" && results && results.noConstellationFound && (
               <motion.div key="no-match" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-8 text-center">
-                <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-display text-xl font-semibold mb-2">No constellation identified</h3>
+                <AlertCircle className={`w-12 h-12 mx-auto mb-4 ${results.notCelestialImage ? "text-amber-500" : "text-muted-foreground"}`} />
+                <h3 className="font-display text-xl font-semibold mb-2">
+                  {results.notCelestialImage ? "Not a celestial photo" : "No constellation identified"}
+                </h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
                   {results.noMatchMessage ?? "Point your camera at a clear night sky with visible stars for best results."}
                 </p>
-                <p className="text-xs text-muted-foreground mb-4">
-                  {results.detectedStarCount} star{results.detectedStarCount !== 1 ? "s" : ""} detected in this image.
-                </p>
+                {!results.notCelestialImage && (
+                  <p className="text-xs text-muted-foreground mb-4">
+                    {results.detectedStarCount} star{results.detectedStarCount !== 1 ? "s" : ""} detected in this image.
+                  </p>
+                )}
                 <Button onClick={reset} variant="outline" className="border-border/50">
-                  Try another photo
+                  {results.notCelestialImage ? "Use a night sky photo" : "Try another photo"}
                 </Button>
               </motion.div>
             )}
 
             {/* Cosmic Reveal */}
-            {results && !storyConstellation && !results.noConstellationFound && (
+            {mode === "upload" && results && !storyConstellation && !results.noConstellationFound && (
               <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
                 <CosmicReveal
                   output={results}

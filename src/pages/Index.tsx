@@ -127,16 +127,18 @@ export default function Index() {
             <div className="glass-card p-6 border-primary/30 bg-primary/5">
               <div className="flex items-center gap-2 text-primary text-sm font-medium mb-3">
                 <Cloud className="w-4 h-4" />
-                One free account — your sky, everywhere
+                One free account
               </div>
-              <p className="text-sm text-foreground/90 mb-3">When you're ready to keep everything:</p>
+              <p className="text-sm text-foreground/90 mb-3">Same features, progress saved when you sign in:</p>
               <ul className="text-sm text-foreground/90 space-y-2">
-                <li><strong>Unlimited</strong> sky scans</li>
-                <li><strong>Unlimited</strong> journal with cloud backup</li>
-                <li>Tonight tailored to your location and what you've already found</li>
-                <li>Progress and badges on every device</li>
-                <li>Export-ready logs for clubs and programs</li>
+                <li>5 sky scans per day</li>
+                <li>All 88 constellations — learn and explore</li>
+                <li>Tonight's sky score and conditions</li>
+                <li>Up to 15 journal entries on this device</li>
+                <li>Sky Map, Planetarium, Time Travel</li>
+                <li>Progress and badges saved with your account</li>
               </ul>
+              <p className="text-xs text-muted-foreground mt-3">Unlimited scans, cloud journal &amp; export? <Link to="/pricing" className="text-primary hover:underline">See Pro</Link>.</p>
               <Button asChild size="sm" className="mt-4 btn-glow">
                 <Link to="/signup">Create free account <ArrowRight className="w-4 h-4 ml-1" /></Link>
               </Button>

@@ -12,7 +12,7 @@ import { getUpcomingEvents } from "@/lib/discovery/eventAwareness";
 export default function EventsPage() {
   const [events, setEvents] = useState<CelestialEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState(90);
 
   const load = useCallback(async () => {
     setLoading(true);
