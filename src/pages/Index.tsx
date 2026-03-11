@@ -162,6 +162,7 @@ export default function Index() {
           <span>Your location, your gear</span>
           <span>No telescope required</span>
           <span>Export for clubs & programs</span>
+          <span className="text-primary/90">Building the universal platform for the night sky</span>
         </motion.div>
       </section>
 

@@ -1,9 +1,12 @@
 # Alnitar
 
-**Alnitar** is an intelligent night-sky exploration platform. Take a photo of the sky and instantly identify constellations, stars, planets, and deep-sky objects.
+**Alnitar** is building the universal platform for exploring, learning, and contributing to humanity’s understanding of the night sky — the operating system of astronomy, not just a sky-recognition tool.
+
+Today: take a photo of the sky and instantly identify constellations, stars, planets, and deep-sky objects; plan tonight’s session; keep a verified observatory log; and learn across 88 constellations.
 
 - **Domain:** [alnitar.com](https://alnitar.com)
 - **Tagline:** Discover the night sky instantly.
+- **Vision & roadmap:** [docs/ECOSYSTEM_BLUEPRINT.md](docs/ECOSYSTEM_BLUEPRINT.md) — data, tools, community, education, and infrastructure in one integrated environment.
 
 ## Core features
 
