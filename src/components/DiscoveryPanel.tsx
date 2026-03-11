@@ -57,6 +57,13 @@ function RecCard({ rec, index = 0 }: { rec: Recommendation; index?: number }) {
             <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${difficultyColors[rec.difficulty]}`}>
               {rec.difficulty}
             </Badge>
+            {rec.suggestedScope && (
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-muted-foreground border-border/50">
+                {rec.suggestedScope === 'naked-eye' && <><Eye className="w-2.5 h-2.5 mr-0.5 inline" /> Naked eye</>}
+                {rec.suggestedScope === 'binoculars' && <><Binoculars className="w-2.5 h-2.5 mr-0.5 inline" /> Binoculars</>}
+                {rec.suggestedScope === 'small-scope' && <><Telescope className="w-2.5 h-2.5 mr-0.5 inline" /> Scope</>}
+              </Badge>
+            )}
             <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-muted/50 border-0">
               {rec.bestViewingTime}
             </Badge>

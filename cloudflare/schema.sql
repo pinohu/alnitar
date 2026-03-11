@@ -11,14 +11,62 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Profiles (display name, avatar)
+-- Profiles (display name, avatar, bio, location)
 CREATE TABLE IF NOT EXISTS profiles (
   id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
   display_name TEXT,
   avatar_url TEXT,
+  bio TEXT,
+  location_public TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- follows: follower follows following
+CREATE TABLE IF NOT EXISTS follows (
+  id TEXT PRIMARY KEY,
+  follower_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  following_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(follower_id, following_id)
+);
+CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);
+CREATE INDEX IF NOT EXISTS idx_follows_following ON follows(following_id);
+
+-- learning_progress
+CREATE TABLE IF NOT EXISTS learning_progress (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  path_id TEXT NOT NULL,
+  step_index INTEGER NOT NULL DEFAULT 0,
+  completed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, path_id)
+);
+CREATE INDEX IF NOT EXISTS idx_learning_progress_user ON learning_progress(user_id);
+
+-- API keys (research / developer)
+CREATE TABLE IF NOT EXISTS api_keys (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  key_hash TEXT NOT NULL,
+  name TEXT NOT NULL,
+  scope TEXT NOT NULL DEFAULT 'read',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_api_keys_user ON api_keys(user_id);
+
+-- Partners (organizations)
+CREATE TABLE IF NOT EXISTS partners (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  domain TEXT,
+  contact_email TEXT,
+  api_key_id TEXT REFERENCES api_keys(id) ON DELETE SET NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_partners_domain ON partners(domain);
 
 -- Observations (journal)
 CREATE TABLE IF NOT EXISTS observations (
@@ -35,6 +83,9 @@ CREATE TABLE IF NOT EXISTS observations (
   image_url TEXT,
   device_type TEXT DEFAULT 'phone',
   alternate_matches TEXT DEFAULT '[]',
+  verified_at TEXT,
+  verification_payload TEXT,
+  visibility TEXT NOT NULL DEFAULT 'private',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -81,6 +132,31 @@ CREATE TABLE IF NOT EXISTS weekly_challenges (
   week_end TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Community events (meteors, transients)
+CREATE TABLE IF NOT EXISTS community_events (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+  event_type TEXT NOT NULL DEFAULT 'meteor',
+  lat REAL NOT NULL,
+  lng REAL NOT NULL,
+  observed_at TEXT NOT NULL DEFAULT (datetime('now')),
+  notes TEXT DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_community_events_observed_at ON community_events(observed_at);
+
+-- User event reminders (in_app | email | push)
+CREATE TABLE IF NOT EXISTS user_event_reminders (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  event_id TEXT NOT NULL,
+  notify_days_before INTEGER NOT NULL DEFAULT 1,
+  channel TEXT NOT NULL DEFAULT 'in_app',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, event_id, channel)
+);
+CREATE INDEX IF NOT EXISTS idx_user_event_reminders_user ON user_event_reminders(user_id);
 
 -- Seed badges
 INSERT OR IGNORE INTO badges (id, name, description, icon, category) VALUES

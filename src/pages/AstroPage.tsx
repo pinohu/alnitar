@@ -143,12 +143,25 @@ export default function AstroPage() {
                       <Eye className="w-4 h-4 text-primary" /> Framing
                     </h4>
                     <p className="text-sm text-foreground/80">{analysis.framingQuality}</p>
+                    {analysis.suggestedFovDegrees != null && (
+                      <p className="text-xs text-primary mt-2">Frame target with ~{analysis.suggestedFovDegrees}° FOV for best composition.</p>
+                    )}
                   </div>
                   <div className="glass-card p-5">
                     <h4 className="font-display font-semibold text-sm flex items-center gap-2 mb-2">
                       <Sparkles className="w-4 h-4 text-accent" /> Exposure
                     </h4>
                     <p className="text-sm text-foreground/80">{analysis.exposureHint}</p>
+                    {(analysis.suggestedExposureMinSec != null || analysis.suggestedIso != null) && (
+                      <p className="text-xs text-primary mt-2">
+                        Suggested: {analysis.suggestedExposureMinSec ?? 30}–{analysis.suggestedExposureMaxSec ?? 120} s at ISO {analysis.suggestedIso ?? 800}.
+                      </p>
+                    )}
+                    {analysis.stackingDocLink && (
+                      <a href={analysis.stackingDocLink} target="_blank" rel="noopener noreferrer" className="text-xs text-accent hover:underline mt-2 inline-block">
+                        Stack with Siril/PixInsight →
+                      </a>
+                    )}
                   </div>
                 </div>
 

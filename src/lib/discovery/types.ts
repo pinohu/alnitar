@@ -15,6 +15,8 @@ export interface ObserverProfile {
   totalObservations: number;
 }
 
+export type SuggestedScope = 'naked-eye' | 'binoculars' | 'small-scope';
+
 export interface Recommendation {
   id: string;
   objectId: string;
@@ -26,6 +28,8 @@ export interface Recommendation {
   reason: string;
   tips: string;
   equipment: Equipment;
+  /** Suggested scope for this target (session planner / Tonight). */
+  suggestedScope?: SuggestedScope;
   visibility: number; // 0-100
   altitude: number;
   bestViewingTime: string;

@@ -258,25 +258,25 @@ If Alnitar integrates these layers, it can become that central platform.
 
 ## Current State vs Blueprint (reference)
 
-Use this to prioritize. **In place today** vs **planned / gap**.
+Use this to prioritize. **In place today** vs **planned / gap**. Implementation is tracked in the phased plan (schema, Worker APIs, frontend).
 
 | Blueprint area              | Current state |
 |----------------------------|---------------|
-| Sky recognition             | ✅ Constellation + DSO recognition, overlays; AR/live sky; no full satellite/planetary ID yet |
-| Observation planner        | ✅ Tonight’s Sky, session planner (Pro), conditions |
-| Astrophotography assistant  | ⬜ Basic image analysis (Astro page); no framing/stacking/alignment suite |
-| Astronomy database         | ✅ Star/constellation/DSO catalogs; not Gaia/NASA/MPC scale yet |
-| Observation network        | ⬜ Journal + cloud; no global feed, meteor/transient contribution yet |
-| Learning platform          | ✅ Learn (88 constellations), spotting tips, discovery recommendations |
-| Community layer             | ⬜ Share résumé, export; no follow/collaborate/social feed |
-| Researcher/institution tools| ⬜ API/partners doc; no dedicated research access or telescope integrations |
-| Hardware integration       | ⬜ Not yet |
-| Developer platform         | ⬜ Partners/API mentioned; no public APIs/SDKs/plugins yet |
-| Event engine               | ⬜ No eclipse/meteor/comet notifications yet |
+| Sky recognition             | ✅ Constellation + DSO recognition, overlays; AR/live sky; planet/satellite candidates and real-time tracking when context provided |
+| Observation planner        | ✅ Tonight’s Sky, session planner (Pro), conditions; Bortle/dark sky quality; telescope (scope) suggestions per target |
+| Astrophotography assistant  | ✅ Image analysis (Astro); framing FOV suggestions; exposure/ISO and stacking doc links; alignment star suggestions (Align page) |
+| Astronomy database         | ✅ Star/constellation/DSO catalogs; catalog service (planets, DSOs, ISS); not Gaia/NASA/MPC scale yet |
+| Observation network        | ✅ Global feed and stats (Worker); meteor/transient report; observation visibility (private/public/anonymous) |
+| Learning platform          | ✅ Learn (88 constellations), learning paths (/learn/paths), discovery recommendations, guided targets |
+| Community layer             | ✅ Public profiles (/profile/:id), follow/unfollow, for-you feed; profiles extended (bio, location_public) |
+| Researcher/institution tools| ✅ API key auth; GET /api/v1/observations and /api/v1/aggregates; Research/API page; admin key creation |
+| Hardware integration       | ✅ Align-scope page (suggested alignment stars); Explore entry; mount control (Alpaca/INDI) planned |
+| Developer platform         | ✅ Public API v1 (observations, aggregates); Research page and docs; rate limits / SDK planned |
+| Event engine               | ✅ Upcoming events API; Events page; user event reminders (in-app); optional email/push later |
 | AI for discovery           | ✅ Discovery engine, recommendations; no transient/pattern detection yet |
-| Immersive visualization    | ✅ Sky map, planetarium, time travel; no full 3D galaxy/planetary yet |
+| Immersive visualization    | ✅ Sky map, planetarium, time travel; /explore placeholder for 3D; full 3D galaxy/planetary planned |
 | Monetization               | ✅ Pro subscription, support/donate, partners |
-| Partnerships               | ⬜ Partners page; no formal observatory/university partnerships yet |
-| Branding                   | ⬜ No podcasts/campaigns/live events yet |
+| Partnerships               | ✅ Partners page; admin partner CRUD (Worker); campaigns page; institutional onboarding path |
+| Branding                   | ✅ Campaigns page and structure; podcasts/campaigns/live events content pipeline planned |
 
 *Update this table as the product evolves.*

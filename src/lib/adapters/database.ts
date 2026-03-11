@@ -1,12 +1,13 @@
 /**
  * Database Abstraction Layer
- * 
+ *
  * Provides a portable interface for data access.
- * Current adapter: Supabase (via Lovable Cloud)
- * Future adapters: Cloudflare D1, PlanetScale, Turso, etc.
+ * When VITE_CF_API_URL is set, uses Cloudflare Worker (D1) for observations.
+ * Otherwise uses Supabase (via Lovable Cloud).
  */
 
 import { supabase } from "@/integrations/supabase/client";
+import { cfFetch, isCloudflareConfigured } from "@/integrations/cloudflare/client";
 
 // ─── Generic Types ───────────────────────────────────────────
 
@@ -82,6 +83,137 @@ class SupabaseAdapter implements DatabaseAdapter {
   /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
+// ─── Cloudflare (D1) Adapter ───────────────────────────────────
+// Uses Worker GET/POST/PATCH/DELETE for observations when VITE_CF_API_URL is set.
+
+class CloudflareAdapter implements DatabaseAdapter {
+  async query<T>(
+    table: string,
+    options?: {
+      filters?: Record<string, unknown>;
+      orderBy?: string;
+      ascending?: boolean;
+      limit?: number;
+      offset?: number;
+    }
+  ): Promise<QueryResult<T>> {
+    if (table !== "observations") return { data: [], error: "Cloudflare adapter supports only observations table" };
+    const userId = options?.filters?.user_id as string | undefined;
+    if (!userId) return { data: [], error: "user_id filter required for observations" };
+    const limit = options?.limit ?? 100;
+    try {
+      const res = await cfFetch(`api/observations?user_id=${encodeURIComponent(userId)}&limit=${limit}`);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        return { data: [], error: (errBody as { error?: string }).error ?? res.statusText };
+      }
+      const body = (await res.json()) as { data?: T[] };
+      let data = (body.data ?? []) as T[];
+      if (options?.orderBy) {
+        const asc = options.ascending ?? false;
+        data = [...data].sort((a, b) => {
+          const av = (a as Record<string, unknown>)[options.orderBy!];
+          const bv = (b as Record<string, unknown>)[options.orderBy!];
+          if (av == null && bv == null) return 0;
+          if (av == null) return asc ? 1 : -1;
+          if (bv == null) return asc ? -1 : 1;
+          const cmp = String(av).localeCompare(String(bv), undefined, { numeric: true });
+          return asc ? cmp : -cmp;
+        });
+      }
+      if (options?.offset) data = data.slice(options.offset, options.offset + (options.limit ?? data.length));
+      return { data };
+    } catch (e) {
+      return { data: [], error: e instanceof Error ? e.message : "Request failed" };
+    }
+  }
+
+  async getById<T>(table: string, id: string): Promise<SingleResult<T>> {
+    if (table !== "observations") return { data: null, error: "Cloudflare adapter supports only observations table" };
+    try {
+      const res = await cfFetch(`api/observations/${encodeURIComponent(id)}`);
+      if (!res.ok) {
+        if (res.status === 404) return { data: null };
+        const errBody = await res.json().catch(() => ({}));
+        return { data: null, error: (errBody as { error?: string }).error ?? res.statusText };
+      }
+      const body = (await res.json()) as { data?: T };
+      return { data: body.data ?? null };
+    } catch (e) {
+      return { data: null, error: e instanceof Error ? e.message : "Request failed" };
+    }
+  }
+
+  async insert<T>(table: string, data: Partial<T>): Promise<SingleResult<T>> {
+    if (table !== "observations") return { data: null, error: "Cloudflare adapter supports only observations table" };
+    const row = data as Record<string, unknown>;
+    const payload = {
+      constellation_id: row.constellation_id ?? "",
+      constellation_name: row.constellation_name ?? "",
+      confidence: row.confidence ?? 0,
+      notes: row.notes ?? "",
+      location: row.location ?? "",
+      date: row.date ?? new Date().toISOString().slice(0, 10),
+      equipment: row.equipment ?? "phone",
+      image_url: row.image_url ?? null,
+      device_type: row.device_type ?? "phone",
+      alternate_matches: row.alternate_matches ?? [],
+      verified_at: row.verified_at ?? null,
+      verification_payload: row.verification_payload ?? null,
+      visibility: (row.visibility as string) ?? "private",
+    };
+    try {
+      const res = await cfFetch("api/observations", { method: "POST", body: JSON.stringify(payload) });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        return { data: null, error: (errBody as { error?: string }).error ?? res.statusText };
+      }
+      const body = (await res.json()) as { data?: T };
+      return { data: body.data ?? null };
+    } catch (e) {
+      return { data: null, error: e instanceof Error ? e.message : "Request failed" };
+    }
+  }
+
+  async update<T>(table: string, id: string, data: Partial<T>): Promise<SingleResult<T>> {
+    if (table !== "observations") return { data: null, error: "Cloudflare adapter supports only observations table" };
+    const patch: Record<string, unknown> = {};
+    if (Object.prototype.hasOwnProperty.call(data, "notes")) patch.notes = (data as Record<string, unknown>).notes;
+    if (Object.prototype.hasOwnProperty.call(data, "location")) patch.location = (data as Record<string, unknown>).location;
+    if (Object.prototype.hasOwnProperty.call(data, "verified_at")) patch.verified_at = (data as Record<string, unknown>).verified_at;
+    if (Object.prototype.hasOwnProperty.call(data, "verification_payload")) patch.verification_payload = (data as Record<string, unknown>).verification_payload;
+    if (Object.keys(patch).length === 0) return this.getById<T>(table, id);
+    try {
+      const res = await cfFetch(`api/observations/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        return { data: null, error: (errBody as { error?: string }).error ?? res.statusText };
+      }
+      const body = (await res.json()) as { data?: T };
+      return { data: body.data ?? null };
+    } catch (e) {
+      return { data: null, error: e instanceof Error ? e.message : "Request failed" };
+    }
+  }
+
+  async remove(table: string, id: string): Promise<{ error?: string }> {
+    if (table !== "observations") return { error: "Cloudflare adapter supports only observations table" };
+    try {
+      const res = await cfFetch(`api/observations/${encodeURIComponent(id)}`, { method: "DELETE" });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        return { error: (errBody as { error?: string }).error ?? res.statusText };
+      }
+      return {};
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Request failed" };
+    }
+  }
+}
+
 // ─── Export singleton ────────────────────────────────────────
 
-export const db: DatabaseAdapter = new SupabaseAdapter();
+export const db: DatabaseAdapter = isCloudflareConfigured ? new CloudflareAdapter() : new SupabaseAdapter();

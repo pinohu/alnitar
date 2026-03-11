@@ -1,5 +1,6 @@
 import { constellations, type Constellation } from "@/data/constellations";
 import { deepSkyCatalog, type DeepSkyCatalogObject } from "@/data/deepSkyObjects";
+import { getBortleLevel, bortleToDarkSkyScore } from "@/lib/lightPollution";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -12,6 +13,10 @@ export interface TonightSkyData {
   moonPhase: string;
   moonBrightness: number;
   darkness: number;
+  /** Bortle scale 1–9 (1=pristine, 9=city). Used with darkness for dark sky quality. */
+  bortleLevel: number;
+  /** 0–100 combined dark sky quality (moon + light pollution). */
+  darkSkyQuality: number;
 }
 
 function getMoonPhase(date: Date): { phase: string; brightness: number } {
@@ -53,9 +58,12 @@ function getVisiblePlanets(date: Date): { name: string; brightness: string; dire
   return planets;
 }
 
-export function getTonightSkyData(date: Date = new Date(), latitude: number = 40): TonightSkyData {
+export function getTonightSkyData(date: Date = new Date(), latitude: number = 40, longitude: number = 0): TonightSkyData {
   const monthName = MONTHS[date.getMonth()];
   const { phase: moonPhase, brightness: moonBrightness } = getMoonPhase(date);
+  const bortleLevel = getBortleLevel(latitude, longitude);
+  const darkness = Math.max(0, 100 - moonBrightness);
+  const darkSkyQuality = Math.round(darkness * 0.6 + bortleToDarkSkyScore(bortleLevel) * 0.4);
 
   // Best constellations for this month
   const bestConstellations = constellations
@@ -77,11 +85,10 @@ export function getTonightSkyData(date: Date = new Date(), latitude: number = 40
   // Visible planets
   const visiblePlanets = getVisiblePlanets(date);
 
-  // Sky score (0-100)
-  const darkness = Math.max(0, 100 - moonBrightness);
+  // Sky score (0-100) — factor in dark sky quality
   const targetCount = Math.min(bestConstellations.length, 10);
   const skyScore = Math.round(
-    (darkness * 0.4) + (targetCount * 5 * 0.3) + ((5 - Math.min(visiblePlanets.length, 5)) * 6 * 0.3)
+    (darkSkyQuality * 0.4) + (targetCount * 5 * 0.3) + ((5 - Math.min(visiblePlanets.length, 5)) * 6 * 0.3)
   );
 
   return {
@@ -93,5 +100,7 @@ export function getTonightSkyData(date: Date = new Date(), latitude: number = 40
     moonPhase,
     moonBrightness,
     darkness,
+    bortleLevel,
+    darkSkyQuality: Math.min(100, darkSkyQuality),
   };
 }

@@ -50,6 +50,7 @@ function buildConstellationRec(
   if (brightestMag < 1) reasons.push('Contains very bright stars');
   if ((c.difficulty ?? 3) <= 2) reasons.push('Excellent beginner target');
 
+  const suggestedScope = (c.difficulty ?? 3) <= 2 ? 'naked-eye' as const : (c.difficulty ?? 3) <= 3 ? 'binoculars' as const : 'small-scope' as const;
   return {
     id: `rec-${c.id}-${category}`,
     objectId: c.id,
@@ -61,6 +62,7 @@ function buildConstellationRec(
     reason: reasons.slice(0, 2).join('. ') || 'Visible tonight',
     tips: c.spottingTips.slice(0, 120),
     equipment: 'naked-eye',
+    suggestedScope,
     visibility: Math.round(Math.min(100, alt + (c.bestMonths.includes(MONTHS[month]) ? 20 : 0))),
     altitude: alt,
     bestViewingTime: alt > 50 ? '9-11 PM' : '11 PM – 1 AM',
@@ -93,6 +95,8 @@ function buildDSORec(
 
   const eqNeeded = obj.visibility === 'naked-eye' ? 'naked-eye' as const
     : obj.visibility === 'binocular' ? 'binoculars' as const : 'telescope' as const;
+  const suggestedScope = obj.visibility === 'naked-eye' ? 'naked-eye' as const
+    : obj.visibility === 'binocular' ? 'binoculars' as const : 'small-scope' as const;
 
   return {
     id: `rec-${obj.id}-${category}`,
@@ -105,6 +109,7 @@ function buildDSORec(
     reason: reasons.slice(0, 2).join('. ') || 'Worth observing tonight',
     tips: obj.description.slice(0, 120),
     equipment: eqNeeded,
+    suggestedScope,
     visibility: eqMatch ? 80 : 40,
     altitude: 45,
     bestViewingTime: '10 PM – midnight',
@@ -114,7 +119,7 @@ function buildDSORec(
 }
 
 export function getDiscoveryRecommendations(profile: ObserverProfile): DiscoveryResult {
-  const skyData = getTonightSkyData(profile.date, profile.latitude);
+  const skyData = getTonightSkyData(profile.date, profile.latitude, profile.longitude);
   const month = MONTHS[profile.date.getMonth()];
   const { moonBrightness, moonPhase, skyScore } = skyData;
   const level = getExperienceLevel(profile.totalObservations, profile.constellationsFound.length);

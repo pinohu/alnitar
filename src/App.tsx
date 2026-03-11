@@ -11,7 +11,9 @@ const Index = lazy(() => import("./pages/Index.tsx"));
 const RecognizePage = lazy(() => import("./pages/RecognizePage.tsx"));
 const SkyPage = lazy(() => import("./pages/SkyPage.tsx"));
 const LearnPage = lazy(() => import("./pages/LearnPage.tsx"));
+const LearnPathsPage = lazy(() => import("./pages/LearnPathsPage.tsx"));
 const ConstellationDetailPage = lazy(() => import("./pages/ConstellationDetailPage.tsx"));
+const PublicProfilePage = lazy(() => import("./pages/PublicProfilePage.tsx"));
 const JournalPage = lazy(() => import("./pages/JournalPage.tsx"));
 const LoginPage = lazy(() => import("./pages/LoginPage.tsx"));
 const SignupPage = lazy(() => import("./pages/SignupPage.tsx"));
@@ -22,11 +24,16 @@ const AstroPage = lazy(() => import("./pages/AstroPage.tsx"));
 const PlanetariumPage = lazy(() => import("./pages/PlanetariumPage.tsx"));
 const LiveSkyPage = lazy(() => import("./pages/LiveSkyPage.tsx"));
 const SkyNetworkPage = lazy(() => import("./pages/SkyNetworkPage.tsx"));
+const EventsPage = lazy(() => import("./pages/EventsPage.tsx"));
 const SkyThroughTimePage = lazy(() => import("./pages/SkyThroughTimePage.tsx"));
 const SkyDataPage = lazy(() => import("./pages/SkyDataPage.tsx"));
 const SupportPage = lazy(() => import("./pages/SupportPage.tsx"));
 const PricingPage = lazy(() => import("./pages/PricingPage.tsx"));
 const PartnersPage = lazy(() => import("./pages/PartnersPage.tsx"));
+const ResearchApiPage = lazy(() => import("./pages/ResearchApiPage.tsx"));
+const AlignScopePage = lazy(() => import("./pages/AlignScopePage.tsx"));
+const ExplorePage = lazy(() => import("./pages/ExplorePage.tsx"));
+const CampaignsPage = lazy(() => import("./pages/CampaignsPage.tsx"));
 const SessionPlannerPage = lazy(() => import("./pages/SessionPlannerPage.tsx"));
 const ProgramsPage = lazy(() => import("./pages/ProgramsPage.tsx"));
 const YearInReviewPage = lazy(() => import("./pages/YearInReviewPage.tsx"));
@@ -59,7 +66,9 @@ const App = () => (
                 <Route path="/recognize" element={<RecognizePage />} />
                 <Route path="/sky" element={<SkyPage />} />
                 <Route path="/learn" element={<LearnPage />} />
+                <Route path="/learn/paths" element={<LearnPathsPage />} />
                 <Route path="/learn/:slug" element={<ConstellationDetailPage />} />
+                <Route path="/profile/:userId" element={<PublicProfilePage />} />
                 <Route path="/journal" element={<JournalPage />} />
                 <Route path="/journal/year-in-review" element={<YearInReviewPage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -73,11 +82,16 @@ const App = () => (
                 <Route path="/planetarium" element={<PlanetariumPage />} />
                 <Route path="/live-sky" element={<LiveSkyPage />} />
                 <Route path="/sky-network" element={<SkyNetworkPage />} />
+                <Route path="/events" element={<EventsPage />} />
                 <Route path="/time-travel" element={<SkyThroughTimePage />} />
                 <Route path="/sky-data" element={<SkyDataPage />} />
                 <Route path="/support" element={<SupportPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/partners" element={<PartnersPage />} />
+                <Route path="/research" element={<ResearchApiPage />} />
+                <Route path="/align" element={<AlignScopePage />} />
+                <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/campaigns" element={<CampaignsPage />} />
                 <Route path="/privacy" element={<LegalPage />} />
                 <Route path="/terms" element={<LegalPage />} />
                 <Route path="/disclaimer" element={<LegalPage />} />

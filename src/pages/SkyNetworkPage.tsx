@@ -1,19 +1,99 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Globe, Users, MapPin, Bell, Telescope, Star, Eye, Activity, Radio } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Globe, Users, MapPin, Bell, Telescope, Star, Eye, Activity, Radio, Loader2, Send } from "lucide-react";
+import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
 
-// Live observations and alerts come from the API; no seeded/fake data
-const LIVE_OBSERVATIONS: Array<{ id: number; constellation: string; location: string; lat: number; lng: number; time: string; users: number }> = [];
+interface FeedItem {
+  id: string;
+  constellation: string;
+  location: string;
+  date?: string;
+  time: string;
+  anonymous?: boolean;
+}
+
+interface NetworkStats {
+  totalObserversTonight: number;
+  totalObservationsTonight: number;
+  constellationsSpotted: number;
+  countries: number;
+  meteorsDetected: number;
+}
+
 const SKY_ALERTS: Array<{ id: string; title: string; description: string; type: string; urgency: "high" | "medium" | "low"; time: string }> = [];
-const COMMUNITY_STATS = { totalObserversTonight: 0, totalObservationsTonight: 0, constellationsSpotted: 0, countries: 0, meteorsDetected: 0 };
 
 export default function SkyNetworkPage() {
   const [tab, setTab] = useState<"live" | "alerts" | "community">("live");
+  const [feed, setFeed] = useState<FeedItem[]>([]);
+  const [stats, setStats] = useState<NetworkStats>({ totalObserversTonight: 0, totalObservationsTonight: 0, constellationsSpotted: 0, countries: 0, meteorsDetected: 0 });
+  const [loading, setLoading] = useState(isCloudflareConfigured);
+  const [error, setError] = useState<string | null>(null);
+  const [meteorSubmitting, setMeteorSubmitting] = useState(false);
+  const [meteorLat, setMeteorLat] = useState("");
+  const [meteorLng, setMeteorLng] = useState("");
+  const [meteorNotes, setMeteorNotes] = useState("");
+
+  const loadFeed = useCallback(async () => {
+    if (!isCloudflareConfigured) return;
+    try {
+      const res = await cfFetch("api/network/feed?limit=50");
+      if (!res.ok) throw new Error("Failed to load feed");
+      const data = (await res.json()) as { data?: FeedItem[] };
+      setFeed(data.data ?? []);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load feed");
+      setFeed([]);
+    }
+  }, []);
+
+  const loadStats = useCallback(async () => {
+    if (!isCloudflareConfigured) return;
+    try {
+      const res = await cfFetch("api/network/stats");
+      if (!res.ok) throw new Error("Failed to load stats");
+      const data = (await res.json()) as NetworkStats;
+      setStats(data);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to load stats");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isCloudflareConfigured) {
+      setLoading(false);
+      return;
+    }
+    setError(null);
+    Promise.all([loadFeed(), loadStats()]).finally(() => setLoading(false));
+  }, [loadFeed, loadStats]);
+
+  const submitMeteor = async () => {
+    const lat = Number.parseFloat(meteorLat);
+    const lng = Number.parseFloat(meteorLng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    if (!isCloudflareConfigured) return;
+    setMeteorSubmitting(true);
+    try {
+      const res = await cfFetch("api/network/meteor", {
+        method: "POST",
+        body: JSON.stringify({ lat, lng, notes: meteorNotes.trim() || undefined }),
+      });
+      if (!res.ok) throw new Error("Failed to report");
+      setMeteorLat("");
+      setMeteorLng("");
+      setMeteorNotes("");
+      loadStats();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to report meteor");
+    } finally {
+      setMeteorSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -38,16 +118,27 @@ export default function SkyNetworkPage() {
           </motion.div>
 
           {/* Live stats banner */}
+          {loading && (
+            <div className="glass-card p-6 mb-6 flex items-center justify-center gap-2 text-muted-foreground">
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span className="text-sm">Loading network data…</span>
+            </div>
+          )}
+          {error && !loading && (
+            <div className="glass-card p-4 mb-6 border-destructive/30 bg-destructive/5 text-destructive text-sm">
+              {error}
+            </div>
+          )}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="glass-card p-4 mb-6 flex flex-wrap gap-6 justify-center"
           >
             {[
-              { label: "Active Observers", value: COMMUNITY_STATS.totalObserversTonight.toLocaleString(), icon: Users },
-              { label: "Observations Tonight", value: COMMUNITY_STATS.totalObservationsTonight.toLocaleString(), icon: Eye },
-              { label: "Countries", value: COMMUNITY_STATS.countries.toString(), icon: Globe },
-              { label: "Meteors Detected", value: COMMUNITY_STATS.meteorsDetected.toString(), icon: Activity },
+              { label: "Active Observers", value: stats.totalObserversTonight.toLocaleString(), icon: Users },
+              { label: "Observations Tonight", value: stats.totalObservationsTonight.toLocaleString(), icon: Eye },
+              { label: "Countries", value: stats.countries.toString(), icon: Globe },
+              { label: "Meteors Detected", value: stats.meteorsDetected.toString(), icon: Activity },
             ].map(s => (
               <div key={s.label} className="text-center">
                 <s.icon className="w-4 h-4 mx-auto mb-1 text-primary" />
@@ -84,11 +175,11 @@ export default function SkyNetworkPage() {
                 <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <span className="text-xs text-green-400 font-medium">Live — data from the Alnitar network</span>
               </div>
-              {LIVE_OBSERVATIONS.length === 0 ? (
+              {feed.length === 0 ? (
                 <div className="glass-card p-8 text-center text-muted-foreground text-sm">
-                  No live observations yet. Observations from Alnitar users will appear here when available.
+                  No live observations yet. Set observation visibility to &quot;public&quot; or &quot;anonymous&quot; to appear in the feed.
                 </div>
-              ) : LIVE_OBSERVATIONS.map((obs, i) => (
+              ) : feed.map((obs, i) => (
                 <motion.div
                   key={obs.id}
                   initial={{ opacity: 0, x: -10 }}
@@ -103,18 +194,12 @@ export default function SkyNetworkPage() {
                     <div className="flex items-center gap-2">
                       <h4 className="font-display font-semibold text-sm">{obs.constellation}</h4>
                       <span className="text-[10px] text-muted-foreground">{obs.time}</span>
+                      {obs.anonymous && <Badge variant="secondary" className="text-[10px]">Anonymous</Badge>}
                     </div>
                     <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <MapPin className="w-3 h-3" />
-                      {obs.location}
+                      {obs.location || "—"}
                     </div>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <div className="flex items-center gap-1 text-sm font-display font-semibold">
-                      <Users className="w-3 h-3 text-primary" />
-                      {obs.users}
-                    </div>
-                    <span className="text-[10px] text-muted-foreground">observers</span>
                   </div>
                 </motion.div>
               ))}
@@ -184,10 +269,29 @@ export default function SkyNetworkPage() {
                 </p>
               </div>
 
+              {isCloudflareConfigured && (
+                <div className="glass-card p-5 border-accent/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Activity className="w-4 h-4 text-accent" />
+                    <h3 className="font-display font-semibold text-sm">Report meteor / transient</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-3">Saw a meteor or other transient? Report it to the network.</p>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <Input type="number" placeholder="Latitude" className="w-24 h-8 text-sm" value={meteorLat} onChange={e => setMeteorLat(e.target.value)} step="any" />
+                    <Input type="number" placeholder="Longitude" className="w-24 h-8 text-sm" value={meteorLng} onChange={e => setMeteorLng(e.target.value)} step="any" />
+                    <Input type="text" placeholder="Notes (optional)" className="flex-1 min-w-[120px] h-8 text-sm" value={meteorNotes} onChange={e => setMeteorNotes(e.target.value)} />
+                    <Button size="sm" className="h-8" onClick={submitMeteor} disabled={meteorSubmitting}>
+                      {meteorSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                      <span className="ml-1.5">Report</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
+
               <div className="glass-card p-6 text-center">
                 <p className="text-xs text-muted-foreground mb-2">Your contribution</p>
                 <p className="font-display text-sm font-medium text-foreground">
-                  When you save observations, they are included in the network. Aggregated stats are shown on the Sky Intelligence page.
+                  When you save observations, they are included in the network. Set visibility to public or anonymous to appear in the live feed.
                 </p>
               </div>
             </motion.div>

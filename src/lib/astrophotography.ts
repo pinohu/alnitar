@@ -1,3 +1,5 @@
+import { deepSkyCatalog } from "@/data/deepSkyObjects";
+
 export interface AstroAnalysis {
   blurScore: number; // 0-100, higher = sharper
   starDensity: number; // estimated stars per frame
@@ -7,6 +9,16 @@ export interface AstroAnalysis {
   exposureHint: string;
   suggestions: string[];
   targets: { name: string; type: string; difficulty: string }[];
+  /** Suggested FOV in degrees to frame a target (when target is known). */
+  suggestedFovDegrees?: number;
+  /** Suggested exposure range (seconds). */
+  suggestedExposureMinSec?: number;
+  suggestedExposureMaxSec?: number;
+  suggestedIso?: number;
+  /** e.g. "20–30 frames" */
+  stackingFramesSuggestion?: string;
+  /** Link to stacking workflow (Siril/PixInsight). */
+  stackingDocLink?: string;
 }
 
 export function analyzeAstroImage(imageData: ImageData): AstroAnalysis {
@@ -76,7 +88,7 @@ export function analyzeAstroImage(imageData: ImageData): AstroAnalysis {
   const suggestions: string[] = [];
   if (blurScore < 40) suggestions.push("Use a sturdy tripod and remote shutter release to reduce blur.");
   if (blurScore < 20) suggestions.push("Consider using a star tracker for sharp star points in long exposures.");
-  if (noiseLevel > 60) suggestions.push("Stack multiple exposures to reduce noise (try 20-30 frames).");
+  if (noiseLevel > 60) suggestions.push("Stack 20–30 exposures with Siril or PixInsight to reduce noise.");
   if (brightnessScore > 60) suggestions.push("Use a light pollution filter to darken the sky background.");
   if (starDensity < 5) suggestions.push("Point toward the Milky Way for richer star fields.");
   if (suggestions.length === 0) suggestions.push("Great image! Consider experimenting with different focal lengths.");
@@ -92,6 +104,13 @@ export function analyzeAstroImage(imageData: ImageData): AstroAnalysis {
     { name: "Whirlpool Galaxy (M51)", type: "Galaxy", difficulty: "Advanced" },
   ];
 
+  // Generic exposure suggestion (nebula-friendly default) and stacking
+  const suggestedExposureMinSec = 30;
+  const suggestedExposureMaxSec = 120;
+  const suggestedIso = 800;
+  const stackingFramesSuggestion = "20–30 frames";
+  const stackingDocLink = "https://siril.org/tutorials/stacking/";
+
   return {
     blurScore,
     starDensity,
@@ -101,7 +120,43 @@ export function analyzeAstroImage(imageData: ImageData): AstroAnalysis {
     exposureHint,
     suggestions,
     targets,
+    suggestedExposureMinSec,
+    suggestedExposureMaxSec,
+    suggestedIso,
+    stackingFramesSuggestion,
+    stackingDocLink,
   };
+}
+
+/** Parse DSO angular size string (e.g. "85' × 60'" or "20'") to approximate degrees. */
+function parseAngularSizeToDeg(sizeStr: string | undefined): number | null {
+  if (!sizeStr?.trim()) return null;
+  const match = sizeStr.match(/(\d+)\s*['′]/);
+  if (!match) return null;
+  const arcmin = Number.parseInt(match[1], 10);
+  return arcmin / 60; // degrees
+}
+
+/**
+ * Suggest FOV (degrees) to frame a given target. Uses deepSkyObjects size when available.
+ */
+export function getFramingForTarget(targetId: string): { suggestedFovDegrees: number; label: string } | null {
+  const obj = deepSkyCatalog.find((o) => o.id === targetId);
+  if (!obj?.size) return null;
+  const deg = parseAngularSizeToDeg(obj.size);
+  if (deg == null) return null;
+  const suggestedFovDegrees = Math.min(20, Math.max(1, deg * 2)); // ~2× object size for framing
+  return { suggestedFovDegrees, label: `Frame with ~${suggestedFovDegrees.toFixed(0)}° FOV` };
+}
+
+/** Exposure recommendation by target type (nebula vs galaxy). */
+export function getExposureForTargetType(
+  targetType: string
+): { minSec: number; maxSec: number; iso: number } {
+  const t = targetType.toLowerCase();
+  if (t.includes("nebula") || t.includes("cluster")) return { minSec: 30, maxSec: 120, iso: 800 };
+  if (t.includes("galaxy")) return { minSec: 60, maxSec: 180, iso: 800 };
+  return { minSec: 30, maxSec: 120, iso: 800 };
 }
 
 export function analyzeFromFile(file: File): Promise<AstroAnalysis> {

@@ -25,9 +25,21 @@ export default function LiveSkyPage() {
   const [objects, setObjects] = useState<AROverlayObject[]>([]);
   const [selectedObject, setSelectedObject] = useState<AROverlayObject | null>(null);
   const [simulationMode, setSimulationMode] = useState(false);
+  const [overlayTime, setOverlayTime] = useState(() => new Date());
   const simInterval = useRef<number>(0);
 
   useEffect(() => { trackEvent("live_sky_opened"); }, []);
+
+  // When tracking a planet, update overlay time every second so position stays current
+  const isTrackingMovingObject = selectedObject?.type === 'planet';
+  useEffect(() => {
+    if (selectedObject?.type === 'planet') setOverlayTime(new Date());
+  }, [selectedObject?.id, selectedObject?.type]);
+  useEffect(() => {
+    if (!isTrackingMovingObject) return;
+    const interval = window.setInterval(() => setOverlayTime(new Date()), 1000);
+    return () => clearInterval(interval);
+  }, [isTrackingMovingObject]);
 
   // Request sensor permission
   const requestPermission = useCallback(async () => {
@@ -46,12 +58,12 @@ export default function LiveSkyPage() {
     });
   }, []);
 
-  // Update visible objects
+  // Update visible objects (use overlayTime when tracking a planet so position updates)
   useEffect(() => {
-    const now = new Date();
-    const visible = getAROverlayObjects(orientation, location, now);
+    const time = isTrackingMovingObject ? overlayTime : new Date();
+    const visible = getAROverlayObjects(orientation, location, time);
     setObjects(visible);
-  }, [orientation, location]);
+  }, [orientation, location, overlayTime, isTrackingMovingObject]);
 
   // Simulation mode — slowly rotate the view
   useEffect(() => {
@@ -254,6 +266,9 @@ export default function LiveSkyPage() {
                   <span>Az: {selectedObject.azimuth.toFixed(1)}°</span>
                   {selectedObject.magnitude !== undefined && <span>Mag: {selectedObject.magnitude.toFixed(1)}</span>}
                 </div>
+                {selectedObject.type === 'planet' && (
+                  <p className="text-[10px] text-primary mt-2">Position updates in real time while selected.</p>
+                )}
               </motion.div>
             )}
           </AnimatePresence>

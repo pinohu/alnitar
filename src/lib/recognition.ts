@@ -1,4 +1,6 @@
 import { constellations, type Constellation } from "@/data/constellations";
+import { getVisiblePlanets } from "@/lib/astronomy/planetService";
+import { getSatellitePasses } from "@/lib/catalogService";
 
 export interface RecognitionResult {
   id: string;
@@ -6,6 +8,21 @@ export interface RecognitionResult {
   confidence: number;
   matchedStars: string[];
   reason: string;
+}
+
+/** Planet or satellite candidate that may be in the FOV (when context is provided). */
+export interface PlanetCandidate {
+  name: string;
+  magnitude: number;
+  altitude: number;
+  azimuth: number;
+}
+
+export interface SatelliteCandidate {
+  name: string;
+  id: string;
+  maxAltitude: number;
+  magnitude?: number;
 }
 
 export interface RecognitionOutput {
@@ -18,6 +35,10 @@ export interface RecognitionOutput {
   noConstellationFound?: boolean;
   /** User-facing reason when noConstellationFound is true */
   noMatchMessage?: string;
+  /** Visible planets that could be in frame (when context provided). */
+  planetCandidates?: PlanetCandidate[];
+  /** Satellite passes that could be in frame (when context provided). */
+  satelliteCandidates?: SatelliteCandidate[];
 }
 
 const MIN_STARS_TO_MATCH = 6;
@@ -152,7 +173,16 @@ function matchConstellations(detectedStars: { x: number; y: number; brightness: 
   return results.sort((a, b) => b.confidence - a.confidence).slice(0, 5);
 }
 
-export async function recognizeImage(file: File): Promise<RecognitionOutput> {
+export interface RecognitionContext {
+  latitude: number;
+  longitude: number;
+  date: Date;
+}
+
+export async function recognizeImage(
+  file: File,
+  context?: RecognitionContext
+): Promise<RecognitionOutput> {
   const startTime = performance.now();
 
   return new Promise((resolve) => {
@@ -201,14 +231,45 @@ export async function recognizeImage(file: File): Promise<RecognitionOutput> {
       const minDelay = 1500;
       const delay = Math.max(0, minDelay - elapsed);
 
-      setTimeout(() => {
-        resolve({
-          results,
-          detectedStarCount: starPositions.length,
-          processingTimeMs: Math.round(performance.now() - startTime),
-          imageDimensions: { width: img.width, height: img.height },
-          starPositions,
-          ...(noConstellationFound && { noConstellationFound: true, noMatchMessage }),
+      const baseOutput: RecognitionOutput = {
+        results,
+        detectedStarCount: starPositions.length,
+        processingTimeMs: Math.round(performance.now() - startTime),
+        imageDimensions: { width: img.width, height: img.height },
+        starPositions,
+        ...(noConstellationFound && { noConstellationFound: true, noMatchMessage }),
+      };
+
+      const finish = (out: RecognitionOutput) => resolve(out);
+
+      setTimeout(async () => {
+        if (!context) {
+          finish(baseOutput);
+          return;
+        }
+        const location = { latitude: context.latitude, longitude: context.longitude };
+        const planetCandidates = getVisiblePlanets(location, context.date).map((p) => ({
+          name: p.name,
+          magnitude: p.magnitude,
+          altitude: p.altitude,
+          azimuth: p.azimuth,
+        }));
+        let satelliteCandidates: SatelliteCandidate[] = [];
+        try {
+          const passes = await getSatellitePasses(context.latitude, context.longitude);
+          satelliteCandidates = passes.map((p) => ({
+            name: p.name,
+            id: p.id,
+            maxAltitude: p.maxAltitude,
+            magnitude: p.magnitude,
+          }));
+        } catch {
+          // ignore
+        }
+        finish({
+          ...baseOutput,
+          planetCandidates: planetCandidates.length ? planetCandidates : undefined,
+          satelliteCandidates: satelliteCandidates.length ? satelliteCandidates : undefined,
         });
       }, delay);
     };

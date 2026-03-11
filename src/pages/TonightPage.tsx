@@ -96,7 +96,7 @@ export default function TonightPage() {
   };
 
   const observationTime = useMemo(() => new Date(date + "T20:00:00"), [date]);
-  const data = useMemo(() => getTonightSkyData(observationTime, latitude), [observationTime, latitude]);
+  const data = useMemo(() => getTonightSkyData(observationTime, latitude, longitude), [observationTime, latitude, longitude]);
   const { loading: atmosphereLoading, error: atmosphereError, data: atmosphere } = useAtmosphere(latitude, longitude);
   const { countryCode } = useCountry(latitude, longitude);
   const unitSystem = getUnitSystem(countryCode);
@@ -226,9 +226,9 @@ export default function TonightPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="glass-card p-6 text-center">
               <Eye className="w-6 h-6 mx-auto mb-2 text-secondary" aria-hidden />
-              <div className="text-lg font-display font-bold">{data.darkness}%</div>
+              <div className="text-lg font-display font-bold">{data.darkSkyQuality}%</div>
               <p className="text-xs font-medium text-foreground/90 mt-1">Dark sky quality</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Higher = better for seeing faint stars</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Bortle {data.bortleLevel} · higher % = better for faint stars</p>
             </motion.div>
           </div>
 
