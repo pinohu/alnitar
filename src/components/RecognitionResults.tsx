@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConstellationDiagram } from "./ConstellationDiagram";
 import { type RecognitionOutput, type RecognitionResult } from "@/lib/recognition";
-import { addJournalEntry, getJournalEntries } from "@/lib/journal";
-import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
+import { addJournalEntry, getJournalEntries, buildVerificationForEntry } from "@/lib/journal";
+import { JournalService } from "@/lib/services/journalService";
+import { GUEST_JOURNAL_ENTRY_LIMIT, hasProCloudBackup } from "@/lib/featureAccess";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
@@ -26,12 +27,12 @@ export function RecognitionResults({ output, imageUrl, onReset }: Props) {
   const otherResults = output.results.slice(1);
   const isLowConfidence = topResult && topResult.confidence < 50;
 
-  const saveToJournal = (r: RecognitionResult) => {
+  const saveToJournal = async (r: RecognitionResult) => {
     if (!user && getJournalEntries().length >= GUEST_JOURNAL_ENTRY_LIMIT) {
       toast.error(`Sign up to save more than ${GUEST_JOURNAL_ENTRY_LIMIT} journal entries.`);
       return;
     }
-    addJournalEntry({
+    const entry = {
       date: new Date().toISOString().split("T")[0],
       constellationId: r.constellation.id,
       constellationName: r.constellation.name,
@@ -39,7 +40,13 @@ export function RecognitionResults({ output, imageUrl, onReset }: Props) {
       notes: "",
       location: "Unknown",
       imageThumbnail: imageUrl || undefined,
-    });
+    };
+    if (user && hasProCloudBackup(user)) {
+      const verification = buildVerificationForEntry(entry);
+      await JournalService.addEntry({ ...entry, ...verification }, user.id);
+    } else {
+      addJournalEntry(entry);
+    }
     setSaved(prev => new Set(prev).add(r.id));
     toast.success(`Saved ${r.constellation.name} to your journal`);
   };

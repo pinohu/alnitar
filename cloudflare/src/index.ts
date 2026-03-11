@@ -11,6 +11,14 @@ export interface Env {
   BUCKET: R2Bucket;
   JWT_SECRET: string;
   CORS_ORIGIN?: string;
+  STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
+  /** Price ID (price_...) — use this or STRIPE_PRODUCT_ID_PRO */
+  STRIPE_PRICE_ID_PRO?: string;
+  /** Product ID (prod_...) — if set and no Price ID, first price of this product is used */
+  STRIPE_PRODUCT_ID_PRO?: string;
+  /** One-time secret to create or promote an admin (e.g. wrangler secret put ADMIN_SEED_SECRET) */
+  ADMIN_SEED_SECRET?: string;
 }
 
 const CORS_HEADERS: Record<string, string> = {
@@ -167,7 +175,7 @@ export default {
         }
         const { email, password } = body;
         if (!email || !password) return err("Email and password required", 400);
-        const row = await env.DB.prepare("SELECT id, password_hash, name FROM users WHERE email = ?").bind(String(email).trim().toLowerCase()).first();
+        const row = await env.DB.prepare("SELECT id, password_hash, name, plan, role FROM users WHERE email = ?").bind(String(email).trim().toLowerCase()).first();
         if (!row || typeof row.password_hash !== "string") return err("Invalid email or password", 401);
         const [storedSalt, storedHash] = (row.password_hash as string).split(":");
         if (!(await verifyPassword(storedHash, storedSalt, password))) return err("Invalid email or password", 401);
@@ -175,8 +183,10 @@ export default {
           { sub: row.id, email, exp: Math.floor(Date.now() / 1000) + 7 * 24 * 3600 },
           env.JWT_SECRET
         );
+        const plan = (row as { plan?: string }).plan ?? "free";
+        const role = (row as { role?: string }).role ?? "user";
         return json({
-          user: { id: row.id, email, user_metadata: { name: row.name } },
+          user: { id: row.id, email, user_metadata: { name: row.name, plan, role } },
           session: { access_token: token },
         });
       }
@@ -184,16 +194,73 @@ export default {
       if (path === "api/auth/session" && request.method === "GET") {
         const auth = await getAuth(request, env);
         if (!auth) return json({ session: null, user: null });
-        const row = await env.DB.prepare("SELECT id, email, name FROM users WHERE id = ?").bind(auth.userId).first();
+        const row = await env.DB.prepare("SELECT id, email, name, plan, role FROM users WHERE id = ?").bind(auth.userId).first();
         if (!row) return json({ session: null, user: null });
+        const plan = (row as { plan?: string }).plan ?? "free";
+        const role = (row as { role?: string }).role ?? "user";
         return json({
-          user: { id: row.id, email: row.email, user_metadata: { name: row.name } },
+          user: { id: row.id, email: row.email, user_metadata: { name: row.name, plan, role } },
           session: { access_token: "(use stored token)" },
         });
       }
 
       if (path === "api/auth/logout" && request.method === "POST") {
         return json({ ok: true });
+      }
+
+      // ——— Admin: create superuser or promote (requires ADMIN_SEED_SECRET)
+      function checkAdminSeed(req: Request): boolean {
+        const auth = req.headers.get("Authorization");
+        const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
+        return Boolean(env.ADMIN_SEED_SECRET && token === env.ADMIN_SEED_SECRET);
+      }
+
+      if (path === "api/admin/create-superuser" && request.method === "POST") {
+        if (!checkAdminSeed(request)) return err("Forbidden", 403);
+        let body: { email?: string; password?: string; name?: string };
+        try {
+          body = (await request.json()) as { email?: string; password?: string; name?: string };
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const { email, password, name } = body;
+        if (!email || typeof email !== "string" || !email.trim()) return err("Email is required", 400);
+        if (!password || typeof password !== "string" || password.length < 6) return err("Password must be at least 6 characters", 400);
+        const existing = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email.trim().toLowerCase()).first();
+        if (existing) return err("Email already registered", 400);
+        const id = uuid();
+        const { hash, salt } = await hashPassword(password);
+        await env.DB.prepare(
+          "INSERT INTO users (id, email, password_hash, name, plan, role, created_at) VALUES (?, ?, ?, ?, 'free', 'admin', datetime('now'))"
+        )
+          .bind(id, email.trim().toLowerCase(), `${salt}:${hash}`, (name || email.split("@")[0] || "").trim().slice(0, 200))
+          .run();
+        await env.DB.prepare(
+          "INSERT INTO profiles (id, display_name, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))"
+        )
+          .bind(id, name || email.split("@")[0])
+          .run();
+        await env.DB.prepare(
+          "INSERT INTO user_progress (id, user_id, created_at, updated_at) VALUES (?, ?, datetime('now'), datetime('now'))"
+        )
+          .bind(uuid(), id)
+          .run();
+        return json({ ok: true, email: email.trim().toLowerCase(), role: "admin" }, 200);
+      }
+
+      if (path === "api/admin/promote" && request.method === "POST") {
+        if (!checkAdminSeed(request)) return err("Forbidden", 403);
+        let body: { email?: string };
+        try {
+          body = (await request.json()) as { email?: string };
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const email = body.email?.trim().toLowerCase();
+        if (!email) return err("Email is required", 400);
+        const result = await env.DB.prepare("UPDATE users SET role = ? WHERE email = ?").bind("admin", email).run();
+        if (result.meta.changes === 0) return err("User not found", 404);
+        return json({ ok: true, email, role: "admin" }, 200);
       }
 
       // ——— DB: observations (protected) ———
@@ -258,6 +325,102 @@ export default {
           )
           .run();
         return json({ data: { id: obs.id, ...obs } }, 200);
+      }
+
+      // ——— Stripe: create Checkout session (Pro subscription)
+      if (path === "api/stripe/create-checkout-session" && request.method === "POST") {
+        const auth = await getAuth(request, env);
+        if (!auth) return err("Unauthorized", 401);
+        if (!env.STRIPE_SECRET_KEY?.trim()) {
+          return err("Stripe is not configured. Set STRIPE_SECRET_KEY.", 503);
+        }
+        let priceId = env.STRIPE_PRICE_ID_PRO?.trim();
+        if (!priceId && env.STRIPE_PRODUCT_ID_PRO?.trim()) {
+          const listRes = await fetch(
+            `https://api.stripe.com/v1/prices?product=${encodeURIComponent(env.STRIPE_PRODUCT_ID_PRO)}&limit=1`,
+            { headers: { "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}` } }
+          );
+          const listData = (await listRes.json()) as { data?: { id?: string }[]; error?: { message?: string } };
+          if (listData.error || !listData.data?.length) {
+            return err(listData.error?.message || "No price found for product", 502);
+          }
+          priceId = listData.data[0].id;
+        }
+        if (!priceId) {
+          return err("Set STRIPE_PRICE_ID_PRO or STRIPE_PRODUCT_ID_PRO.", 503);
+        }
+        let body: { success_url?: string; cancel_url?: string };
+        try {
+          body = (await request.json()) as { success_url?: string; cancel_url?: string };
+        } catch {
+          body = {};
+        }
+        const baseUrl = (env.CORS_ORIGIN || request.headers.get("Origin") || "https://alnitar.com").replace(/\/$/, "");
+        const successUrl = body.success_url || `${baseUrl}/profile?pro=success`;
+        const cancelUrl = body.cancel_url || `${baseUrl}/pricing`;
+        const params = new URLSearchParams({
+          "client_reference_id": auth.userId,
+          "mode": "subscription",
+          "success_url": successUrl,
+          "cancel_url": cancelUrl,
+          "line_items[0][price]": priceId,
+          "line_items[0][quantity]": "1",
+        });
+        const stripeRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: params.toString(),
+        });
+        const stripeData = await stripeRes.json() as { id?: string; url?: string; error?: { message?: string } };
+        if (!stripeRes.ok || stripeData.error) {
+          return err(stripeData.error?.message || "Stripe error", 502);
+        }
+        if (!stripeData.url) return err("No checkout URL", 502);
+        return json({ url: stripeData.url }, 200);
+      }
+
+      // ——— Stripe: webhook (set user plan to pro on subscription success)
+      if (path === "api/stripe/webhook" && request.method === "POST") {
+        if (!env.STRIPE_WEBHOOK_SECRET?.trim()) return err("Webhook secret not set", 503);
+        const rawBody = await request.text();
+        const sigHeader = request.headers.get("stripe-signature") || "";
+        const parts = sigHeader.split(",").reduce((acc, p) => {
+          const eq = p.indexOf("=");
+          if (eq > 0) acc[p.slice(0, eq).trim()] = p.slice(eq + 1).trim();
+          return acc;
+        }, {} as Record<string, string>);
+        const t = parts["t"];
+        const v1 = parts["v1"];
+        if (!t || !v1) return err("Missing stripe-signature t or v1", 400);
+        const signedPayload = rawBody + "." + t;
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new TextEncoder().encode(env.STRIPE_WEBHOOK_SECRET),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign"]
+        );
+        const expectedSig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signedPayload));
+        const expectedHex = Array.from(new Uint8Array(expectedSig))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        if (v1 !== expectedHex) return err("Invalid signature", 400);
+        let event: { type?: string; data?: { object?: { client_reference_id?: string } } };
+        try {
+          event = JSON.parse(rawBody) as typeof event;
+        } catch {
+          return err("Invalid JSON", 400);
+        }
+        if (event.type === "checkout.session.completed") {
+          const userId = event.data?.object?.client_reference_id;
+          if (userId) {
+            await env.DB.prepare("UPDATE users SET plan = ? WHERE id = ?").bind("pro", userId).run();
+          }
+        }
+        return json({ received: true }, 200);
       }
 
       // ——— Upload: return a key; client can PUT to Worker or use R2 public URL later

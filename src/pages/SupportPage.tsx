@@ -49,14 +49,17 @@ export default function SupportPage() {
             <section className="glass-card p-6">
               <div className="flex items-center gap-3 mb-2">
                 <Star className="w-5 h-5 text-primary" aria-hidden />
-                <h2 className="font-display text-lg font-semibold">Alnitar Pro (coming later)</h2>
+                <h2 className="font-display text-lg font-semibold">Alnitar Pro</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-3">
-                Optional paid tier: unlimited sky life (cloud, export, backup), expert session planner, verified logs for clubs and schools, and sky identity (badges, challenges). The core app stays free.
+                Pro includes unlimited cloud journal, PDF/CSV export, session planner, year in review, shareable résumé, challenges and programs, and priority support. The core app stays free.
               </p>
               <Link to="/pricing" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline focus-visible:outline focus-visible:ring-2 focus-visible:ring-ring rounded">
-                See pricing and roadmap →
+                See pricing →
               </Link>
+              <p className="text-xs text-muted-foreground mt-2">
+                Pro users: <a href="mailto:support@alnitar.com?subject=Pro%20Priority%20Support" className="text-primary hover:underline">Pro priority support</a>
+              </p>
             </section>
           </div>
 

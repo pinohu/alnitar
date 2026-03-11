@@ -1,10 +1,15 @@
 // src/pages/PricingPage.tsx — Alnitar Pro and pricing (stretched value prop)
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { StarField } from "@/components/StarField";
-import { Check, Star, Award, Mail } from "lucide-react";
+import { Check, Star, Award, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
+import { isPro } from "@/lib/featureAccess";
+import { toast } from "sonner";
 
 const freeFeatures = [
   "Constellation recognition (5 scans/day guest)",
@@ -25,6 +30,32 @@ const proFeatures = [
 ];
 
 export default function PricingPage() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const canUpgrade = isCloudflareConfigured && user && !isPro(user);
+
+  const handleUpgrade = async () => {
+    if (!user || !canUpgrade) return;
+    setLoading(true);
+    try {
+      const res = await cfFetch("api/stripe/create-checkout-session", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok || data.error) {
+        toast.error(data.error || "Could not start checkout");
+        return;
+      }
+      if (data.url) window.location.href = data.url;
+      else toast.error("No checkout URL");
+    } catch {
+      toast.error("Checkout failed. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="relative min-h-screen">
       <StarField />
@@ -64,9 +95,9 @@ export default function PricingPage() {
                 <Award className="w-5 h-5" />
                 Alnitar Pro
               </div>
-              <p className="text-3xl font-display font-bold mb-1">Coming soon</p>
+              <p className="text-3xl font-display font-bold mb-1">$9/mo</p>
               <p className="text-sm text-muted-foreground mb-6">
-                Target: $5–15/mo or $50–150/year. Exact pricing when we launch.
+                Cancel anytime. All Pro features, cloud backup, priority support.
               </p>
               <ul className="space-y-2 mb-6">
                 {proFeatures.map((f) => (
@@ -76,12 +107,18 @@ export default function PricingPage() {
                   </li>
                 ))}
               </ul>
-              <Button asChild className="w-full btn-glow">
-                <a href="mailto:support@alnitar.com?subject=Alnitar%20Pro%20notify%20me">
-                  <Mail className="w-4 h-4 mr-2" />
-                  Notify me when Pro launches
-                </a>
-              </Button>
+              {canUpgrade ? (
+                <Button className="w-full btn-glow" onClick={handleUpgrade} disabled={loading}>
+                  {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                  Upgrade to Pro
+                </Button>
+              ) : isPro(user ?? null) ? (
+                <p className="text-sm text-primary font-medium">You have Pro</p>
+              ) : (
+                <Button asChild variant="outline" className="w-full border-border/50">
+                  <Link to="/login">Sign in to upgrade</Link>
+                </Button>
+              )}
             </div>
           </div>
 

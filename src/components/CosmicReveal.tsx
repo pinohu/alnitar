@@ -11,9 +11,10 @@ import { deepSkyCatalog } from "@/data/deepSkyObjects";
 import { ShareCard } from "./ShareCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
-import { getJournalEntries, addJournalEntry } from "@/lib/journal";
+import { getJournalEntries, addJournalEntry, buildVerificationForEntry } from "@/lib/journal";
+import { JournalService } from "@/lib/services/journalService";
 import { getItem, STORAGE_KEYS } from "@/lib/clientStorage";
-import { GUEST_JOURNAL_ENTRY_LIMIT } from "@/lib/featureAccess";
+import { GUEST_JOURNAL_ENTRY_LIMIT, hasProCloudBackup } from "@/lib/featureAccess";
 import { supabase } from "@/integrations/supabase/client";
 import type { TablesInsert } from "@/integrations/supabase/types";
 import { toast } from "sonner";
@@ -38,7 +39,7 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
 
   const { user } = useAuth();
 
-  const saveToJournal = () => {
+  const saveToJournal = async () => {
     if (!top || !constellation) return;
     if (!user && getJournalEntries().length >= GUEST_JOURNAL_ENTRY_LIMIT) {
       toast.error(`Sign up for a free account to save more than ${GUEST_JOURNAL_ENTRY_LIMIT} journal entries and sync across devices.`);
@@ -50,7 +51,7 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
       lat != null && lng != null && Number.isFinite(Number(lat)) && Number.isFinite(Number(lng))
         ? `${Number(lat) >= 0 ? `${lat}°N` : `${-Number(lat)}°S`}, ${Number(lng) >= 0 ? `${lng}°E` : `${-Number(lng)}°W`}`
         : "Unknown";
-    addJournalEntry({
+    const entry = {
       date: new Date().toISOString().split("T")[0],
       constellationId: constellation.id,
       constellationName: constellation.name,
@@ -58,7 +59,13 @@ export function CosmicReveal({ output, imageUrl, onReset, onShowStory }: Props) 
       notes: "",
       location,
       imageThumbnail: imageUrl ?? undefined,
-    });
+    };
+    if (user && hasProCloudBackup(user)) {
+      const verification = buildVerificationForEntry(entry);
+      await JournalService.addEntry({ ...entry, ...verification }, user.id);
+    } else {
+      addJournalEntry(entry);
+    }
     setJournalSaved(true);
     toast.success(location !== "Unknown" ? "Saved to your journal (verified)" : "Saved to your journal");
   };

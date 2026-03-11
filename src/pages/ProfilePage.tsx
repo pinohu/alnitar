@@ -1,12 +1,15 @@
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
-import { User, LogOut, Star, Award, Flame, Trophy } from "lucide-react";
+import { User, LogOut, Star, Award, Flame, Trophy, Share2, ChevronRight, Check, Headphones } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { getLocalProgress, BADGES } from "@/lib/gamification";
+import { CHALLENGES, getChallengeProgress } from "@/lib/challenges";
+import { canAccessProFeatures } from "@/lib/featureAccess";
+import { ProGate } from "@/components/ProGate";
+import { getConstellationById } from "@/data/constellations";
 import { toast } from "sonner";
 
 export default function ProfilePage() {
@@ -62,12 +65,51 @@ export default function ProfilePage() {
               <Button variant="ghost" size="sm" onClick={handleSignOut} className="mt-3 text-muted-foreground">
                 <LogOut className="w-4 h-4 mr-1" /> Sign out
               </Button>
+              {canAccessProFeatures(user) && (
+                <a
+                  href="mailto:support@alnitar.com?subject=Pro%20Priority%20Support"
+                  className="text-xs text-primary hover:underline mt-2 inline-flex items-center gap-1"
+                >
+                  <Headphones className="w-3.5 h-3.5" /> Pro priority support
+                </a>
+              )}
             </div>
 
-            {/* Sky identity / résumé */}
-            <p className="text-sm text-muted-foreground mb-4">
-              Your sky identity — constellations found, streak, and badges. Shareable sky résumé and club-linked challenges coming soon.
-            </p>
+            {/* Share sky résumé (Pro) */}
+            {canAccessProFeatures(user) ? (
+              <div className="mb-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-primary/30"
+                  onClick={async () => {
+                    const text = `My Alnitar sky: ${progress.constellationsFound.length} constellations, ${progress.badgesEarned.length} badges, ${progress.streakDays}-day streak. Build your own at alnitar.com`;
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({
+                          title: "My sky résumé",
+                          text,
+                          url: "https://alnitar.com",
+                        });
+                        toast.success("Shared");
+                      } catch (e) {
+                        if ((e as Error).name !== "AbortError") {
+                          await navigator.clipboard.writeText(text).then(() => toast.success("Copied to clipboard")).catch(() => toast.error("Could not copy"));
+                        }
+                      }
+                    } else {
+                      await navigator.clipboard.writeText(text).then(() => toast.success("Copied to clipboard")).catch(() => toast.error("Could not copy"));
+                    }
+                  }}
+                >
+                  <Share2 className="w-4 h-4 mr-2" /> Share sky résumé
+                </Button>
+              </div>
+            ) : (
+              <div className="mb-6">
+                <ProGate variant="inline" title="Share sky résumé" description="Part of Pro. Upgrade to share your sky identity." />
+              </div>
+            )}
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 mb-6">
@@ -88,18 +130,43 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Challenges teaser */}
-            <div className="glass-card p-4 mb-6 border-primary/20 flex items-center gap-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Trophy className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h2 className="font-display font-semibold text-sm">Challenges coming soon</h2>
-                <p className="text-xs text-muted-foreground">
-                  Winter DSO challenge, Messier marathon, seasonal and club-linked programs. Your badges and streak will count toward completion.
-                </p>
-              </div>
-            </div>
+            {/* Concrete challenge (Pro) */}
+            {canAccessProFeatures(user) ? CHALLENGES.map((challenge) => {
+              const prog = getChallengeProgress(challenge, progress.constellationsFound, progress.dsosObserved);
+              const nextName = prog.nextId && challenge.targetType === "constellation" ? getConstellationById(prog.nextId)?.name : prog.nextId;
+              const nextSlug = prog.nextId && challenge.targetType === "constellation" ? getConstellationById(prog.nextId)?.slug : null;
+              return (
+                <div key={challenge.id} className="glass-card p-4 mb-6 border-primary/20">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Trophy className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h2 className="font-display font-semibold text-sm">{challenge.name}</h2>
+                      <p className="text-xs text-muted-foreground mt-0.5">{challenge.description}</p>
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
+                        <span className="text-sm font-medium">{prog.completed}/{prog.total}</span>
+                        {prog.isComplete ? (
+                          <span className="text-xs text-primary flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Complete</span>
+                        ) : nextName && nextSlug ? (
+                          <Link to={`/learn/${nextSlug}`} className="text-xs text-primary font-medium hover:underline flex items-center gap-0.5">
+                            Next: {nextName}
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </Link>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            }) : (
+              <ProGate variant="inline" title="Challenges" description="Winter DSO and more. Part of Pro." />
+            )}
+            {canAccessProFeatures(user) && (
+              <p className="text-xs text-muted-foreground mb-6">
+                <Link to="/programs" className="text-primary hover:underline">View all observing programs →</Link>
+              </p>
+            )}
 
             {/* Earned badges */}
             {earnedBadges.length > 0 && (

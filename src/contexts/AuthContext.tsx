@@ -14,7 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-function cfUserToSupabaseUser(cf: { id: string; email?: string; user_metadata?: { name?: string } }): User {
+function cfUserToSupabaseUser(cf: { id: string; email?: string; user_metadata?: { name?: string; plan?: string } }): User {
   return {
     id: cf.id,
     email: cf.email ?? undefined,

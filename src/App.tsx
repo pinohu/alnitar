@@ -27,6 +27,9 @@ const SkyDataPage = lazy(() => import("./pages/SkyDataPage.tsx"));
 const SupportPage = lazy(() => import("./pages/SupportPage.tsx"));
 const PricingPage = lazy(() => import("./pages/PricingPage.tsx"));
 const PartnersPage = lazy(() => import("./pages/PartnersPage.tsx"));
+const SessionPlannerPage = lazy(() => import("./pages/SessionPlannerPage.tsx"));
+const ProgramsPage = lazy(() => import("./pages/ProgramsPage.tsx"));
+const YearInReviewPage = lazy(() => import("./pages/YearInReviewPage.tsx"));
 const LegalPage = lazy(() => import("./pages/LegalPage.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -58,10 +61,13 @@ const App = () => (
                 <Route path="/learn" element={<LearnPage />} />
                 <Route path="/learn/:slug" element={<ConstellationDetailPage />} />
                 <Route path="/journal" element={<JournalPage />} />
+                <Route path="/journal/year-in-review" element={<YearInReviewPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/tonight" element={<TonightPage />} />
+                <Route path="/session-planner" element={<SessionPlannerPage />} />
+                <Route path="/programs" element={<ProgramsPage />} />
                 <Route path="/compare" element={<ComparePage />} />
                 <Route path="/astro" element={<AstroPage />} />
                 <Route path="/planetarium" element={<PlanetariumPage />} />

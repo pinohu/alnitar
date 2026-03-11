@@ -42,6 +42,8 @@ export class JournalService {
       location: String(obs.location ?? "Unknown"),
       imageThumbnail: obs.image_url != null ? String(obs.image_url) : undefined,
       createdAt: String(obs.created_at ?? ""),
+      verifiedAt: obs.verified_at != null ? String(obs.verified_at) : undefined,
+      verificationPayload: obs.verification_payload != null ? String(obs.verification_payload) : undefined,
     }));
   }
 
@@ -58,6 +60,8 @@ export class JournalService {
       location: entry.location,
       image_url: entry.imageThumbnail,
       date: entry.date,
+      verified_at: entry.verifiedAt ?? null,
+      verification_payload: entry.verificationPayload ?? null,
     });
 
     if (result.error) return addLocalEntry(entry);
@@ -89,6 +93,8 @@ export class JournalService {
     await db.update("observations", id, {
       notes: updates.notes,
       location: updates.location,
+      verified_at: updates.verifiedAt,
+      verification_payload: updates.verificationPayload,
     });
   }
 }

@@ -178,3 +178,80 @@ Right now the Worker returns a **key** for uploads; it does not serve public ima
 | 5 | Set `VITE_CF_API_URL` to the Worker URL in Vercel (or your host) and redeploy the frontend. |
 
 After this, sign up and login use the Worker (D1 + JWT); saving observations uses the Worker and D1. No Supabase project is required.
+
+---
+
+## Optional: Stripe Pro subscriptions
+
+To enable “Upgrade to Pro” and Stripe Checkout:
+
+1. **Create a Stripe Product and Price** (Dashboard → Products → Add product “Alnitar Pro” → add a recurring price, e.g. $9/mo). You can use either the **Product ID** (`prod_xxx`) or the **Price ID** (`price_xxx`).
+
+2. **Run the plan migration** (if your D1 database was created before the `plan` column existed):
+   ```powershell
+   npx wrangler d1 execute alnitar-db --remote --file=./migrations/002_add_plan.sql
+   ```
+
+3. **Set Worker secrets:**
+   ```powershell
+   npx wrangler secret put STRIPE_SECRET_KEY
+   npx wrangler secret put STRIPE_WEBHOOK_SECRET
+   npx wrangler secret put STRIPE_PRICE_ID_PRO
+   ```
+   Or use the Product ID instead of the Price ID:
+   ```powershell
+   npx wrangler secret put STRIPE_PRODUCT_ID_PRO
+   ```
+   - **STRIPE_SECRET_KEY:** Your Stripe secret key (`sk_live_...` or `sk_test_...`). Never commit it; use [Stripe Dashboard](https://dashboard.stripe.com/apikeys) and rotate if it was ever exposed.
+   - **STRIPE_WEBHOOK_SECRET:** From Stripe Dashboard → Developers → Webhooks → Add endpoint. URL: `https://<your-worker>.workers.dev/api/stripe/webhook`, event: `checkout.session.completed`. Copy the signing secret (`whsec_...`).
+   - **STRIPE_PRICE_ID_PRO:** The Price ID (`price_xxx`) from step 1, **or**
+   - **STRIPE_PRODUCT_ID_PRO:** The Product ID (`prod_xxx`); the Worker will use the first price on that product.
+
+4. **Redeploy** the Worker after setting secrets.
+
+Logged-in users (Cloudflare auth) will see “Upgrade to Pro” on the Pricing page; after payment, the webhook sets `users.plan = 'pro'` and they get Pro features on next login/session load.
+
+---
+
+## Optional: Admin / superuser account
+
+To create or promote an admin account:
+
+1. **Run the role migration** (if your D1 DB was created before the `role` column existed):
+   ```powershell
+   npx wrangler d1 execute alnitar-db --remote --file=./migrations/003_add_role.sql
+   ```
+
+2. **Set a one-time secret:**
+   ```powershell
+   npx wrangler secret put ADMIN_SEED_SECRET
+   ```
+   Enter a strong random string (e.g. from a password generator). You will use it once to create or promote an admin, then you can remove or rotate it.
+
+3. **Create a new superuser or promote an existing account:**
+
+   **Option A — PowerShell script (easiest)**  
+   From the repo root, set your Worker URL and admin secret (one-time), then run:
+   ```powershell
+   $env:VITE_CF_API_URL = "https://YOUR-WORKER.workers.dev"   # your Worker URL, no trailing slash
+   $env:ADMIN_SEED_SECRET = "the-secret-you-set-with-wrangler"
+
+   # Promote an existing account (use the email you already sign in with):
+   cd cloudflare\scripts
+   .\promote-admin.ps1 -Email "your@email.com"
+
+   # Or create a brand-new admin account:
+   .\promote-admin.ps1 -Email "admin@example.com" -Password "YourSecurePassword" -Name "Admin"
+   ```
+
+   **Option B — curl**
+   ```powershell
+   curl -X POST "https://YOUR-WORKER.workers.dev/api/admin/create-superuser" -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_ADMIN_SEED_SECRET" -d "{\"email\":\"your@email.com\",\"password\":\"YourSecurePassword\",\"name\":\"Your Name\"}"
+   ```
+   Or to promote: use endpoint `api/admin/promote` with body `{"email":"your@email.com"}`.
+
+4. **Optional:** Remove or rotate `ADMIN_SEED_SECRET` after use so the endpoint cannot be abused:
+   ```powershell
+   npx wrangler secret delete ADMIN_SEED_SECRET
+   ```
+   The admin account remains admin; you only need the secret again if you want to create or promote another admin later.

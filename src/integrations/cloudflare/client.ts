@@ -36,7 +36,7 @@ export async function cfFetch(
 export interface CfUser {
   id: string;
   email?: string;
-  user_metadata?: { name?: string };
+  user_metadata?: { name?: string; plan?: string };
 }
 
 export interface CfSession {

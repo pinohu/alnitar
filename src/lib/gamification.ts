@@ -29,6 +29,7 @@ export const BADGES: Badge[] = [
 
 export interface UserProgressLocal {
   constellationsFound: string[];
+  dsosObserved: string[];
   totalObservations: number;
   streakDays: number;
   lastObservationDate: string | null;
@@ -38,11 +39,21 @@ export interface UserProgressLocal {
 export function getLocalProgress(): UserProgressLocal {
   try {
     const raw = getItem(STORAGE_KEYS.PROGRESS);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<UserProgressLocal>;
+      return {
+        constellationsFound: parsed.constellationsFound ?? [],
+        dsosObserved: parsed.dsosObserved ?? [],
+        totalObservations: parsed.totalObservations ?? 0,
+        streakDays: parsed.streakDays ?? 0,
+        lastObservationDate: parsed.lastObservationDate ?? null,
+        badgesEarned: parsed.badgesEarned ?? [],
+      };
+    }
   } catch {
     // localStorage unavailable (private mode, etc.)
   }
-  return { constellationsFound: [], totalObservations: 0, streakDays: 0, lastObservationDate: null, badgesEarned: [] };
+  return { constellationsFound: [], dsosObserved: [], totalObservations: 0, streakDays: 0, lastObservationDate: null, badgesEarned: [] };
 }
 
 export function saveLocalProgress(progress: UserProgressLocal) {

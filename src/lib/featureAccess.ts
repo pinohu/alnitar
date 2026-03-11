@@ -54,3 +54,24 @@ export function hasFullJournal(user: { id: string } | null): boolean {
 export function canSaveToNetwork(user: { id: string } | null): boolean {
   return user != null;
 }
+
+/** Pro: from user metadata, app_metadata, or env allowlist (e.g. VITE_PRO_EMAILS=a@b.com,c@d.com). */
+export function isPro(user: { id: string; email?: string; user_metadata?: Record<string, unknown>; app_metadata?: Record<string, unknown> } | null): boolean {
+  if (!user) return false;
+  const meta = user.user_metadata ?? {};
+  const appMeta = user.app_metadata ?? {};
+  if (meta.plan === "pro" || appMeta.plan === "pro") return true;
+  const envList = typeof import.meta.env.VITE_PRO_EMAILS === "string" ? import.meta.env.VITE_PRO_EMAILS.split(",").map((e: string) => e.trim().toLowerCase()) : [];
+  if (user.email && envList.includes(user.email.toLowerCase())) return true;
+  return false;
+}
+
+/** Pro: cloud backup for journal (sync to backend). */
+export function hasProCloudBackup(user: { id: string } | null): boolean {
+  return user != null && isPro(user as Parameters<typeof isPro>[0]);
+}
+
+/** Pro: access to session planner, programs, year in review, share résumé, challenges. */
+export function canAccessProFeatures(user: Parameters<typeof isPro>[0] | null): boolean {
+  return isPro(user);
+}
