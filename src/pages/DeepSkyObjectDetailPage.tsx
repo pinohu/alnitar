@@ -13,11 +13,17 @@ import { Badge } from "@/components/ui/badge";
 import { getDeepSkyObjectById } from "@/data/deepSkyObjects";
 import { getConstellationById } from "@/data/constellations";
 import { trackEvent } from "@/lib/analytics";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { useEffect } from "react";
 
 export default function DeepSkyObjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const object = id ? getDeepSkyObjectById(id) : undefined;
+
+  usePageTitle(
+    object ? `${object.name} (${object.id})` : "Deep-Sky Object",
+    object ? `${object.type} in ${object.constellation}. Magnitude ${object.magnitude ?? "—"}, best months: ${object.bestMonths?.join(", ") ?? "—"}.` : undefined
+  );
 
   useEffect(() => {
     if (object) trackEvent("object_viewed", { object_id: object.id, object_type: "dso", source: "detail_page" });

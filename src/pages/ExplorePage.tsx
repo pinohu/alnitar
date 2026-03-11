@@ -4,8 +4,10 @@ import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { Button } from "@/components/ui/button";
 import { Globe, Clock, Sparkles } from "lucide-react";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function ExplorePage() {
+  usePageTitle("Explore", "Solar system and sky. Browse celestial objects, planetarium, and time-travel views.");
   return (
     <div className="relative min-h-screen">
       <StarField />

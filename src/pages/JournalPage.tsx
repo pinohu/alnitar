@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { GUEST_JOURNAL_ENTRY_LIMIT, hasProCloudBackup } from "@/lib/featureAccess";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 function filterEntries(
   entries: JournalEntry[],
@@ -42,6 +43,7 @@ function filterEntries(
 }
 
 export default function JournalPage() {
+  usePageTitle("Journal", "Your observatory log. Search, filter, and export observations with verified timestamps and location.");
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFrom, setDateFrom] = useState("");

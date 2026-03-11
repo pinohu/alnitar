@@ -125,8 +125,8 @@ export default function LiveSkyPage() {
                 <AlertCircle className="w-12 h-12 text-accent mx-auto mb-4" />
                 <h2 className="font-display text-xl font-bold mb-2">Device Sensors Not Available</h2>
                 <p className="text-sm text-muted-foreground mb-6">
-                  AR sky overlay requires device orientation sensors (gyroscope, accelerometer).
-                  This feature works best on mobile devices.
+                  Sky overlay uses device orientation (gyroscope, accelerometer, compass). No camera is used on this page.
+                  Works best on mobile devices with motion sensors.
                 </p>
                 <Button onClick={() => setSimulationMode(true)} className="btn-glow">
                   Try Simulation Mode
@@ -141,8 +141,9 @@ export default function LiveSkyPage() {
                 <Compass className="w-12 h-12 text-primary mx-auto mb-4" />
                 <h2 className="font-display text-xl font-bold mb-2">Enable Sky Overlay</h2>
                 <p className="text-sm text-muted-foreground mb-6">
-                  Allow access to device sensors to overlay constellations on the real sky.
-                  Point your phone at the sky to identify stars and constellations.
+                  This view uses your device&apos;s orientation sensors (gyroscope, accelerometer, compass) only — no camera.
+                  Point your phone at the sky to see constellation and planet labels over a simulated starfield.
+                  For a live camera view with AR overlay, use Cosmic Camera from the Recognize page.
                 </p>
                 <div className="flex gap-3 justify-center">
                   <Button onClick={requestPermission} className="btn-glow">

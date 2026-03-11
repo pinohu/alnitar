@@ -27,21 +27,6 @@ export default function YearInReviewPage() {
     }
   }, [user]);
 
-  if (!canAccessProFeatures(user)) {
-    return (
-      <div className="relative min-h-screen">
-        <StarField />
-        <Navbar />
-        <div className="relative z-10 pt-24 pb-16 px-4">
-          <div className="container max-w-2xl">
-            <Link to="/journal" className="text-sm text-muted-foreground hover:text-primary mb-4 inline-block">← Back to Journal</Link>
-            <ProGate title="Year in Review" description="Your sky stats for the year, print or copy to share. Part of Alnitar Pro." />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const yearEntries = useMemo(
     () => entries.filter((e) => e.date.startsWith(String(year))),
     [entries, year]
@@ -72,6 +57,27 @@ export default function YearInReviewPage() {
     return lines.join("\n");
   }, [year, stats]);
 
+  const yearsAvailable = useMemo(() => {
+    const set = new Set(entries.map((e) => e.date.slice(0, 4)));
+    if (!set.has(String(currentYear))) set.add(String(currentYear));
+    return Array.from(set, Number).sort((a, b) => b - a);
+  }, [entries]);
+
+  if (!canAccessProFeatures(user)) {
+    return (
+      <div className="relative min-h-screen">
+        <StarField />
+        <Navbar />
+        <div className="relative z-10 pt-24 pb-16 px-4">
+          <div className="container max-w-2xl">
+            <Link to="/journal" className="text-sm text-muted-foreground hover:text-primary mb-4 inline-block">← Back to Journal</Link>
+            <ProGate title="Year in Review" description="Your sky stats for the year, print or copy to share. Part of Alnitar Pro." />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const handlePrint = () => {
     window.print();
   };
@@ -96,12 +102,6 @@ export default function YearInReviewPage() {
       toast.error("Could not copy");
     }
   };
-
-  const yearsAvailable = useMemo(() => {
-    const set = new Set(entries.map((e) => e.date.slice(0, 4)));
-    if (!set.has(String(currentYear))) set.add(String(currentYear));
-    return Array.from(set, Number).sort((a, b) => b - a);
-  }, [entries]);
 
   return (
     <div className="relative min-h-screen">

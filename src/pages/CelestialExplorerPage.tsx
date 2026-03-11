@@ -14,10 +14,15 @@ import { Search, Sparkles, Globe } from "lucide-react";
 import { ConstellationCard } from "@/components/ConstellationCard";
 import { searchCelestialObjects, CELESTIAL_OBJECT_KINDS, isConstellationItem, isDSOItem } from "@/lib/celestial-explorer";
 import { trackEvent } from "@/lib/analytics";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 const ALL_KINDS = "all";
 
 export default function CelestialExplorerPage() {
+  usePageTitle(
+    "Celestial Explorer",
+    "Search and browse constellations, galaxies, nebulae, and clusters. Scientific metadata and observation tips."
+  );
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<string>(ALL_KINDS);
 

@@ -28,7 +28,8 @@ Route-level and feature list for product and implementation reference. See [IMPL
 | `/planetarium` | PlanetariumPage | Interactive planetarium |
 | `/live-sky` | LiveSkyPage | Live sky / AR-style overlay |
 | `/sky-network` | SkyNetworkPage | Network feed, stats, meteor report |
-| `/events` | EventsPage | Upcoming celestial events; link to simulate |
+| `/events` | EventsPage | Upcoming celestial events; link to event detail and simulate |
+| `/events/:id` | EventDetailPage | Single event detail (meteor shower, eclipse, opposition, etc.) |
 | `/events/simulate` | EventSimulatePage | Event simulation (e.g. lunar eclipse) |
 | `/time-travel` | SkyThroughTimePage | Time travel (planet positions over time) |
 | `/sky-data` | SkyDataPage | Sky data views |

@@ -277,3 +277,26 @@ To create or promote an admin account:
    npx wrangler secret delete ADMIN_SEED_SECRET
    ```
    The admin account remains admin; you only need the secret again if you want to create or promote another admin later.
+
+---
+
+## Admin password not working / reset password
+
+If admin (or any) passwords stop working (e.g. after a DB change or migration), you can set a new password using the same secret used for creating admins:
+
+1. **Set** (or re-set) the one-time secret:
+   ```powershell
+   npx wrangler secret put ADMIN_SEED_SECRET
+   ```
+   Use a strong random string (same as when creating admins).
+
+2. **Reset the user’s password** (replace with your Worker URL, secret, email, and new password):
+   ```powershell
+   curl -X POST "https://YOUR-WORKER.workers.dev/api/admin/reset-password" -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_ADMIN_SEED_SECRET" -d "{\"email\":\"admin@example.com\",\"newPassword\":\"YourNewSecurePassword\"}"
+   ```
+   `newPassword` must be at least 6 characters. The user can then sign in with this new password.
+
+3. **Optional:** Remove the secret again after recovery:
+   ```powershell
+   npx wrangler secret delete ADMIN_SEED_SECRET
+   ```

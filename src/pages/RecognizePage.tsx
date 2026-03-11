@@ -20,9 +20,14 @@ import {
 } from "@/lib/featureAccess";
 import { type Constellation } from "@/data/constellations";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { getTonightSkyData } from "@/lib/tonight";
 
 export default function RecognizePage() {
+  usePageTitle(
+    "Cosmic Camera",
+    "Upload a sky photo or use live camera to identify constellations and deep-sky objects with confidence scores and overlays."
+  );
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);

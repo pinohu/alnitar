@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { toast } from "sonner";
 import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 function getStoredLocation(): { lat: number; lng: number } | null {
   const lat = getItem(STORAGE_KEYS.TONIGHT_LAT);
@@ -33,6 +34,10 @@ function getStoredLocation(): { lat: number; lng: number } | null {
 }
 
 export default function TonightPage() {
+  usePageTitle(
+    "Tonight's Sky",
+    "What to look at tonight: sky conditions, moon phase, and personalized recommendations for your location."
+  );
   const { user } = useAuth();
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [latitude, setLatitude] = useState(() => {

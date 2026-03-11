@@ -79,3 +79,8 @@ export function getTonightEvent(date: Date): CelestialEvent | null {
 export function getAllEvents(): CelestialEvent[] {
   return EVENTS_2026;
 }
+
+/** Get a single event by id (for detail page). Returns undefined if not found. */
+export function getEventById(id: string): CelestialEvent | undefined {
+  return EVENTS_2026.find((e) => e.id === id);
+}

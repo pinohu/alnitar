@@ -37,6 +37,7 @@ const CelestialExplorerPage = lazy(() => import("./pages/CelestialExplorerPage.t
 const DeepSkyObjectDetailPage = lazy(() => import("./pages/DeepSkyObjectDetailPage.tsx"));
 const SolarSystemPage = lazy(() => import("./pages/SolarSystemPage.tsx"));
 const EventSimulatePage = lazy(() => import("./pages/EventSimulatePage.tsx"));
+const EventDetailPage = lazy(() => import("./pages/EventDetailPage.tsx"));
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage.tsx"));
 const SessionPlannerPage = lazy(() => import("./pages/SessionPlannerPage.tsx"));
 const ProgramsPage = lazy(() => import("./pages/ProgramsPage.tsx"));
@@ -87,6 +88,7 @@ const App = () => (
                 <Route path="/live-sky" element={<LiveSkyPage />} />
                 <Route path="/sky-network" element={<SkyNetworkPage />} />
                 <Route path="/events" element={<EventsPage />} />
+                <Route path="/events/:id" element={<EventDetailPage />} />
                 <Route path="/time-travel" element={<SkyThroughTimePage />} />
                 <Route path="/sky-data" element={<SkyDataPage />} />
                 <Route path="/support" element={<SupportPage />} />

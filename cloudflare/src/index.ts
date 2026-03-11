@@ -376,6 +376,26 @@ export default {
         return json({ ok: true, email, role: "admin" }, 200);
       }
 
+      // Reset password for any user (recovery when admin passwords stop working). Requires ADMIN_SEED_SECRET.
+      if (path === "api/admin/reset-password" && request.method === "POST") {
+        if (!checkAdminSeed(request)) return err("Forbidden", 403);
+        let body: { email?: string; newPassword?: string };
+        try {
+          body = (await request.json()) as { email?: string; newPassword?: string };
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const email = body.email?.trim().toLowerCase();
+        const newPassword = body.newPassword;
+        if (!email) return err("Email is required", 400);
+        if (!newPassword || typeof newPassword !== "string" || newPassword.length < 6) return err("newPassword must be at least 6 characters", 400);
+        const row = await env.DB.prepare("SELECT id FROM users WHERE email = ?").bind(email).first();
+        if (!row) return err("User not found", 404);
+        const { hash, salt } = await hashPassword(newPassword);
+        await env.DB.prepare("UPDATE users SET password_hash = ? WHERE email = ?").bind(`${salt}:${hash}`, email).run();
+        return json({ ok: true, email, message: "Password updated. Sign in with the new password." }, 200);
+      }
+
       // ——— DB: observations (protected) ———
       if (path === "api/observations" && request.method === "GET") {
         const auth = await getAuth(request, env);

@@ -8,11 +8,12 @@ import { Check, Star, Award, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
-import { isPro } from "@/lib/featureAccess";
+import { isPro, GUEST_RECOGNITION_LIMIT_PER_DAY } from "@/lib/featureAccess";
+import { usePageTitle } from "@/hooks/use-page-title";
 import { toast } from "sonner";
 
-const freeFeatures = [
-  "Constellation recognition (5 scans/day without account)",
+const freeFeatures = (guestScanLimit: number) => [
+  `Constellation recognition (${guestScanLimit} scans/day without account)`,
   "Sky Map, Planetarium, Tonight's Sky",
   "Learn — all 88 constellations",
   "Up to 15 journal entries on this device",
@@ -70,6 +71,10 @@ const proFeatureList = [
 ];
 
 export default function PricingPage() {
+  usePageTitle(
+    "Pricing",
+    "Free and Pro plans. Unlimited scans, cloud journal, exports, session planner, and verified observations."
+  );
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const canUpgrade = isCloudflareConfigured && user && !isPro(user);
@@ -118,7 +123,7 @@ export default function PricingPage() {
               <p className="text-3xl font-display font-bold mb-1">$0</p>
               <p className="text-sm text-muted-foreground mb-6">Forever. No credit card.</p>
               <ul className="space-y-2 mb-6">
-                {freeFeatures.map((f) => (
+                {freeFeatures(GUEST_RECOGNITION_LIMIT_PER_DAY).map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     {f}

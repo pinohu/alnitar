@@ -11,6 +11,7 @@ import { recognizeFrame, type RecognitionOutput, type RecognitionContext } from 
 import { getTonightSkyData } from "@/lib/tonight";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { deepSkyCatalog } from "@/data/deepSkyObjects";
+import { getSkyCameraStream } from "@/lib/camera";
 
 const CAPTURE_INTERVAL_MS = 1000;
 const MAX_FRAME_DIM = 640;
@@ -193,15 +194,7 @@ export function CosmicCameraLiveView({ onClose }: CosmicCameraLiveViewProps) {
 
   useEffect(() => {
     setError(null);
-    navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      })
+    getSkyCameraStream()
       .then((stream) => {
         streamRef.current = stream;
         const video = videoRef.current;
@@ -214,7 +207,7 @@ export function CosmicCameraLiveView({ onClose }: CosmicCameraLiveViewProps) {
         }
       })
       .catch((err) => {
-        setError(err.message || "Camera access denied. Use a device with a camera and allow access.");
+        setError(err.message || "Camera access denied. Use the back camera and allow access for sky view.");
       });
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -236,12 +229,10 @@ export function CosmicCameraLiveView({ onClose }: CosmicCameraLiveViewProps) {
         playsInline
         muted
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ transform: "scaleX(-1)" }}
       />
       <canvas
         ref={overlayRef}
         className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        style={{ transform: "scaleX(-1)" }}
       />
 
       {error && (

@@ -6,6 +6,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Camera, AlertCircle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getSkyCameraStream } from "@/lib/camera";
 
 export interface CameraCaptureViewProps {
   onCapture: (file: File) => void;
@@ -20,15 +21,7 @@ export function CameraCaptureView({ onCapture, onClose }: CameraCaptureViewProps
 
   useEffect(() => {
     setError(null);
-    navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          facingMode: "environment",
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      })
+    getSkyCameraStream()
       .then((stream) => {
         streamRef.current = stream;
         const video = videoRef.current;
@@ -41,7 +34,7 @@ export function CameraCaptureView({ onCapture, onClose }: CameraCaptureViewProps
         }
       })
       .catch((err) => {
-        setError(err.message || "Camera access denied. Allow camera access to take a photo.");
+        setError(err.message || "Camera access denied. Allow back camera access to take a sky photo.");
       });
     return () => {
       streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -87,7 +80,6 @@ export function CameraCaptureView({ onCapture, onClose }: CameraCaptureViewProps
         playsInline
         muted
         className="w-full h-auto max-h-[70vh] object-cover"
-        style={{ transform: "scaleX(-1)" }}
       />
 
       {error && (

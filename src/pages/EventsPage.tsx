@@ -8,8 +8,13 @@ import { Calendar, Loader2, Star, Sparkles } from "lucide-react";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
 import type { CelestialEvent } from "@/lib/discovery/types";
 import { getUpcomingEvents } from "@/lib/discovery/eventAwareness";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function EventsPage() {
+  usePageTitle(
+    "Astronomy Events",
+    "Upcoming meteor showers, eclipses, conjunctions, and oppositions. Plan your observing nights."
+  );
   const [events, setEvents] = useState<CelestialEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(90);
@@ -92,8 +97,12 @@ export default function EventsPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className={`glass-card p-5 ${importanceClass(e)}`}
                 >
+                  <Link
+                    to={`/events/${e.id}`}
+                    onClick={() => trackEvent("event_viewed", { event_id: e.id, event_type: e.type, source: "events_list" })}
+                    className={`block glass-card p-5 hover:border-primary/30 hover:bg-primary/5 transition-colors ${importanceClass(e)}`}
+                  >
                   <div className="flex items-start gap-3">
                     <div className="shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                       {e.type === "meteor-shower" ? (
@@ -124,6 +133,7 @@ export default function EventsPage() {
                       </div>
                     </div>
                   </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>

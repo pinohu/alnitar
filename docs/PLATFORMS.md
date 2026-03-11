@@ -45,6 +45,11 @@ The project includes:
 
 The build is **installable** and works **offline**: users can “Add to Home Screen” or “Install app,” and repeat visits use the cached bundle when offline.
 
+### Camera and sensors (sky features)
+
+- **Cosmic Camera (live view) and Take Photo** — Use the **rear (back) camera** via `facingMode: "environment"` so you point the device at the sky. Implemented in `src/lib/camera.ts` (`getSkyCameraStream`). The video feed is not mirrored. On desktop, the outward-facing webcam is used when available.
+- **Live Sky / Sky Overlay** (`/live-sky`) — Uses **device orientation only** (gyroscope, accelerometer, compass via `DeviceOrientationEvent`). No camera is used; labels are overlaid on a simulated starfield. Best on mobile devices with motion sensors. For a live camera + AR overlay, use Cosmic Camera from the Recognize page.
+
 ### PWA checklist
 
 - [ ] Serve the site over HTTPS (required for install and service worker).

@@ -2,7 +2,7 @@
 
 import { STORAGE_KEYS, getItem, setItem } from "@/lib/clientStorage";
 
-const GUEST_RECOGNITION_LIMIT = 5;
+const GUEST_RECOGNITION_LIMIT = 10;
 const GUEST_JOURNAL_LIMIT = 15;
 
 function getStoredRecognitionCount(): { count: number; date: string } {

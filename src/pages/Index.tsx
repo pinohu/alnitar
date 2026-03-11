@@ -15,6 +15,7 @@ import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { trackEvent } from "@/lib/analytics";
 import { useGeolocation } from "@/hooks/use-geolocation";
+import { usePageTitle } from "@/hooks/use-page-title";
 
 const features: { icon: typeof Eye; title: string; desc: string; to: string }[] = [
   { icon: Eye, title: "Identify in seconds", desc: "Upload a sky photo and see which constellations are in it — with confidence scores and links to learn more. No telescope needed.", to: "/recognize" },
@@ -31,6 +32,10 @@ function getConstellationOfTheNight() {
 }
 
 export default function Index() {
+  usePageTitle(
+    "Discover the Night Sky",
+    "Photograph the sky and instantly identify constellations, stars, planets, and deep-sky objects. Your intelligent night-sky exploration platform."
+  );
   const { latitude, longitude } = useGeolocation();
   const now = new Date();
   const dateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
@@ -117,7 +122,7 @@ export default function Index() {
               </div>
               <p className="text-sm text-muted-foreground mb-3">See what Alnitar can do for you:</p>
               <ul className="text-sm text-muted-foreground space-y-2">
-                <li>5 sky scans per day</li>
+                <li>10 sky scans per day</li>
                 <li>All 88 constellations — learn and explore</li>
                 <li>Tonight's sky score and conditions</li>
                 <li>Up to 15 journal entries on this device</li>
@@ -129,9 +134,9 @@ export default function Index() {
                 <Cloud className="w-4 h-4" />
                 One free account
               </div>
-              <p className="text-sm text-foreground/90 mb-3">Same features, progress saved when you sign in:</p>
+              <p className="text-sm text-foreground/90 mb-3">Unlimited scans and cloud journal when you sign in:</p>
               <ul className="text-sm text-foreground/90 space-y-2">
-                <li>5 sky scans per day</li>
+                <li>Unlimited sky scans</li>
                 <li>All 88 constellations — learn and explore</li>
                 <li>Tonight's sky score and conditions</li>
                 <li>Up to 15 journal entries on this device</li>
@@ -181,7 +186,7 @@ export default function Index() {
                   transition={{ delay: i * 0.08 }}
                 >
                   <Link
-                    to="/events"
+                    to={`/events/${e.id}`}
                     onClick={() => trackEvent("event_viewed", { event_id: e.id, source: "homepage" })}
                     className="block glass-card p-4 hover:border-primary/30 hover:bg-primary/5 transition-colors rounded-xl"
                   >
