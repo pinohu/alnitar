@@ -39,6 +39,16 @@ export interface RecognitionOutput {
   planetCandidates?: PlanetCandidate[];
   /** Satellite passes that could be in frame (when context provided). */
   satelliteCandidates?: SatelliteCandidate[];
+  /** Heuristic: bright unmatched points that might be transients (meteor, nova, etc.). Not ML-based. */
+  transientCandidates?: TransientCandidate[];
+}
+
+/** Possible transient from image — bright point not clearly matching known pattern. Placeholder for future ML. */
+export interface TransientCandidate {
+  x: number;
+  y: number;
+  brightness: number;
+  reason: string;
 }
 
 const MIN_STARS_TO_MATCH = 6;
@@ -173,6 +183,27 @@ function matchConstellations(detectedStars: { x: number; y: number; brightness: 
   return results.sort((a, b) => b.confidence - a.confidence).slice(0, 5);
 }
 
+/** Heuristic: flag bright isolated points as possible transients (meteor tip, nova, etc.). Placeholder for ML-based detection. */
+function detectPossibleTransients(
+  starPositions: { x: number; y: number; brightness: number }[]
+): TransientCandidate[] {
+  if (starPositions.length < 3) return [];
+  const sorted = [...starPositions].sort((a, b) => b.brightness - a.brightness);
+  const median = sorted[Math.floor(sorted.length / 2)]?.brightness ?? 0;
+  const candidates: TransientCandidate[] = [];
+  for (const s of sorted.slice(0, 3)) {
+    if (median > 0 && s.brightness >= median * 1.8) {
+      candidates.push({
+        x: s.x,
+        y: s.y,
+        brightness: s.brightness,
+        reason: "Bright unmatched point — could be meteor, satellite, or star; verify with catalog.",
+      });
+    }
+  }
+  return candidates.slice(0, 2);
+}
+
 export interface RecognitionContext {
   latitude: number;
   longitude: number;
@@ -231,6 +262,7 @@ export async function recognizeImage(
       const minDelay = 1500;
       const delay = Math.max(0, minDelay - elapsed);
 
+      const transientCandidates = detectPossibleTransients(starPositions);
       const baseOutput: RecognitionOutput = {
         results,
         detectedStarCount: starPositions.length,
@@ -238,6 +270,7 @@ export async function recognizeImage(
         imageDimensions: { width: img.width, height: img.height },
         starPositions,
         ...(noConstellationFound && { noConstellationFound: true, noMatchMessage }),
+        ...(transientCandidates.length > 0 && { transientCandidates }),
       };
 
       const finish = (out: RecognitionOutput) => resolve(out);

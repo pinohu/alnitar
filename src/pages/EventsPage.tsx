@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
@@ -55,6 +56,9 @@ export default function EventsPage() {
             <p className="text-muted-foreground mb-6">
               Meteor showers, oppositions, eclipses, and seasonal highlights. Plan your observing nights.
             </p>
+            <Link to="/events/simulate" className="text-sm text-primary hover:underline">
+              Simulate an event (e.g. lunar eclipse) →
+            </Link>
           </motion.div>
 
           <div className="flex items-center gap-2 mb-4">

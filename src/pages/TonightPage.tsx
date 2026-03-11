@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
-import { getTonightSkyData } from "@/lib/tonight";
+import { getTonightSkyData, getGuidedTonightTour } from "@/lib/tonight";
 import { getDiscoveryRecommendations } from "@/lib/discovery";
 import { getLocalProgress } from "@/lib/gamification";
 import { useAtmosphere } from "@/hooks/use-atmosphere";
@@ -15,7 +15,7 @@ import { DiscoveryPanel } from "@/components/DiscoveryPanel";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2, Thermometer, Droplets, Cloud, Wind, Activity, Sun } from "lucide-react";
+import { Moon, Eye, Globe, Calendar, Gauge, MapPin, Loader2, Thermometer, Droplets, Cloud, Wind, Activity, Sun, Compass } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { toast } from "sonner";
@@ -117,6 +117,10 @@ export default function TonightPage() {
 
   const scoreColor = data.skyScore >= 70 ? "text-green-400" : data.skyScore >= 40 ? "text-accent" : "text-destructive";
   const scoreLabel = data.skyScore >= 70 ? "Good" : data.skyScore >= 40 ? "Fair" : "Poor";
+  const guidedTour = useMemo(
+    () => getGuidedTonightTour(observationTime, latitude, longitude),
+    [observationTime, latitude, longitude]
+  );
 
   return (
     <div className="relative min-h-screen">
@@ -231,6 +235,32 @@ export default function TonightPage() {
               <p className="text-xs text-muted-foreground mt-0.5">Bortle {data.bortleLevel} · higher % = better for faint stars</p>
             </motion.div>
           </div>
+
+          {/* Guided: Tonight's tour */}
+          {guidedTour.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="mb-8">
+              <h2 className="text-lg font-semibold flex items-center gap-2 mb-3">
+                <Compass className="w-5 h-5 text-primary" aria-hidden />
+                Guided: Tonight&apos;s tour
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Follow this order for a smooth session: first find an easy constellation, then star-hop to a deep-sky target or planet.
+              </p>
+              <div className="space-y-4">
+                {guidedTour.map((s) => (
+                  <div key={s.step} className="glass-card p-4 flex gap-4">
+                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary font-bold flex items-center justify-center text-sm" aria-hidden>
+                      {s.step}
+                    </span>
+                    <div>
+                      <h3 className="font-semibold text-sm">{s.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{s.body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Discovery Engine */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>

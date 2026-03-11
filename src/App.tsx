@@ -33,6 +33,10 @@ const PartnersPage = lazy(() => import("./pages/PartnersPage.tsx"));
 const ResearchApiPage = lazy(() => import("./pages/ResearchApiPage.tsx"));
 const AlignScopePage = lazy(() => import("./pages/AlignScopePage.tsx"));
 const ExplorePage = lazy(() => import("./pages/ExplorePage.tsx"));
+const CelestialExplorerPage = lazy(() => import("./pages/CelestialExplorerPage.tsx"));
+const DeepSkyObjectDetailPage = lazy(() => import("./pages/DeepSkyObjectDetailPage.tsx"));
+const SolarSystemPage = lazy(() => import("./pages/SolarSystemPage.tsx"));
+const EventSimulatePage = lazy(() => import("./pages/EventSimulatePage.tsx"));
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage.tsx"));
 const SessionPlannerPage = lazy(() => import("./pages/SessionPlannerPage.tsx"));
 const ProgramsPage = lazy(() => import("./pages/ProgramsPage.tsx"));
@@ -91,6 +95,10 @@ const App = () => (
                 <Route path="/research" element={<ResearchApiPage />} />
                 <Route path="/align" element={<AlignScopePage />} />
                 <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/explore/objects" element={<CelestialExplorerPage />} />
+                <Route path="/explore/object/dso/:id" element={<DeepSkyObjectDetailPage />} />
+                <Route path="/explore/solar-system" element={<SolarSystemPage />} />
+                <Route path="/events/simulate" element={<EventSimulatePage />} />
                 <Route path="/campaigns" element={<CampaignsPage />} />
                 <Route path="/privacy" element={<LegalPage />} />
                 <Route path="/terms" element={<LegalPage />} />

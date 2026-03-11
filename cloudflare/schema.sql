@@ -158,6 +158,38 @@ CREATE TABLE IF NOT EXISTS user_event_reminders (
 );
 CREATE INDEX IF NOT EXISTS idx_user_event_reminders_user ON user_event_reminders(user_id);
 
+-- Push subscriptions (Web Push for event reminders)
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, endpoint)
+);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id);
+
+-- User campaign participation
+CREATE TABLE IF NOT EXISTS user_campaigns (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  campaign_id TEXT NOT NULL,
+  joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(user_id, campaign_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_campaigns_user ON user_campaigns(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_campaigns_campaign ON user_campaigns(campaign_id);
+
+-- API rate limits (per key per minute)
+CREATE TABLE IF NOT EXISTS api_rate_limits (
+  key_id TEXT NOT NULL,
+  window INTEGER NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (key_id, window)
+);
+CREATE INDEX IF NOT EXISTS idx_api_rate_limits_window ON api_rate_limits(window);
+
 -- Seed badges
 INSERT OR IGNORE INTO badges (id, name, description, icon, category) VALUES
   ('first-find', 'First Light', 'Identified your first constellation', 'star', 'milestone'),

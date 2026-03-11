@@ -104,3 +104,63 @@ export function getTonightSkyData(date: Date = new Date(), latitude: number = 40
     darkSkyQuality: Math.min(100, darkSkyQuality),
   };
 }
+
+export interface GuidedTonightStep {
+  step: number;
+  title: string;
+  body: string;
+  targetId?: string;
+  type?: "constellation" | "dso" | "planet";
+}
+
+const TOUR_NARRATIVES: Record<string, string> = {
+  orion: "Look for three bright stars in a row — the Belt. Above them, reddish Betelgeuse; below, Rigel. Orion is your anchor for finding nearby constellations.",
+  "ursa-major": "The Big Dipper (part of Ursa Major) is one of the easiest patterns. Use the two \"pointer\" stars at the front of the bowl to find Polaris.",
+  cassiopeia: "A distinctive W (or M) shape. It sits roughly opposite the Big Dipper and circles the pole. Great for northern observers.",
+  cygnus: "The Northern Cross: a bright cross of stars in the summer Milky Way. Deneb marks the top; look for the Swan flying along the band of the galaxy.",
+  taurus: "Find the V-shaped face of the Bull; the bright red star Aldebaran marks one eye. The Pleiades cluster sits on the Bull's shoulder.",
+  m42: "The Orion Nebula: a fuzzy patch below Orion's Belt. Visible to the naked eye in dark skies; binoculars or a scope reveal its glow.",
+};
+
+/**
+ * Ordered guided tour for tonight: 3–5 targets with narrative copy ("First find X, then…").
+ */
+export function getGuidedTonightTour(date: Date, latitude: number, _longitude: number): GuidedTonightStep[] {
+  const sky = getTonightSkyData(date, latitude, _longitude);
+  const steps: GuidedTonightStep[] = [];
+  const seen = new Set<string>();
+  let step = 1;
+  for (const c of sky.beginnerTargets.slice(0, 3)) {
+    const key = c.id ?? c.name?.toLowerCase().replace(/\s+/g, "-") ?? "";
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const narrative = TOUR_NARRATIVES[key] ?? `One of the best constellations to spot tonight. Start here, then use it to star-hop to fainter targets.`;
+    steps.push({
+      step: step++,
+      title: `Find ${c.name}`,
+      body: narrative,
+      targetId: c.id,
+      type: "constellation",
+    });
+  }
+  const dso = sky.deepSkyTargets[0];
+  if (dso && step <= 5) {
+    steps.push({
+      step: step++,
+      title: `Then try ${dso.name}`,
+      body: dso.type === "nebula" ? "A nebula is a cloud of gas and dust; with binoculars or a small scope you'll see a faint glow." : "Use your star chart or app to star-hop from a nearby constellation to this object.",
+      targetId: dso.id,
+      type: "dso",
+    });
+  }
+  if (sky.visiblePlanets.length > 0 && step <= 5) {
+    const p = sky.visiblePlanets[0];
+    steps.push({
+      step: step++,
+      title: `Look for ${p.name}`,
+      body: `${p.name} is visible ${p.direction} tonight — ${p.brightness.toLowerCase()}. Naked-eye friendly.`,
+      type: "planet",
+    });
+  }
+  return steps;
+}

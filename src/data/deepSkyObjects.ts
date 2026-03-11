@@ -210,6 +210,10 @@ export const deepSkyCatalog: DeepSkyCatalogObject[] = [
   },
 ];
 
+export function getDeepSkyObjectById(id: string): DeepSkyCatalogObject | undefined {
+  return deepSkyCatalog.find((o) => o.id === id);
+}
+
 export function getDeepSkyObjectsByConstellation(constellationId: string): DeepSkyCatalogObject[] {
   return deepSkyCatalog.filter(o => o.constellation === constellationId);
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { Button } from "@/components/ui/button";
-import { Globe, Clock } from "lucide-react";
+import { Globe, Clock, Sparkles } from "lucide-react";
 
 export default function ExplorePage() {
   return (
@@ -17,7 +17,7 @@ export default function ExplorePage() {
               3D <span className="gradient-text">Explore</span>
             </h1>
             <p className="text-muted-foreground mb-6">
-              Solar system and sky in 3D. Use the planetarium and time-travel views for interactive 2D; full 3D WebGL scene coming next.
+              Solar system and sky in 3D. Browse celestial objects, planetarium, and time-travel views.
             </p>
           </motion.div>
 
@@ -27,6 +27,13 @@ export default function ExplorePage() {
             transition={{ delay: 0.1 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
+            <Link to="/explore/objects" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Sparkles className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Celestial Explorer</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Constellations, galaxies, nebulae, clusters</p>
+              </div>
+            </Link>
             <Link to="/planetarium" className="glass-card-hover glass-card p-6 flex items-center gap-4">
               <Globe className="w-10 h-10 text-primary shrink-0" />
               <div>
@@ -41,15 +48,20 @@ export default function ExplorePage() {
                 <p className="text-xs text-muted-foreground mt-0.5">Scrub through time and see planet orbits</p>
               </div>
             </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mt-8 glass-card p-6 text-center text-muted-foreground text-sm"
-          >
-            <p>Full 3D galaxy and solar system view (WebGL) will appear here in a future update.</p>
+            <Link to="/explore/solar-system" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Globe className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Solar system orrery</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">2D orbits; 3D WebGL coming next</p>
+              </div>
+            </Link>
+            <Link to="/events/simulate" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Clock className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Event simulation</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Simulate lunar eclipse</p>
+              </div>
+            </Link>
           </motion.div>
         </div>
       </div>

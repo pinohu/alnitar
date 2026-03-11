@@ -54,4 +54,16 @@ export const learningPaths: LearningPath[] = [
       { id: "a4", type: "read", targetId: "read-stacking", title: "Introduction to stacking" },
     ],
   },
+  {
+    id: "telescope-usage",
+    title: "Telescope Usage",
+    description: "Set up, align, and use your telescope for deep-sky and planetary viewing.",
+    steps: [
+      { id: "t1", type: "read", targetId: "read-setup", title: "Assemble and balance your scope" },
+      { id: "t2", type: "read", targetId: "read-align", title: "Polar alignment and star alignment" },
+      { id: "t3", type: "constellation", targetId: "ursa-minor", title: "Find Polaris for polar alignment" },
+      { id: "t4", type: "constellation", targetId: "orion", title: "Star-hop from Orion to M42" },
+      { id: "t5", type: "dso", targetId: "m42", title: "Center and focus on the Orion Nebula" },
+    ],
+  },
 ];

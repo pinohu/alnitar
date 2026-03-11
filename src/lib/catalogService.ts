@@ -1,12 +1,13 @@
 /**
  * Catalog service — single interface for "objects in this patch of sky".
- * Used by recognition, planetarium, and Tonight. Aggregates planets, DSOs, constellation stars, and satellites.
+ * Used by recognition, planetarium, and Tonight. Aggregates planets, DSOs, constellation stars, satellites, and external data (comets/minor planets).
  */
 
 import type { ObserverLocation } from "@/lib/astronomy/types";
 import { getPlanetPositions, getVisiblePlanets } from "@/lib/astronomy/planetService";
 import { deepSkyCatalog, type DeepSkyCatalogObject } from "@/data/deepSkyObjects";
 import { constellations, type Constellation } from "@/data/constellations";
+import { fetchCometsAndMinorPlanets, type CometOrMinorPlanet } from "@/lib/catalog/externalData";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -33,11 +34,15 @@ export interface SatellitePass {
   magnitude?: number;
 }
 
+export type { CometOrMinorPlanet };
+
 export interface ObjectsInSky {
   planets: CatalogPlanet[];
   dsos: CatalogDSO[];
   constellations: Constellation[];
   satellitePasses: SatellitePass[];
+  /** Comets and minor planets from JPL/MPC-style sources (when available). */
+  cometsAndMinorPlanets: CometOrMinorPlanet[];
 }
 
 /**
@@ -70,6 +75,27 @@ export function getObjectsForLocation(location: ObserverLocation, date: Date): O
     dsos,
     constellations: visibleConstellations,
     satellitePasses: [],
+    cometsAndMinorPlanets: [],
+  };
+}
+
+/**
+ * Async: get objects in sky including external data (satellites, comets/minor planets).
+ * Use when you need ISS passes or JPL comet/asteroid data.
+ */
+export async function getObjectsForLocationAsync(
+  location: ObserverLocation,
+  date: Date
+): Promise<ObjectsInSky> {
+  const sync = getObjectsForLocation(location, date);
+  const [satellitePasses, cometsAndMinorPlanets] = await Promise.all([
+    getSatellitePasses(location.latitude, location.longitude),
+    fetchCometsAndMinorPlanets(15),
+  ]);
+  return {
+    ...sync,
+    satellitePasses,
+    cometsAndMinorPlanets,
   };
 }
 

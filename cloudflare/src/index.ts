@@ -19,6 +19,10 @@ export interface Env {
   STRIPE_PRODUCT_ID_PRO?: string;
   /** One-time secret to create or promote an admin (e.g. wrangler secret put ADMIN_SEED_SECRET) */
   ADMIN_SEED_SECRET?: string;
+  /** Resend API key for event reminder emails (e.g. wrangler secret put RESEND_API_KEY) */
+  RESEND_API_KEY?: string;
+  /** From address for reminder emails (e.g. reminders@alnitar.com) */
+  RESEND_FROM_EMAIL?: string;
 }
 
 const CORS_HEADERS: Record<string, string> = {
@@ -143,6 +147,23 @@ async function getApiKeyAuth(req: Request, env: Env): Promise<{ keyId: string; u
   return { keyId: row.id as string, userId: row.user_id as string };
 }
 
+const API_RATE_LIMIT_PER_MINUTE = 100;
+
+async function checkApiRateLimit(env: Env, keyId: string): Promise<boolean> {
+  const window = Math.floor(Date.now() / 60000);
+  await env.DB.prepare("INSERT OR IGNORE INTO api_rate_limits (key_id, window, count) VALUES (?, ?, 0)")
+    .bind(keyId, window)
+    .run();
+  await env.DB.prepare("UPDATE api_rate_limits SET count = count + 1 WHERE key_id = ? AND window = ?")
+    .bind(keyId, window)
+    .run();
+  const row = await env.DB.prepare("SELECT count FROM api_rate_limits WHERE key_id = ? AND window = ?")
+    .bind(keyId, window)
+    .first();
+  const count = (row?.count as number) ?? 0;
+  return count > API_RATE_LIMIT_PER_MINUTE;
+}
+
 // Upcoming celestial events (single source of truth; sync with eventAwareness when needed)
 const UPCOMING_EVENTS: Array<{ id: string; title: string; description: string; date: string; endDate?: string; type: string; importance: string; relatedObjects: string[] }> = [
   { id: "quadrantids-2026", title: "Quadrantid Meteor Shower", type: "meteor-shower", importance: "highlight", description: "One of the best annual meteor showers. Up to 120 meteors per hour at peak.", date: "2026-01-03", endDate: "2026-01-04", relatedObjects: ["bootes"] },
@@ -157,7 +178,56 @@ const UPCOMING_EVENTS: Array<{ id: string; title: string; description: string; d
   { id: "total-lunar-2026", title: "Total Lunar Eclipse", type: "lunar", importance: "highlight", description: "The Moon turns deep red during a total lunar eclipse visible from many regions.", date: "2026-03-03", relatedObjects: [] },
 ];
 
+/** Send event reminder emails (Resend). Called from scheduled handler. */
+async function sendEventReminderEmails(env: Env): Promise<{ sent: number }> {
+  if (!env.RESEND_API_KEY?.trim() || !env.RESEND_FROM_EMAIL?.trim()) return { sent: 0 };
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  let sent = 0;
+  const { results: rows } = await env.DB.prepare(
+    "SELECT r.id, r.user_id, r.event_id, r.notify_days_before, r.channel FROM user_event_reminders r WHERE r.channel = 'email'"
+  ).all();
+  if (!rows?.length) return { sent: 0 };
+  const eventMap = new Map(UPCOMING_EVENTS.map((e) => [e.id, e]));
+  const seen = new Set<string>();
+  for (const row of rows as { user_id: string; event_id: string; notify_days_before: number }[]) {
+    const event = eventMap.get(row.event_id);
+    if (!event) continue;
+    const eventDate = new Date(event.date).getTime();
+    const daysUntil = Math.round((eventDate - todayStart) / 86400000);
+    if (daysUntil < 0 || daysUntil > row.notify_days_before) continue;
+    const key = `${row.user_id}:${row.event_id}:email`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const userRow = await env.DB.prepare("SELECT email FROM users WHERE id = ?").bind(row.user_id).first();
+    const email = (userRow as { email?: string } | null)?.email;
+    if (!email) continue;
+    const subject = `Reminder: ${event.title} — ${event.date}`;
+    const html = `<!DOCTYPE html><html><body><h2>${event.title}</h2><p>${event.description}</p><p><strong>Date:</strong> ${event.date}</p><p>— Alnitar</p></body></html>`;
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: env.RESEND_FROM_EMAIL,
+        to: [email],
+        subject,
+        html,
+      }),
+    });
+    if (res.ok) sent += 1;
+  }
+  return { sent };
+}
+
 export default {
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    await sendEventReminderEmails(env);
+    // Push: subscriptions stored; actual Web Push send would require VAPID signing and fetch to endpoint (future)
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (request.method === "OPTIONS") return new Response(null, { headers: CORS_HEADERS });
 
@@ -584,6 +654,91 @@ export default {
         return json({ data: { id, event_id, notify_days_before, channel } }, 200);
       }
 
+      // ——— Notifications: push subscription (auth) for event reminders
+      if (path === "api/notifications/push-subscribe" && request.method === "POST") {
+        const auth = await getAuth(request, env);
+        if (!auth) return err("Unauthorized", 401);
+        let raw: unknown;
+        try {
+          raw = await request.json();
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const schema = z.object({
+          endpoint: z.string().url(),
+          keys: z.object({ p256dh: z.string(), auth: z.string() }),
+        });
+        const parsed = schema.safeParse(raw);
+        if (!parsed.success) return err("Invalid subscription (endpoint, keys.p256dh, keys.auth required)", 400);
+        const { endpoint, keys } = parsed.data;
+        await env.DB.prepare("DELETE FROM push_subscriptions WHERE user_id = ? AND endpoint = ?")
+          .bind(auth.userId, endpoint)
+          .run();
+        const id = uuid();
+        await env.DB.prepare(
+          "INSERT INTO push_subscriptions (id, user_id, endpoint, p256dh, auth, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))"
+        )
+          .bind(id, auth.userId, endpoint, keys.p256dh, keys.auth)
+          .run();
+        return json({ data: { id } }, 200);
+      }
+
+      // ——— Campaigns: list + join/leave (auth for join/leave)
+      const CAMPAIGNS_LIST: Array<{ id: string; title: string; description: string; dateStart: string; dateEnd: string; cta: string }> = [
+        { id: "global-star-count-2026", title: "Global Star Count 2026", description: "Join observers worldwide in counting visible stars. Your data helps measure light pollution.", dateStart: "2026-08-01", dateEnd: "2026-08-31", cta: "I'm participating" },
+        { id: "perseids-watch", title: "Perseids Watch", description: "Log your Perseid meteor observations during peak nights.", dateStart: "2026-08-12", dateEnd: "2026-08-14", cta: "Join campaign" },
+      ];
+      if (path === "api/campaigns" && request.method === "GET") {
+        const auth = await getAuth(request, env);
+        let participatedIds: string[] = [];
+        if (auth) {
+          const { results } = await env.DB.prepare("SELECT campaign_id FROM user_campaigns WHERE user_id = ?").bind(auth.userId).all();
+          participatedIds = ((results ?? []) as { campaign_id: string }[]).map((r) => r.campaign_id);
+        }
+        const list = CAMPAIGNS_LIST.map((c) => ({ ...c, participated: participatedIds.includes(c.id) }));
+        return json({ data: list }, 200);
+      }
+      if (path === "api/campaigns/join" && request.method === "POST") {
+        const auth = await getAuth(request, env);
+        if (!auth) return err("Unauthorized", 401);
+        let raw: unknown;
+        try {
+          raw = await request.json();
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const schema = z.object({ campaign_id: z.string().min(1) });
+        const parsed = schema.safeParse(raw);
+        if (!parsed.success) return err("campaign_id required", 400);
+        const campaignId = parsed.data.campaign_id;
+        if (!CAMPAIGNS_LIST.some((c) => c.id === campaignId)) return err("Unknown campaign", 400);
+        await env.DB.prepare("DELETE FROM user_campaigns WHERE user_id = ? AND campaign_id = ?").bind(auth.userId, campaignId).run();
+        const id = uuid();
+        await env.DB.prepare(
+          "INSERT INTO user_campaigns (id, user_id, campaign_id, joined_at) VALUES (?, ?, ?, datetime('now'))"
+        )
+          .bind(id, auth.userId, campaignId)
+          .run();
+        return json({ data: { id, campaign_id: campaignId } }, 200);
+      }
+      if (path === "api/campaigns/leave" && request.method === "POST") {
+        const auth = await getAuth(request, env);
+        if (!auth) return err("Unauthorized", 401);
+        let raw: unknown;
+        try {
+          raw = await request.json();
+        } catch {
+          return err("Invalid JSON body", 400);
+        }
+        const schema = z.object({ campaign_id: z.string().min(1) });
+        const parsed = schema.safeParse(raw);
+        if (!parsed.success) return err("campaign_id required", 400);
+        await env.DB.prepare("DELETE FROM user_campaigns WHERE user_id = ? AND campaign_id = ?")
+          .bind(auth.userId, parsed.data.campaign_id)
+          .run();
+        return json({ data: { left: parsed.data.campaign_id } }, 200);
+      }
+
       // ——— Events: upcoming (no auth; single source of truth for Phase 2)
       if (path === "api/events/upcoming" && request.method === "GET") {
         const windowDays = Math.min(parseInt(url.searchParams.get("days") || "30", 10) || 30, 365);
@@ -737,10 +892,61 @@ export default {
         return json({ data: { path_id, step_index } }, 200);
       }
 
-      // ——— Public API v1 (API key auth)
+      // ——— OpenAPI spec (public)
+      if (path === "api/openapi.json" && request.method === "GET") {
+        const spec = {
+          openapi: "3.0.0",
+          info: { title: "Alnitar API", version: "1.0.0", description: "Research and institutional access to observation data." },
+          servers: [{ url: "/", description: "Worker base URL" }],
+          security: [{ ApiKeyAuth: [] }],
+          components: {
+            securitySchemes: { ApiKeyAuth: { type: "apiKey", in: "header", name: "Authorization", description: "Bearer <API_KEY> or use X-API-Key header" } },
+          },
+          paths: {
+            "/api/v1/observations": {
+              get: {
+                summary: "List observations",
+                security: [{ ApiKeyAuth: [] }],
+                parameters: [
+                  { name: "limit", in: "query", schema: { type: "integer", default: 50 } },
+                  { name: "offset", in: "query", schema: { type: "integer", default: 0 } },
+                  { name: "date_from", in: "query", schema: { type: "string", format: "date" } },
+                  { name: "date_to", in: "query", schema: { type: "string", format: "date" } },
+                  { name: "constellation_id", in: "query", schema: { type: "string" } },
+                ],
+                responses: { 200: { description: "Paginated observations" }, 401: { description: "API key required" }, 429: { description: "Rate limit exceeded" } },
+              },
+            },
+            "/api/v1/aggregates": {
+              get: {
+                summary: "Aggregated counts",
+                security: [{ ApiKeyAuth: [] }],
+                parameters: [{ name: "by", in: "query", schema: { type: "string", enum: ["day", "constellation"] } }],
+                responses: { 200: { description: "Aggregate data" }, 401: { description: "API key required" }, 429: { description: "Rate limit exceeded" } },
+              },
+            },
+            "/api/events/upcoming": {
+              get: {
+                summary: "Upcoming celestial events",
+                parameters: [{ name: "days", in: "query", schema: { type: "integer", default: 30 } }],
+                responses: { 200: { description: "List of events" } },
+              },
+            },
+          },
+        };
+        return json(spec, 200);
+      }
+
+      // ——— Public API v1 (API key auth, rate limited)
       if (path === "api/v1/observations" && request.method === "GET") {
         const apiAuth = await getApiKeyAuth(request, env);
         if (!apiAuth) return err("API key required (Authorization: Bearer <key> or X-API-Key)", 401);
+        if (await checkApiRateLimit(env, apiAuth.keyId)) {
+          return new Response(
+            JSON.stringify({ error: "Rate limit exceeded. Max 100 requests per minute per API key." }),
+            { status: 429, headers: { ...CORS_HEADERS, "Content-Type": "application/json", "Retry-After": "60" } }
+          );
+        }
         const limit = Math.min(parseInt(url.searchParams.get("limit") || "50", 10) || 50, 200);
         const offset = parseInt(url.searchParams.get("offset") || "0", 10) || 0;
         const dateFrom = url.searchParams.get("date_from")?.trim();
@@ -769,6 +975,12 @@ export default {
       if (path === "api/v1/aggregates" && request.method === "GET") {
         const apiAuth = await getApiKeyAuth(request, env);
         if (!apiAuth) return err("API key required", 401);
+        if (await checkApiRateLimit(env, apiAuth.keyId)) {
+          return new Response(
+            JSON.stringify({ error: "Rate limit exceeded. Max 100 requests per minute per API key." }),
+            { status: 429, headers: { ...CORS_HEADERS, "Content-Type": "application/json", "Retry-After": "60" } }
+          );
+        }
         const by = url.searchParams.get("by") || "day";
         if (by === "day") {
           const { results } = await env.DB.prepare(
