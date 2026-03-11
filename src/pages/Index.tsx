@@ -9,18 +9,20 @@ import { ConstellationDiagram } from "@/components/ConstellationDiagram";
 import { getDiscoveryRecommendations } from "@/lib/discovery";
 import { getLocalProgress } from "@/lib/gamification";
 import { getUpcomingEvents } from "@/lib/discovery/eventAwareness";
+import { getTonightSkyData } from "@/lib/tonight";
 import { HomepageDiscovery } from "@/components/DiscoveryPanel";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { trackEvent } from "@/lib/analytics";
+import { useGeolocation } from "@/hooks/use-geolocation";
 
-const features = [
-  { icon: Eye, title: "Identify in seconds", desc: "Upload a sky photo and see which constellations are in it — with confidence scores and links to learn more. No telescope needed." },
-  { icon: Compass, title: "Explore the sky", desc: "Interactive sky map and planetarium. Stars, constellations, planets, and deep-sky objects — all at your fingertips." },
-  { icon: Sparkles, title: "Deep-sky spotting", desc: "Nebulae, galaxies, and clusters with Messier and NGC info. Know what's visible and how to find it." },
-  { icon: Star, title: "Your observatory log", desc: "Every observation in one place — searchable and exportable. Build a permanent record that clubs and programs can trust." },
-  { icon: BookOpen, title: "Tonight, planned for you", desc: "What to look at and when, for your location and gear. So every clear night is time well spent." },
-  { icon: Zap, title: "Logs that count", desc: "Verified timestamps and location. Export for your club, school, or citizen science — your hobby can contribute." },
+const features: { icon: typeof Eye; title: string; desc: string; to: string }[] = [
+  { icon: Eye, title: "Identify in seconds", desc: "Upload a sky photo and see which constellations are in it — with confidence scores and links to learn more. No telescope needed.", to: "/recognize" },
+  { icon: Compass, title: "Explore the sky", desc: "Interactive sky map and planetarium. Stars, constellations, planets, and deep-sky objects — all at your fingertips.", to: "/sky" },
+  { icon: Sparkles, title: "Deep-sky spotting", desc: "Nebulae, galaxies, and clusters with Messier and NGC info. Know what's visible and how to find it.", to: "/explore/objects" },
+  { icon: Star, title: "Your observatory log", desc: "Every observation in one place — searchable and exportable. Build a permanent record that clubs and programs can trust.", to: "/journal" },
+  { icon: BookOpen, title: "Tonight, planned for you", desc: "What to look at and when, for your location and gear. So every clear night is time well spent.", to: "/tonight" },
+  { icon: Zap, title: "Logs that count", desc: "Verified timestamps and location. Export for your club, school, or citizen science — your hobby can contribute.", to: "/journal" },
 ];
 
 function getConstellationOfTheNight() {
@@ -29,23 +31,30 @@ function getConstellationOfTheNight() {
 }
 
 export default function Index() {
-  const tonight = getConstellationOfTheNight();
+  const { latitude, longitude } = useGeolocation();
+  const now = new Date();
+  const dateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+  const tonightSky = useMemo(
+    () => getTonightSkyData(now, latitude, longitude),
+    [latitude, longitude, dateKey]
+  );
+  const tonight = tonightSky.bestConstellations[0] ?? getConstellationOfTheNight();
 
   const discovery = useMemo(() => {
     const progress = getLocalProgress();
     return getDiscoveryRecommendations({
-      latitude: 40,
-      longitude: 0,
-      date: new Date(),
-      equipment: 'naked-eye',
-      experienceLevel: 'beginner',
+      latitude,
+      longitude,
+      date: now,
+      equipment: "naked-eye",
+      experienceLevel: "beginner",
       constellationsFound: progress.constellationsFound,
       dsosObserved: [],
       totalObservations: progress.totalObservations,
     });
-  }, []);
+  }, [latitude, longitude, dateKey]);
 
-  const upcomingEvents = useMemo(() => getUpcomingEvents(new Date(), 90).slice(0, 3), []);
+  const upcomingEvents = useMemo(() => getUpcomingEvents(now, 90).slice(0, 3), [dateKey]);
 
   return (
     <div className="relative min-h-screen">
@@ -212,7 +221,7 @@ export default function Index() {
               </div>
               <div className="flex-1 text-center sm:text-left">
                 <h3 className="font-display text-2xl font-bold mb-1">{tonight.name}</h3>
-                <p className="text-muted-foreground text-sm mb-3">{tonight.alternateNames[0]}</p>
+                {tonight.alternateNames[0] && <p className="text-muted-foreground text-sm mb-3">{tonight.alternateNames[0]}</p>}
                 <p className="text-sm text-foreground/80 leading-relaxed line-clamp-3 mb-4">
                   {tonight.mythology.slice(0, 200)}…
                 </p>
@@ -269,12 +278,18 @@ export default function Index() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {features.map((f, i) => (
               <motion.div key={f.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ delay: i * 0.08 }} className="glass-card p-6 group">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <f.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-display font-semibold mb-2">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+                <Link
+                  to={f.to}
+                  className="block glass-card p-6 group cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors rounded-xl"
+                  onClick={() => trackEvent("cta_click", { location: "features_grid", cta: f.to })}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                    <f.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <h3 className="font-display font-semibold mb-2">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                </Link>
               </motion.div>
             ))}
           </div>

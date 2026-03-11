@@ -83,7 +83,7 @@
   }
 
   .glass-card-hover {
-    @apply glass-card transition-all duration-300;
+    @apply glass-card transition-all duration-300 cursor-pointer;
   }
   .glass-card-hover:hover {
     @apply border-primary/30;

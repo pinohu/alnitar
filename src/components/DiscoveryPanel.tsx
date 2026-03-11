@@ -24,9 +24,13 @@ const difficultyColors: Record<string, string> = {
 };
 
 function RecCard({ rec, index = 0 }: { rec: Recommendation; index?: number }) {
-  const constellation = constellations.find(c => c.id === rec.objectId);
-  const linkTo = rec.objectType === 'constellation' && constellation
-    ? `/learn/${constellation.slug}` : '/tonight';
+  const constellation = constellations.find((c) => c.id === rec.objectId);
+  const linkTo =
+    rec.objectType === "constellation" && constellation
+      ? `/learn/${constellation.slug}`
+      : rec.objectType === "deep-sky"
+        ? `/explore/object/dso/${rec.objectId.toLowerCase()}`
+        : "/tonight";
 
   return (
     <motion.div
@@ -34,7 +38,7 @@ function RecCard({ rec, index = 0 }: { rec: Recommendation; index?: number }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
     >
-      <Link to={linkTo} className="glass-card-hover p-4 flex gap-3 items-start">
+      <Link to={linkTo} className="glass-card-hover p-4 flex gap-3 items-start cursor-pointer">
         {constellation && (
           <div className="shrink-0 rounded bg-muted/20">
             <ConstellationDiagram constellation={constellation} width={52} height={52} />
@@ -97,7 +101,10 @@ function RecSection({ title, icon: Icon, recs, emptyText }: {
 
 function ChallengeCard({ challenge }: { challenge: SkyChallenge }) {
   return (
-    <div className="glass-card p-5 border-primary/20">
+    <Link
+      to="/tonight"
+      className="block glass-card p-5 border-primary/20 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-colors rounded-xl"
+    >
       <div className="flex items-center gap-2 mb-2">
         <Trophy className="w-5 h-5 text-accent" />
         <h3 className="font-display font-semibold text-sm">Tonight's Challenge</h3>
@@ -108,25 +115,28 @@ function ChallengeCard({ challenge }: { challenge: SkyChallenge }) {
       <p className="font-display font-bold text-lg mb-1">{challenge.title}</p>
       <p className="text-xs text-muted-foreground mb-2">{challenge.description}</p>
       <p className="text-[10px] text-accent">{challenge.reward}</p>
-    </div>
+    </Link>
   );
 }
 
 function EventCard({ event }: { event: CelestialEvent }) {
   const importanceStyles = {
-    highlight: 'border-accent/30 bg-accent/5',
-    notable: 'border-primary/20',
-    minor: 'border-border/30',
+    highlight: "border-accent/30 bg-accent/5",
+    notable: "border-primary/20",
+    minor: "border-border/30",
   };
   return (
-    <div className={`glass-card p-4 ${importanceStyles[event.importance]}`}>
+    <Link
+      to="/events"
+      className={`block glass-card p-4 cursor-pointer hover:border-primary/30 hover:bg-primary/5 transition-colors rounded-xl ${importanceStyles[event.importance]}`}
+    >
       <div className="flex items-center gap-2 mb-1">
         <Zap className="w-4 h-4 text-accent" />
         <h4 className="font-display font-semibold text-sm">{event.title}</h4>
       </div>
       <p className="text-xs text-muted-foreground mb-1">{event.description.slice(0, 100)}</p>
       <p className="text-[10px] text-muted-foreground/70">{event.date}</p>
-    </div>
+    </Link>
   );
 }
 
@@ -200,7 +210,10 @@ export function HomepageDiscovery({ result }: { result: DiscoveryResult }) {
         {unique.map((r, i) => <RecCard key={r.id} rec={r} index={i} />)}
       </div>
       {result.challenge && (
-        <div className="glass-card p-4 border-primary/20 mb-3">
+        <Link
+          to="/tonight"
+          className="block glass-card p-4 border-primary/20 mb-3 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-colors rounded-xl"
+        >
           <div className="flex items-center gap-2">
             <Trophy className="w-4 h-4 text-accent" />
             <span className="font-display font-semibold text-sm">{result.challenge.title}</span>
@@ -209,9 +222,9 @@ export function HomepageDiscovery({ result }: { result: DiscoveryResult }) {
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-1">{result.challenge.description.slice(0, 80)}…</p>
-        </div>
+        </Link>
       )}
-      <Button asChild variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10">
+      <Button asChild variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-primary/10 cursor-pointer">
         <Link to="/tonight">
           See full sky guide <ArrowRight className="w-4 h-4 ml-1" />
         </Link>

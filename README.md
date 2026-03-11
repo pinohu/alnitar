@@ -97,9 +97,17 @@ Required for auth, database, storage, and edge functions. The app runs without t
 
 ### Vercel
 
-- Connect repo, set root directory, build command: `npm run build`, output: `dist`.
+- Connect repo, set root directory, build command: `npm run build`, output: `dist`. The repo includes `vercel.json` with build command, output directory, and SPA rewrites.
 - Add env vars in Project Settings → Environment Variables.
 - **Commit not showing on the live site?** Pushing to `main` runs GitHub Actions (lint, test, build) but does **not** deploy. The live site is deployed by **Vercel**. Ensure your Vercel project is linked to this GitHub repo; then each push to `main` triggers a new Vercel build and deploy. If your commit still isn’t live: open [Vercel Dashboard](https://vercel.com) → your project → **Deployments**, check the latest deployment (it should be from your push), and if needed click **Redeploy** on the latest or wait for the build to finish.
+
+**Changes still not visible after push?**
+
+1. **Confirm where alnitar.com is hosted** — If the domain points to Vercel, the project must be linked to **this** GitHub repo. If it points to Netlify, Cloudflare Pages, or another host, a push to GitHub only updates that host if that host is connected to the same repo; otherwise deploy from that host’s dashboard or connect the repo there.
+2. **Vercel → Your project → Deployments** — Check the **latest deployment**: is the commit your push (e.g. “feat: implementation plan…”)? Is status **Ready** (green)? If it’s **Building** or **Error**, open it and check the build logs.
+3. **Production branch** — In Vercel → **Settings** → **Git** → **Production Branch**. It must be `main` (or whatever branch you push to) so that pushes create production deploys.
+4. **Hard refresh** — Try the live URL in an incognito/private window or with cache disabled (e.g. Ctrl+Shift+R) so you’re not seeing an old cached version.
+5. **URL** — Confirm you’re opening the production URL (e.g. `https://alnitar.com` or the Vercel production domain), not an old preview or bookmark.
 
 ### Netlify
 
