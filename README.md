@@ -96,6 +96,7 @@ Required for auth, database, storage, and edge functions. The app runs without t
 
 - Connect repo, set root directory, build command: `npm run build`, output: `dist`.
 - Add env vars in Project Settings → Environment Variables.
+- **Commit not showing on the live site?** Pushing to `main` runs GitHub Actions (lint, test, build) but does **not** deploy. The live site is deployed by **Vercel**. Ensure your Vercel project is linked to this GitHub repo; then each push to `main` triggers a new Vercel build and deploy. If your commit still isn’t live: open [Vercel Dashboard](https://vercel.com) → your project → **Deployments**, check the latest deployment (it should be from your push), and if needed click **Redeploy** on the latest or wait for the build to finish.
 
 ### Netlify
 
