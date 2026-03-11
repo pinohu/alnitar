@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { canAccessProFeatures, hasProCloudBackup } from "@/lib/featureAccess";
 import { ProGate } from "@/components/ProGate";
 import { Button } from "@/components/ui/button";
-import { Printer, Copy } from "lucide-react";
+import { Printer, Copy, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -74,6 +74,18 @@ export default function YearInReviewPage() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const displayName = (user?.user_metadata as { name?: string } | undefined)?.name || user?.email || "Observer";
+
+  const handlePrintCertificate = () => {
+    document.body.classList.add("printing-certificate");
+    window.print();
+    const remove = () => {
+      document.body.classList.remove("printing-certificate");
+      window.removeEventListener("afterprint", remove);
+    };
+    window.addEventListener("afterprint", remove);
   };
 
   const handleCopy = async () => {
@@ -151,6 +163,10 @@ export default function YearInReviewPage() {
                       <Printer className="w-4 h-4 mr-2" />
                       Print / PDF
                     </Button>
+                    <Button variant="outline" size="sm" onClick={handlePrintCertificate}>
+                      <Award className="w-4 h-4 mr-2" />
+                      Print certificate
+                    </Button>
                     <Button variant="outline" size="sm" onClick={handleCopy}>
                       <Copy className="w-4 h-4 mr-2" />
                       Copy summary
@@ -166,12 +182,44 @@ export default function YearInReviewPage() {
                 <pre className="whitespace-pre-wrap bg-muted/30 rounded-lg p-4 border border-border/50">{summaryText}</pre>
               </div>
             )}
+
+            {/* Observation certificate: visible only when printing (print-certificate mode) */}
+            {yearEntries.length > 0 && (
+              <div
+                id="observation-certificate"
+                className="observation-certificate hidden"
+              >
+                <div className="border-2 border-primary/40 rounded-xl p-8 max-w-lg text-center print:border-primary/60">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-2">Observation Certificate</p>
+                  <h2 className="font-display text-2xl font-bold mb-1">Alnitar</h2>
+                  <p className="text-sm text-muted-foreground mb-6">Sky observation record</p>
+                  <p className="text-lg font-medium text-foreground mb-2">This certifies that</p>
+                  <p className="text-xl font-display font-bold text-primary mb-6">{displayName}</p>
+                  <p className="text-sm text-foreground mb-4">
+                    recorded <strong>{stats.total}</strong> observation{stats.total !== 1 ? "s" : ""} across <strong>{stats.constellations}</strong> constellation{stats.constellations !== 1 ? "s" : ""} in the year <strong>{year}</strong>.
+                  </p>
+                  {stats.firstDate && stats.lastDate && (
+                    <p className="text-xs text-muted-foreground mb-6">
+                      First observation: {stats.firstDate} · Last observation: {stats.lastDate}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">alnitar.com · Verified observatory log</p>
+                </div>
+              </div>
+            )}
           </motion.div>
         </div>
       </div>
       <style>{`
         @media print {
           .no-print, .no-print * { display: none !important; }
+        }
+        /* When printing, show only the certificate if it's the certificate print flow. We use a dedicated class so "Print / PDF" still prints the page; "Print certificate" focuses on certificate. */
+        @media print {
+          body.printing-certificate * { visibility: hidden; }
+          body.printing-certificate #observation-certificate,
+          body.printing-certificate #observation-certificate * { visibility: visible; }
+          body.printing-certificate #observation-certificate { position: fixed !important; inset: 0 !important; display: flex !important; align-items: center; justify-content: center; background: hsl(var(--background)); }
         }
       `}</style>
     </div>
