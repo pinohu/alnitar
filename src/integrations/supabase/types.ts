@@ -38,6 +38,75 @@ export type Database = {
         }
         Relationships: []
       }
+      favorites: {
+        Row: {
+          id: string
+          user_id: string
+          item_type: string
+          item_id: string
+          name: string | null
+          saved_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          item_type: string
+          item_id: string
+          name?: string | null
+          saved_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          item_type?: string
+          item_id?: string
+          name?: string | null
+          saved_at?: string
+        }
+        Relationships: []
+      }
+      journal_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          observed_at: string
+          location: string | null
+          sky_condition: string | null
+          notes: string | null
+          object_slugs: string[]
+          event_slugs: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          observed_at: string
+          location?: string | null
+          sky_condition?: string | null
+          notes?: string | null
+          object_slugs?: string[]
+          event_slugs?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          observed_at?: string
+          location?: string | null
+          sky_condition?: string | null
+          notes?: string | null
+          object_slugs?: string[]
+          event_slugs?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       deep_sky_catalog: {
         Row: {
           angular_size: string | null

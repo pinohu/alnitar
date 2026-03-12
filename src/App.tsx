@@ -33,11 +33,18 @@ const PartnersPage = lazy(() => import("./pages/PartnersPage.tsx"));
 const ResearchApiPage = lazy(() => import("./pages/ResearchApiPage.tsx"));
 const AlignScopePage = lazy(() => import("./pages/AlignScopePage.tsx"));
 const ExplorePage = lazy(() => import("./pages/ExplorePage.tsx"));
+const CatalogPage = lazy(() => import("./pages/CatalogPage.tsx"));
+const SeedObjectDetailPage = lazy(() => import("./pages/SeedObjectDetailPage.tsx"));
+const ObjectExplorerPage = lazy(() => import("./pages/ObjectExplorerPage.tsx"));
+const ObjectDetailBySlugPage = lazy(() => import("./pages/ObjectDetailBySlugPage.tsx"));
+const EventExplorerPage = lazy(() => import("./pages/EventExplorerPage.tsx"));
+const EventDetailBySlugPage = lazy(() => import("./pages/EventDetailBySlugPage.tsx"));
 const CelestialExplorerPage = lazy(() => import("./pages/CelestialExplorerPage.tsx"));
 const DeepSkyObjectDetailPage = lazy(() => import("./pages/DeepSkyObjectDetailPage.tsx"));
 const SolarSystemPage = lazy(() => import("./pages/SolarSystemPage.tsx"));
 const EventSimulatePage = lazy(() => import("./pages/EventSimulatePage.tsx"));
 const EventDetailPage = lazy(() => import("./pages/EventDetailPage.tsx"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage.tsx"));
 const CampaignsPage = lazy(() => import("./pages/CampaignsPage.tsx"));
 const SessionPlannerPage = lazy(() => import("./pages/SessionPlannerPage.tsx"));
 const ProgramsPage = lazy(() => import("./pages/ProgramsPage.tsx"));
@@ -51,8 +58,15 @@ const basename = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "") || "/";
 
 function PageFallback() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden />
+    <div className="min-h-[60vh] animate-pulse">
+      <div className="container max-w-6xl space-y-8 px-4 pt-24 pb-16">
+        <div className="h-40 rounded-2xl bg-muted/30 border border-border/30" />
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-52 rounded-2xl bg-muted/30 border border-border/30" />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -75,6 +89,7 @@ const App = () => (
                 <Route path="/learn/:slug" element={<ConstellationDetailPage />} />
                 <Route path="/profile/:userId" element={<PublicProfilePage />} />
                 <Route path="/journal" element={<JournalPage />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/journal/year-in-review" element={<YearInReviewPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
@@ -97,6 +112,12 @@ const App = () => (
                 <Route path="/research" element={<ResearchApiPage />} />
                 <Route path="/align" element={<AlignScopePage />} />
                 <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/explore/catalog" element={<CatalogPage />} />
+                <Route path="/object/:id" element={<SeedObjectDetailPage />} />
+                <Route path="/objects" element={<ObjectExplorerPage />} />
+                <Route path="/objects/:slug" element={<ObjectDetailBySlugPage />} />
+                <Route path="/events/explore" element={<EventExplorerPage />} />
+                <Route path="/events/explore/:slug" element={<EventDetailBySlugPage />} />
                 <Route path="/explore/objects" element={<CelestialExplorerPage />} />
                 <Route path="/explore/object/dso/:id" element={<DeepSkyObjectDetailPage />} />
                 <Route path="/explore/solar-system" element={<SolarSystemPage />} />

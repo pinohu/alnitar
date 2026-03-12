@@ -8,6 +8,13 @@ const productLinks = [
   { to: "/pricing", label: "Pricing" },
 ] as const;
 
+const exploreLinks = [
+  { to: "/objects", label: "Celestial objects" },
+  { to: "/events/explore", label: "Astronomy events" },
+  { to: "/events", label: "Upcoming events" },
+  { to: "/objects?tag=beginner", label: "Beginner picks" },
+] as const;
+
 const companyLinks = [
   { to: "/partners", label: "Clubs & organizations" },
   { to: "/support", label: "Support" },
@@ -49,7 +56,7 @@ export function Footer() {
       aria-label="Site footer"
     >
       <div className="container px-4 sm:px-6 py-8 min-w-0 overflow-x-hidden">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10 min-w-0">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 min-w-0">
           {/* Brand & contact */}
           <div className="flex flex-col gap-3">
             <p className="text-sm font-display font-bold">
@@ -67,6 +74,7 @@ export function Footer() {
             </a>
           </div>
           <LinkGroup title="Product" links={productLinks} ariaLabel="Product links" />
+          <LinkGroup title="Explore" links={exploreLinks} ariaLabel="Explore links" />
           <LinkGroup title="Company" links={companyLinks} ariaLabel="Company links" />
           <LinkGroup title="Legal" links={legalLinks} ariaLabel="Legal links" />
         </div>

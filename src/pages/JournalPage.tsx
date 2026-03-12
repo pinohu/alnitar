@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { RegisterGate } from "@/components/RegisterGate";
 import { GUEST_JOURNAL_ENTRY_LIMIT, hasProCloudBackup } from "@/lib/featureAccess";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { JournalSessionSection } from "@/components/journal/JournalSessionSection";
 
 function filterEntries(
   entries: JournalEntry[],
@@ -81,7 +82,7 @@ export default function JournalPage() {
       <StarField />
       <Navbar />
       <div className="relative z-10 pt-24 pb-16 px-4">
-        <div className="container max-w-3xl">
+        <div className="container max-w-6xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
             <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
               Observation <span className="gradient-text">Journal</span>
@@ -293,6 +294,14 @@ export default function JournalPage() {
               </AnimatePresence>
             </div>
           )}
+
+          <div className="mt-16">
+            <h2 className="font-display text-2xl font-semibold mb-4">Observation sessions</h2>
+            <p className="text-muted-foreground text-sm mb-6">
+              Log skywatching sessions with title, time, location, sky condition, and links to objects and events.
+            </p>
+            <JournalSessionSection />
+          </div>
         </div>
       </div>
     </div>

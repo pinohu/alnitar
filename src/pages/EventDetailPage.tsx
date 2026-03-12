@@ -11,6 +11,8 @@ import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { useFavorite } from "@/hooks/use-favorites";
 import { getEventById } from "@/lib/discovery/eventAwareness";
 import type { CelestialEvent } from "@/lib/discovery/types";
 import { trackEvent } from "@/lib/analytics";
@@ -24,6 +26,7 @@ function EventTypeIcon({ type }: { type: CelestialEvent["type"] }) {
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const event = id ? getEventById(id) : undefined;
+  const { isSaved: saved, toggle: toggleSaved } = useFavorite("event", event?.id ?? "");
 
   usePageTitle(
     event ? event.title : "Event",
@@ -74,7 +77,16 @@ export default function EventDetailPage() {
                 <EventTypeIcon type={event.type} />
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="font-display text-2xl sm:text-3xl font-bold mb-2">{event.title}</h1>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <h1 className="font-display text-2xl sm:text-3xl font-bold">{event.title}</h1>
+                  <FavoriteButton
+                    itemType="event"
+                    itemId={event.id}
+                    isSaved={saved}
+                    onToggle={() => toggleSaved()}
+                    className="ml-auto"
+                  />
+                </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant="secondary" className="capitalize bg-muted/50 border-0">
                     {event.type.replace("-", " ")}

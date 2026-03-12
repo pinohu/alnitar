@@ -1,0 +1,745 @@
+[
+  {
+    "id": "evt-quadrantids",
+    "slug": "quadrantids",
+    "name": "Quadrantids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "January 3-4",
+    "summary": "A short but often strong meteor shower best seen from the Northern Hemisphere after midnight.",
+    "bestFor": "north",
+    "tags": [
+      "meteor-shower",
+      "annual",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-lyrids",
+    "slug": "lyrids",
+    "name": "Lyrids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "April 21-22",
+    "summary": "One of the oldest recorded meteor showers, active each April.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-eta-aquariids",
+    "slug": "eta-aquariids",
+    "name": "Eta Aquariids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "May 5-6",
+    "summary": "A meteor shower associated with Halley's Comet, favoring southern latitudes and pre-dawn hours.",
+    "bestFor": "south",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-delta-aquariids",
+    "slug": "southern-delta-aquariids",
+    "name": "Southern Delta Aquariids",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "July 29-30",
+    "summary": "A broad midsummer meteor shower best seen after midnight.",
+    "bestFor": "south",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-alpha-capricornids",
+    "slug": "alpha-capricornids",
+    "name": "Alpha Capricornids",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "July 30-31",
+    "summary": "Known for occasional bright fireballs despite modest hourly rates.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-perseids",
+    "slug": "perseids",
+    "name": "Perseids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "August 12-13",
+    "summary": "One of the most popular annual meteor showers with bright fast meteors.",
+    "bestFor": "north",
+    "tags": [
+      "meteor-shower",
+      "annual",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-orionids",
+    "slug": "orionids",
+    "name": "Orionids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "October 20-21",
+    "summary": "Another shower linked to Halley's Comet, best seen before dawn.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-southern-taurids",
+    "slug": "southern-taurids",
+    "name": "Southern Taurids",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "November 4-5",
+    "summary": "A long-duration shower known for occasional fireballs.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-northern-taurids",
+    "slug": "northern-taurids",
+    "name": "Northern Taurids",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "November 11-12",
+    "summary": "Overlaps seasonally with the Southern Taurids and can produce bright meteors.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-leonids",
+    "slug": "leonids",
+    "name": "Leonids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "November 17-18",
+    "summary": "Famous for past meteor storms, though usually more modest today.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-geminids",
+    "slug": "geminids",
+    "name": "Geminids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "December 13-14",
+    "summary": "One of the year's strongest and most reliable meteor showers.",
+    "bestFor": "both",
+    "tags": [
+      "meteor-shower",
+      "annual",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-ursids",
+    "slug": "ursids",
+    "name": "Ursids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "December 21-22",
+    "summary": "A northern shower arriving near the December solstice.",
+    "bestFor": "north",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-draconids",
+    "slug": "draconids",
+    "name": "Draconids Meteor Shower",
+    "type": "meteor-shower",
+    "recurrence": "annual",
+    "peakWindow": "October 8-9",
+    "summary": "An often-variable shower best seen in the evening when active.",
+    "bestFor": "north",
+    "tags": [
+      "meteor-shower",
+      "annual"
+    ]
+  },
+  {
+    "id": "evt-total-lunar-eclipse",
+    "slug": "total-lunar-eclipse",
+    "name": "Total Lunar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when the full Moon passes completely into Earth's umbra, often turning red.",
+    "bestFor": "location-dependent",
+    "tags": [
+      "eclipse",
+      "moon",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-partial-lunar-eclipse",
+    "slug": "partial-lunar-eclipse",
+    "name": "Partial Lunar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when only part of the Moon enters Earth's darkest shadow.",
+    "bestFor": "location-dependent",
+    "tags": [
+      "eclipse",
+      "moon"
+    ]
+  },
+  {
+    "id": "evt-total-solar-eclipse",
+    "slug": "total-solar-eclipse",
+    "name": "Total Solar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when the Moon fully covers the Sun along a narrow path on Earth.",
+    "bestFor": "path-specific",
+    "tags": [
+      "eclipse",
+      "sun",
+      "advanced",
+      "safety"
+    ]
+  },
+  {
+    "id": "evt-annular-solar-eclipse",
+    "slug": "annular-solar-eclipse",
+    "name": "Annular Solar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when the Moon appears slightly too small to completely cover the Sun, producing a ring of fire.",
+    "bestFor": "path-specific",
+    "tags": [
+      "eclipse",
+      "sun",
+      "safety"
+    ]
+  },
+  {
+    "id": "evt-partial-solar-eclipse",
+    "slug": "partial-solar-eclipse",
+    "name": "Partial Solar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when the Moon covers part of the Sun as seen from a location on Earth.",
+    "bestFor": "region-specific",
+    "tags": [
+      "eclipse",
+      "sun",
+      "safety"
+    ]
+  },
+  {
+    "id": "evt-penumbral-lunar-eclipse",
+    "slug": "penumbral-lunar-eclipse",
+    "name": "Penumbral Lunar Eclipse",
+    "type": "eclipse",
+    "recurrence": "irregular",
+    "peakWindow": "varies",
+    "summary": "Occurs when the Moon passes through Earth's outer shadow, causing subtle dimming.",
+    "bestFor": "location-dependent",
+    "tags": [
+      "eclipse",
+      "moon"
+    ]
+  },
+  {
+    "id": "evt-planetary-opposition",
+    "slug": "planetary-opposition",
+    "name": "Planetary Opposition",
+    "type": "planetary-event",
+    "recurrence": "regular for outer planets",
+    "peakWindow": "varies by planet and year",
+    "summary": "An outer planet rises around sunset and is typically brightest and best placed for observing.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "observing",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-greatest-elongation",
+    "slug": "greatest-elongation",
+    "name": "Greatest Elongation of Mercury or Venus",
+    "type": "planetary-event",
+    "recurrence": "regular",
+    "peakWindow": "varies",
+    "summary": "Best evening or morning viewing opportunity for the inner planets.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "observing"
+    ]
+  },
+  {
+    "id": "evt-planetary-conjunction",
+    "slug": "planetary-conjunction",
+    "name": "Planetary Conjunction",
+    "type": "planetary-event",
+    "recurrence": "frequent",
+    "peakWindow": "varies",
+    "summary": "Two planets appear close together in the sky from Earth's perspective.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "visual",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-moon-planet-conjunction",
+    "slug": "moon-planet-conjunction",
+    "name": "Moon–Planet Conjunction",
+    "type": "planetary-event",
+    "recurrence": "frequent",
+    "peakWindow": "monthly/varies",
+    "summary": "The Moon passes near a bright planet, creating an easy naked-eye pairing.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "planet",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-messier-marathon",
+    "slug": "messier-marathon",
+    "name": "Messier Marathon Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "March new-moon period",
+    "summary": "A popular observing challenge to see as many Messier objects as possible in one night.",
+    "bestFor": "both",
+    "tags": [
+      "deep-sky",
+      "messier",
+      "challenge"
+    ]
+  },
+  {
+    "id": "evt-galactic-center-season",
+    "slug": "galactic-center-season",
+    "name": "Milky Way Galactic Center Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "late spring through summer",
+    "summary": "Prime season for viewing and imaging the bright Milky Way core in dark skies.",
+    "bestFor": "both",
+    "tags": [
+      "milky-way",
+      "astrophotography"
+    ]
+  },
+  {
+    "id": "evt-winter-hexagon",
+    "slug": "winter-hexagon-season",
+    "name": "Winter Hexagon Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "December through March",
+    "summary": "A rich naked-eye sky pattern linking many bright winter stars.",
+    "bestFor": "north",
+    "tags": [
+      "seasonal-sky",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-summer-triangle",
+    "slug": "summer-triangle-season",
+    "name": "Summer Triangle Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "June through September",
+    "summary": "A bright asterism formed by Vega, Deneb, and Altair, ideal for navigation and beginner observing.",
+    "bestFor": "north",
+    "tags": [
+      "seasonal-sky",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-galaxy-season",
+    "slug": "galaxy-season",
+    "name": "Galaxy Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "spring",
+    "summary": "A prime season for observing many galaxies in Leo, Virgo, and Ursa Major.",
+    "bestFor": "north",
+    "tags": [
+      "galaxy",
+      "observing"
+    ]
+  },
+  {
+    "id": "evt-orion-season",
+    "slug": "orion-season",
+    "name": "Orion Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "late autumn through winter",
+    "summary": "The Orion region dominates evening skies with bright stars and nebulae.",
+    "bestFor": "both",
+    "tags": [
+      "orion",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-march-equinox",
+    "slug": "march-equinox",
+    "name": "March Equinox",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "around March 20",
+    "summary": "Marks the start of spring in the north and autumn in the south.",
+    "bestFor": "both",
+    "tags": [
+      "calendar",
+      "equinox"
+    ]
+  },
+  {
+    "id": "evt-june-solstice",
+    "slug": "june-solstice",
+    "name": "June Solstice",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "around June 20-21",
+    "summary": "Marks the start of summer in the north and winter in the south.",
+    "bestFor": "both",
+    "tags": [
+      "calendar",
+      "solstice"
+    ]
+  },
+  {
+    "id": "evt-september-equinox",
+    "slug": "september-equinox",
+    "name": "September Equinox",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "around September 22-23",
+    "summary": "Marks the start of autumn in the north and spring in the south.",
+    "bestFor": "both",
+    "tags": [
+      "calendar",
+      "equinox"
+    ]
+  },
+  {
+    "id": "evt-december-solstice",
+    "slug": "december-solstice",
+    "name": "December Solstice",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "around December 21-22",
+    "summary": "Marks the start of winter in the north and summer in the south.",
+    "bestFor": "both",
+    "tags": [
+      "calendar",
+      "solstice"
+    ]
+  },
+  {
+    "id": "evt-mercury-greatest-eastern",
+    "slug": "mercury-greatest-eastern-elongation",
+    "name": "Mercury Greatest Eastern Elongation",
+    "type": "planetary-event",
+    "recurrence": "regular",
+    "peakWindow": "varies",
+    "summary": "One of the best evening appearances of Mercury.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "mercury"
+    ]
+  },
+  {
+    "id": "evt-mercury-greatest-western",
+    "slug": "mercury-greatest-western-elongation",
+    "name": "Mercury Greatest Western Elongation",
+    "type": "planetary-event",
+    "recurrence": "regular",
+    "peakWindow": "varies",
+    "summary": "One of the best morning appearances of Mercury.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "mercury"
+    ]
+  },
+  {
+    "id": "evt-venus-greatest-eastern",
+    "slug": "venus-greatest-eastern-elongation",
+    "name": "Venus Greatest Eastern Elongation",
+    "type": "planetary-event",
+    "recurrence": "regular",
+    "peakWindow": "varies",
+    "summary": "A strong evening apparition of Venus.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "venus"
+    ]
+  },
+  {
+    "id": "evt-venus-greatest-western",
+    "slug": "venus-greatest-western-elongation",
+    "name": "Venus Greatest Western Elongation",
+    "type": "planetary-event",
+    "recurrence": "regular",
+    "peakWindow": "varies",
+    "summary": "A strong morning apparition of Venus.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "venus"
+    ]
+  },
+  {
+    "id": "evt-mars-opposition",
+    "slug": "mars-opposition",
+    "name": "Mars at Opposition",
+    "type": "planetary-event",
+    "recurrence": "irregular",
+    "peakWindow": "roughly every 26 months",
+    "summary": "Mars is brightest and best placed for observing.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "mars",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-jupiter-opposition",
+    "slug": "jupiter-opposition",
+    "name": "Jupiter at Opposition",
+    "type": "planetary-event",
+    "recurrence": "annual-ish",
+    "peakWindow": "varies",
+    "summary": "Jupiter rises around sunset and is best for telescopic viewing.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "jupiter",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-saturn-opposition",
+    "slug": "saturn-opposition",
+    "name": "Saturn at Opposition",
+    "type": "planetary-event",
+    "recurrence": "annual-ish",
+    "peakWindow": "varies",
+    "summary": "Saturn is brightest and best placed for viewing its rings.",
+    "bestFor": "both",
+    "tags": [
+      "planet",
+      "saturn",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-full-moon",
+    "slug": "full-moon",
+    "name": "Full Moon",
+    "type": "lunar-event",
+    "recurrence": "monthly",
+    "peakWindow": "varies",
+    "summary": "The Moon is fully illuminated and rises around sunset.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event",
+      "beginner"
+    ]
+  },
+  {
+    "id": "evt-new-moon",
+    "slug": "new-moon",
+    "name": "New Moon",
+    "type": "lunar-event",
+    "recurrence": "monthly",
+    "peakWindow": "varies",
+    "summary": "The Moon is between Earth and the Sun; best for dark-sky observing.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event",
+      "dark-sky"
+    ]
+  },
+  {
+    "id": "evt-first-quarter",
+    "slug": "first-quarter-moon",
+    "name": "First Quarter Moon",
+    "type": "lunar-event",
+    "recurrence": "monthly",
+    "peakWindow": "varies",
+    "summary": "Half the Moon is illuminated; good for lunar detail and evening observing.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event"
+    ]
+  },
+  {
+    "id": "evt-last-quarter",
+    "slug": "last-quarter-moon",
+    "name": "Last Quarter Moon",
+    "type": "lunar-event",
+    "recurrence": "monthly",
+    "peakWindow": "varies",
+    "summary": "Half the Moon is illuminated; rises late at night.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event"
+    ]
+  },
+  {
+    "id": "evt-supermoon",
+    "slug": "supermoon",
+    "name": "Supermoon",
+    "type": "lunar-event",
+    "recurrence": "several per year",
+    "peakWindow": "varies",
+    "summary": "Full or new Moon near perigee, appearing slightly larger and brighter.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event"
+    ]
+  },
+  {
+    "id": "evt-blue-moon",
+    "slug": "blue-moon",
+    "name": "Blue Moon",
+    "type": "lunar-event",
+    "recurrence": "occasional",
+    "peakWindow": "varies",
+    "summary": "Second full Moon in a calendar month, or third full Moon in a four-full-Moon season.",
+    "bestFor": "both",
+    "tags": [
+      "moon",
+      "lunar-event"
+    ]
+  },
+  {
+    "id": "evt-zodiacal-light-spring",
+    "slug": "zodiacal-light-spring",
+    "name": "Zodiacal Light Spring Evening Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "late winter through spring",
+    "summary": "A good season for spotting the evening zodiacal light from dark locations.",
+    "bestFor": "both",
+    "tags": [
+      "zodiacal-light",
+      "dark-sky"
+    ]
+  },
+  {
+    "id": "evt-zodiacal-light-autumn",
+    "slug": "zodiacal-light-autumn",
+    "name": "Zodiacal Light Autumn Morning Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "late summer through autumn",
+    "summary": "A good season for spotting the morning zodiacal light before dawn.",
+    "bestFor": "both",
+    "tags": [
+      "zodiacal-light",
+      "dark-sky"
+    ]
+  },
+  {
+    "id": "evt-aurora-borealis",
+    "slug": "aurora-borealis-alert",
+    "name": "Aurora Borealis Alert Windows",
+    "type": "observing-season",
+    "recurrence": "solar-cycle dependent",
+    "peakWindow": "varies",
+    "summary": "Heightened geomagnetic activity can bring auroral displays farther south than usual.",
+    "bestFor": "north",
+    "tags": [
+      "aurora",
+      "solar"
+    ]
+  },
+  {
+    "id": "evt-globular-season",
+    "slug": "globular-cluster-season",
+    "name": "Globular Cluster Season",
+    "type": "observing-season",
+    "recurrence": "annual",
+    "peakWindow": "late spring through summer",
+    "summary": "A rewarding season for observing bright globular clusters such as M3, M5, M13, and M22.",
+    "bestFor": "north",
+    "tags": [
+      "cluster",
+      "observing"
+    ]
+  },
+  {
+    "id": "evt-earth-perihelion",
+    "slug": "earth-perihelion",
+    "name": "Earth at Perihelion",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "early January",
+    "summary": "Earth reaches its closest point to the Sun for the year.",
+    "bestFor": "both",
+    "tags": [
+      "calendar"
+    ]
+  },
+  {
+    "id": "evt-earth-aphelion",
+    "slug": "earth-aphelion",
+    "name": "Earth at Aphelion",
+    "type": "calendar-event",
+    "recurrence": "annual",
+    "peakWindow": "early July",
+    "summary": "Earth reaches its farthest point from the Sun for the year.",
+    "bestFor": "both",
+    "tags": [
+      "calendar"
+    ]
+  }
+]

@@ -1,10 +1,13 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
-import { User, LogOut, Star, Award, Flame, Trophy, Share2, ChevronRight, Check, Headphones } from "lucide-react";
+import { User, LogOut, Star, Award, Flame, Trophy, Share2, ChevronRight, Check, Headphones, BookOpen, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useFavoritesList } from "@/hooks/use-favorites";
+import { getJournalSessionEntriesAsync } from "@/lib/journalSessions";
 import { getLocalProgress, BADGES } from "@/lib/gamification";
 import { CHALLENGES, getChallengeProgress } from "@/lib/challenges";
 import { canAccessProFeatures } from "@/lib/featureAccess";
@@ -16,6 +19,15 @@ export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const progress = getLocalProgress();
+  const favorites = useFavoritesList();
+  const [journalSessionCount, setJournalSessionCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getJournalSessionEntriesAsync(user.id).then((entries) =>
+      setJournalSessionCount(entries.length)
+    );
+  }, [user?.id]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -112,7 +124,7 @@ export default function ProfilePage() {
             )}
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
               <div className="glass-card p-4 text-center">
                 <Star className="w-5 h-5 mx-auto mb-1 text-accent" />
                 <div className="text-xl font-display font-bold">{progress.constellationsFound.length}</div>
@@ -128,6 +140,24 @@ export default function ProfilePage() {
                 <div className="text-xl font-display font-bold">{earnedBadges.length}</div>
                 <p className="text-xs text-muted-foreground">Badges</p>
               </div>
+              <div className="glass-card p-4 text-center">
+                <Heart className="w-5 h-5 mx-auto mb-1 text-primary/80" />
+                <div className="text-xl font-display font-bold">{favorites.length}</div>
+                <p className="text-xs text-muted-foreground">Saved</p>
+              </div>
+              <div className="glass-card p-4 text-center">
+                <BookOpen className="w-5 h-5 mx-auto mb-1 text-primary/80" />
+                <div className="text-xl font-display font-bold">{journalSessionCount}</div>
+                <p className="text-xs text-muted-foreground">Sessions</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/favorites">View favorites</Link>
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/journal">Observation journal</Link>
+              </Button>
             </div>
 
             {/* Concrete challenge (Pro) */}

@@ -8,6 +8,8 @@ import { Calendar, Loader2, Star, Sparkles } from "lucide-react";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
 import type { CelestialEvent } from "@/lib/discovery/types";
 import { getUpcomingEvents } from "@/lib/discovery/eventAwareness";
+import { getSeedEvents } from "@/lib/seed";
+import { trackEvent } from "@/lib/analytics";
 import { usePageTitle } from "@/hooks/use-page-title";
 
 export default function EventsPage() {
@@ -138,6 +140,35 @@ export default function EventsPage() {
               ))}
             </div>
           )}
+
+          <section className="mt-12">
+            <h2 className="font-display font-semibold text-xl mb-3 flex items-center gap-2">
+              <Star className="w-5 h-5 text-primary" aria-hidden />
+              Recurring event types
+            </h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Meteor showers, eclipse types, planetary events, and observing seasons — when they typically occur.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {getSeedEvents({ limit: 12 }).map((evt) => (
+                <div
+                  key={evt.id}
+                  className="glass-card p-4 border-border/40"
+                >
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <span className="font-medium text-sm">{evt.name}</span>
+                    <Badge variant="secondary" className="text-[10px] capitalize bg-muted/50 border-0">
+                      {evt.type.replace("-", " ")}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground line-clamp-2">{evt.summary}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1.5">
+                    Peak: {evt.peakWindow} · Best for: {evt.bestFor}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </div>

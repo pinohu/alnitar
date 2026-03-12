@@ -4,6 +4,19 @@
 
 **Source docs:** PRD (vision, user segments, feature groups A–F, MVP scope), Technical Architecture (layers, domain models, service modules), Phased Development Backlog (Phases 1–6), Feature Prompts A–E (Homepage, Sky Scanner, Celestial Object Explorer, Event Explorer, Observation Journal).
 
+**Repository docs (Cursor Master Prompt alignment):**
+
+| Doc | Purpose |
+|-----|---------|
+| [alnitar-prd.md](./alnitar-prd.md) | Product vision, core areas, user journeys, MVP scope. |
+| [alnitar-architecture.md](./alnitar-architecture.md) | Layers, directory structure, key services. |
+| [alnitar-backlog.md](./alnitar-backlog.md) | Phased backlog summary. |
+| [setup-guide.md](./setup-guide.md) | Local install, env, run, test. |
+| [analytics-events.md](./analytics-events.md) | Analytics event list (matches `src/lib/analytics.ts`). |
+| [cursor-prompts/](./cursor-prompts/) | Feature-specific prompts (homepage, object-explorer, event-explorer, observation-journal, sky-scanner). |
+
+Full audit (stack, routes, domain, services, tests, gaps): see project audit summary or [FEATURE_INVENTORY.md](./FEATURE_INVENTORY.md) and [ARCHITECTURE.md](./ARCHITECTURE.md).
+
 ---
 
 ## 1. From PRD → concrete tasks
@@ -14,7 +27,7 @@
 | **FR-2 Object Explorer** — browse, search, detail | Celestial Explorer page + DSO detail page | Search/filter by type; constellation → /learn/:slug; DSO → /explore/object/dso/:id; detail has scientific metadata, visibility, tips | Done |
 | **FR-3 Event Explorer** — browse events, detail, save/remind | Events list + Event detail page | List with date range; each event links to /events/:id; detail shows description, date, related constellations | Done |
 | **FR-4 Journal** — save/log observations | Journal page + adapter | List, search, filter; create from recognize; cloud when backend set | Done |
-| **FR-5 Save/Favorite** | Consistent save/favorite pattern | Observations saved to journal; favorites schema (SavedItem) in types | Partial (journal done; favorites UI TBD) |
+| **FR-5 Save/Favorite** | Consistent save/favorite pattern | Observations saved to journal; favorites schema (SavedItem); FavoriteButton on DSO/event detail; Favorites page; persistence via favoritesService (localStorage) | Done |
 | **FR-6 Responsive** | Mobile-first layout, touch targets | Key flows work on 320px; no horizontal scroll | Done |
 
 ---
@@ -78,7 +91,7 @@
 - [x] Typed domain models: `src/types/domain.ts`
 - [x] SEO: per-route title/description via usePageTitle
 - [x] Analytics: event_viewed, object_viewed, cta_click, journal_created
-- [ ] Tests: critical flows (recognize, tonight, journal save) — partial (celestial search, event awareness tested)
+- [x] Tests: critical flows — journal (add/delete/update/export), favorites (add/remove/toggle), tonight, celestial search, event awareness
 - [ ] ENVIRONMENT.md: all VITE_* and Worker secrets documented
 
 ---
@@ -87,8 +100,16 @@
 
 1. **Tests:** Add Vitest tests for tonight (getTonightSkyData), journal (addJournalEntry, filter), and recognition (recognizeImage shape).
 2. **Event API by id:** If Worker adds events not in EVENTS_2026, add `api/events/:id` and use it in EventDetailPage when getEventById returns undefined.
-3. **Favorites UI:** Surface SavedItem in a Favorites or Saved list and wire save/unsave from object and event detail pages.
+3. **Favorites UI:** Done — Favorites page at /favorites, FavoriteButton on DSO and event detail pages, favoritesService (localStorage) with useFavorites hook.
 4. **Performance:** Lazy load heavy components; image optimization for DSO/constellation images where present.
 5. **Docs:** Keep FEATURE_INVENTORY and IMPLEMENTATION_PLAN in sync with new routes and features.
 
-*Last updated: post event-detail and implementation-plan pass.*
+---
+
+## 8. Post-audit notes (Master Prompt)
+
+- **Stack:** Vite + React (not Next.js); React Router config-based; Supabase and/or Cloudflare Worker backends. TypeScript strict mode is off; enabling it is a high-leverage cleanup.
+- **Favorites:** SavedItem type exists; save/unsave UI on object and event detail pages is the main missing surface (FR-5).
+- **CI:** No GitHub Actions for lint/test/build in repo; add when release cadence requires it.
+
+*Last updated: post Master Prompt doc drop-in and implementation-plan alignment.*

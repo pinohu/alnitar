@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { isCloudflareConfigured, cfFetch } from "@/integrations/cloudflare/client";
 import { isPro, GUEST_RECOGNITION_LIMIT_PER_DAY } from "@/lib/featureAccess";
+import { FREE_ACCOUNT } from "@/lib/tierMessaging";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { toast } from "sonner";
 
@@ -16,7 +17,7 @@ const freeFeatures = (guestScanLimit: number) => [
   `Constellation recognition (${guestScanLimit} scans/day without account)`,
   "Sky Map, Planetarium, Tonight's Sky",
   "Learn — all 88 constellations",
-  "Up to 15 journal entries on this device",
+  FREE_ACCOUNT.journalBullet,
   "Progress and badges here",
 ];
 
@@ -73,7 +74,7 @@ const proFeatureList = [
 export default function PricingPage() {
   usePageTitle(
     "Pricing",
-    "Free and Pro plans. Unlimited scans, cloud journal, exports, session planner, and verified observations."
+    "Free and Pro plans. Free: unlimited scans; Pro adds cloud journal, exports, session planner, and verified observations."
   );
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);

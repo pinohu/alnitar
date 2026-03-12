@@ -1,0 +1,29 @@
+---
+description: When user reports a bug — reproduce with a test first, then fix via subagents
+alwaysApply: true
+---
+
+# Bug Report Workflow
+
+When the user **reports a bug**, follow this order. Do **not** start by changing production code to fix it.
+
+## 1. Reproduce with a test
+
+- **First** write (or add to) a test that **reproduces the bug** (the test should fail in the broken state).
+- Prefer unit/integration tests in the same style as the project (e.g. Vitest in `src/**/*.test.ts(x)`).
+- The test must clearly express the expected, correct behavior so that:
+  - It **fails** before the fix.
+  - It **passes** after the fix.
+
+## 2. Fix via subagents
+
+- **Then** use subagents (e.g. `mcp_task` with a fix-oriented subagent type) to implement the fix.
+- Instruct the subagent to:
+  - Change only what’s needed to fix the bug.
+  - Run the new/failing test and ensure it **passes** after the change.
+- Do not apply the fix yourself in the main agent before the test exists; the subagent proves the fix with the passing test.
+
+## 3. Summary
+
+- **Order:** Test (repro) → Subagent fix → Passing test.
+- **Rule:** No production fix before a failing test that reproduces the bug.

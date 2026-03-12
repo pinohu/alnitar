@@ -10,7 +10,7 @@ describe("App", () => {
 
   it("renders home and has main heading and link to recognize", async () => {
     render(<App />);
-    const links = await screen.findAllByRole("link", { name: /try it now|upload sky photo|cosmic camera|get started|try it free/i, timeout: 5000 });
+    const links = await screen.findAllByRole("link", { name: /identify|cosmic camera|open cosmic/i }, { timeout: 10000 });
     expect(links.length).toBeGreaterThanOrEqual(1);
     const recognizeLink = links.find((el) => el.getAttribute("href")?.endsWith("/recognize"));
     expect(recognizeLink).toBeDefined();

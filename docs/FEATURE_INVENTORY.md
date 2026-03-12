@@ -17,6 +17,7 @@ Route-level and feature list for product and implementation reference. See [IMPL
 | `/profile/:userId` | PublicProfilePage | Public user profile; follow/unfollow |
 | `/journal` | JournalPage | Observation journal (list, search, filters) |
 | `/journal/year-in-review` | YearInReviewPage | Year-in-review summary |
+| `/favorites` | FavoritesPage | Saved objects and events (favorites list) |
 | `/login` | LoginPage | Sign in |
 | `/signup` | SignupPage | Register |
 | `/profile` | ProfilePage | Own profile (authenticated) |

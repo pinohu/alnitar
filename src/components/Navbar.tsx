@@ -22,6 +22,7 @@ import {
   Target,
   User,
   Eye,
+  Heart,
 } from "lucide-react";
 import { useNightVision } from "@/contexts/NightVisionContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,6 +44,10 @@ const primaryItems: NavItem[] = [
 ];
 
 const moreItems: NavItem[] = [
+  { path: "/objects", label: "Objects", icon: Eye },
+  { path: "/events/explore", label: "Events", icon: Calendar },
+  { path: "/explore", label: "Explore hub", icon: Compass },
+  { path: "/favorites", label: "Favorites", icon: Heart },
   { path: "/planetarium", label: "Planetarium", icon: Globe },
   { path: "/live-sky", label: "Live Sky", icon: Smartphone },
   { path: "/sky", label: "Sky Map", icon: Compass },

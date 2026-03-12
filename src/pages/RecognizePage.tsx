@@ -22,6 +22,7 @@ import { type Constellation } from "@/data/constellations";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { usePageTitle } from "@/hooks/use-page-title";
 import { getTonightSkyData } from "@/lib/tonight";
+import { RECOGNIZE_FREE_CTA, RECOGNIZE_GATE_DESCRIPTION } from "@/lib/tierMessaging";
 
 export default function RecognizePage() {
   usePageTitle(
@@ -134,7 +135,7 @@ export default function RecognizePage() {
             {!user && (
               <p className="text-sm text-muted-foreground/90 mb-6">
                 {guestCount < GUEST_RECOGNITION_LIMIT_PER_DAY
-                  ? `${GUEST_RECOGNITION_LIMIT_PER_DAY - guestCount} of ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans left today. Create a free account for unlimited scans and cloud journal.`
+                  ? `${GUEST_RECOGNITION_LIMIT_PER_DAY - guestCount} of ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans left today. ${RECOGNIZE_FREE_CTA}`
                   : "You've used today's free scans. Create a free account for unlimited scans and to keep every observation in your journal."}
               </p>
             )}
@@ -144,7 +145,7 @@ export default function RecognizePage() {
             <RegisterGate
               variant="card"
               title="You're clearly into the sky — take it to the next level"
-              description={`You've used your ${GUEST_RECOGNITION_LIMIT_PER_DAY} free scans for today. Join thousands of stargazers with a free account: unlimited scans, cloud journal, and your progress saved everywhere.`}
+              description={RECOGNIZE_GATE_DESCRIPTION(GUEST_RECOGNITION_LIMIT_PER_DAY)}
               benefits={[
                 "Unlimited Cosmic Camera — scan as many skies as you want",
                 "Every discovery saved to your journal & the global network",

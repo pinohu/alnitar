@@ -10,12 +10,17 @@ import { getDiscoveryRecommendations } from "@/lib/discovery";
 import { getLocalProgress } from "@/lib/gamification";
 import { getUpcomingEvents } from "@/lib/discovery/eventAwareness";
 import { getTonightSkyData } from "@/lib/tonight";
+import { getTonightSkyFeed } from "@/lib/seed";
+import { TonightInTheSkyStrip } from "@/components/home/TonightInTheSkyStrip";
+import { ObjectCard } from "@/components/explore/ObjectCard";
+import { EventCard } from "@/components/explore/EventCard";
 import { HomepageDiscovery } from "@/components/DiscoveryPanel";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
 import { trackEvent } from "@/lib/analytics";
 import { useGeolocation } from "@/hooks/use-geolocation";
 import { usePageTitle } from "@/hooks/use-page-title";
+import { FREE_ACCOUNT, HERO_FREE_LINE, SEE_PRO_PREFIX } from "@/lib/tierMessaging";
 
 const features: { icon: typeof Eye; title: string; desc: string; to: string }[] = [
   { icon: Eye, title: "Identify in seconds", desc: "Upload a sky photo and see which constellations are in it — with confidence scores and links to learn more. No telescope needed.", to: "/recognize" },
@@ -61,6 +66,9 @@ export default function Index() {
 
   const upcomingEvents = useMemo(() => getUpcomingEvents(now, 90).slice(0, 3), [dateKey]);
 
+  const hemisphere = latitude != null ? (latitude >= 0 ? "north" : "south") : "both";
+  const tonightFeed = useMemo(() => getTonightSkyFeed(hemisphere), [hemisphere]);
+
   return (
     <div className="relative min-h-screen">
       <StarField />
@@ -93,7 +101,7 @@ export default function Index() {
               Point your camera at the sky and know what you're seeing in seconds. Build a permanent observatory log, get tonight's best targets for your location and gear, and export verified records for your club or programs — no telescope required.
             </p>
             <p className="text-sm text-muted-foreground/80 mb-10">
-              Free to try. One account unlocks unlimited scans, cloud journal, and planning that remembers you.
+              Free to try. {HERO_FREE_LINE}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="btn-glow text-base font-semibold px-8">
@@ -107,6 +115,11 @@ export default function Index() {
                 </Link>
               </Button>
             </div>
+            <p className="mt-6 text-sm text-muted-foreground/90">
+              <Link to="/objects" className="hover:text-primary transition-colors">Browse objects</Link>
+              <span className="mx-2">·</span>
+              <Link to="/events/explore" className="hover:text-primary transition-colors">Explore events</Link>
+            </p>
           </motion.div>
         </div>
       </section>
@@ -134,16 +147,16 @@ export default function Index() {
                 <Cloud className="w-4 h-4" />
                 One free account
               </div>
-              <p className="text-sm text-foreground/90 mb-3">Unlimited scans and cloud journal when you sign in:</p>
+              <p className="text-sm text-foreground/90 mb-3">{FREE_ACCOUNT.intro}</p>
               <ul className="text-sm text-foreground/90 space-y-2">
                 <li>Unlimited sky scans</li>
                 <li>All 88 constellations — learn and explore</li>
                 <li>Tonight's sky score and conditions</li>
-                <li>Up to 15 journal entries on this device</li>
+                <li>{FREE_ACCOUNT.journalBullet}</li>
                 <li>Sky Map, Planetarium, Time Travel</li>
                 <li>Progress and badges saved with your account</li>
               </ul>
-              <p className="text-xs text-muted-foreground mt-3">Unlimited scans, cloud journal &amp; export? <Link to="/pricing" className="text-primary hover:underline">See Pro</Link>.</p>
+              <p className="text-xs text-muted-foreground mt-3">{SEE_PRO_PREFIX} <Link to="/pricing" className="text-primary hover:underline">See Pro</Link>.</p>
               <Button asChild size="sm" className="mt-4 btn-glow">
                 <Link to="/signup">Create free account <ArrowRight className="w-4 h-4 ml-1" /></Link>
               </Button>
@@ -164,6 +177,75 @@ export default function Index() {
                 Open Cosmic Camera <ArrowRight className="w-4 h-4 ml-2" aria-hidden />
               </Link>
             </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Tonight in the Sky — hemisphere toggle + visible objects & timely events */}
+      <section className="relative z-10 py-16 px-4 border-y border-border/20">
+        <div className="container max-w-6xl">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <TonightInTheSkyStrip />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured celestial objects — homepage feed */}
+      <section className="relative z-10 py-16 px-4 border-y border-border/20">
+        <div className="container max-w-6xl">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-primary/80">Explore the night sky</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">Featured celestial objects</h2>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="text-primary shrink-0">
+              <Link to="/objects">View all <ArrowRight className="w-4 h-4 ml-1" aria-hidden /></Link>
+            </Button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {tonightFeed.featuredObjects.slice(0, 6).map((obj) => (
+              <ObjectCard key={obj.id} item={obj} />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured astronomy events — homepage feed */}
+      <section className="relative z-10 py-16 px-4 border-y border-border/20">
+        <div className="container max-w-6xl">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-violet-400/80">Sky calendar</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">Featured astronomy events</h2>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="text-primary shrink-0">
+              <Link to="/events/explore">View all <ArrowRight className="w-4 h-4 ml-1" aria-hidden /></Link>
+            </Button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {tonightFeed.featuredEvents.slice(0, 6).map((evt) => (
+              <EventCard key={evt.id} item={evt} />
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Beginner-friendly objects — homepage feed */}
+      <section className="relative z-10 py-16 px-4 border-y border-border/20">
+        <div className="container max-w-6xl">
+          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-6 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs uppercase tracking-widest text-primary/80">Start here</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">Easy first targets</h2>
+            </div>
+            <Button asChild variant="ghost" size="sm" className="text-primary shrink-0">
+              <Link to="/objects?tag=beginner">Browse beginner objects <ArrowRight className="w-4 h-4 ml-1" aria-hidden /></Link>
+            </Button>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {tonightFeed.beginnerObjects.slice(0, 6).map((obj) => (
+              <ObjectCard key={obj.id} item={obj} />
+            ))}
           </motion.div>
         </div>
       </section>

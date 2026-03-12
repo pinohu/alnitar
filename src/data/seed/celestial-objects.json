@@ -1,0 +1,2005 @@
+[
+  {
+    "id": "obj-sun",
+    "slug": "sun",
+    "name": "Sun",
+    "type": "star",
+    "subtype": "G-type main-sequence star",
+    "visibility": "daytime",
+    "hemisphere": "both",
+    "summary": "The star at the center of our solar system.",
+    "facts": {
+      "distance_from_earth": "~1 AU",
+      "notable": "Drives daylight, seasons, and solar activity"
+    },
+    "tags": [
+      "solar-system",
+      "star",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-moon",
+    "slug": "moon",
+    "name": "Moon",
+    "type": "moon",
+    "subtype": "Earth's natural satellite",
+    "visibility": "varies monthly",
+    "hemisphere": "both",
+    "summary": "Earth's only natural satellite and the brightest object in the night sky after the Sun.",
+    "facts": {
+      "distance_from_earth": "~384,400 km",
+      "notable": "Phases, eclipses, craters, maria"
+    },
+    "tags": [
+      "moon",
+      "beginner",
+      "photography"
+    ]
+  },
+  {
+    "id": "obj-mercury",
+    "slug": "mercury",
+    "name": "Mercury",
+    "type": "planet",
+    "subtype": "terrestrial planet",
+    "visibility": "best near greatest elongation",
+    "hemisphere": "both",
+    "summary": "The smallest and innermost planet.",
+    "facts": {
+      "distance_from_sun": "1st planet",
+      "notable": "Extreme temperature swings"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-venus",
+    "slug": "venus",
+    "name": "Venus",
+    "type": "planet",
+    "subtype": "terrestrial planet",
+    "visibility": "morning/evening",
+    "hemisphere": "both",
+    "summary": "Often the brightest planet in the sky, seen as the Morning or Evening Star.",
+    "facts": {
+      "distance_from_sun": "2nd planet",
+      "notable": "Thick atmosphere and runaway greenhouse effect"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-earth",
+    "slug": "earth",
+    "name": "Earth",
+    "type": "planet",
+    "subtype": "terrestrial planet",
+    "visibility": "not applicable",
+    "hemisphere": "both",
+    "summary": "Our home world and the reference point for observing the sky.",
+    "facts": {
+      "distance_from_sun": "3rd planet",
+      "notable": "Only known world with confirmed surface life"
+    },
+    "tags": [
+      "planet",
+      "solar-system"
+    ]
+  },
+  {
+    "id": "obj-mars",
+    "slug": "mars",
+    "name": "Mars",
+    "type": "planet",
+    "subtype": "terrestrial planet",
+    "visibility": "best near opposition",
+    "hemisphere": "both",
+    "summary": "The Red Planet, popular with observers and imagers.",
+    "facts": {
+      "distance_from_sun": "4th planet",
+      "notable": "Polar caps, dust storms, Olympus Mons"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "beginner",
+      "photography"
+    ]
+  },
+  {
+    "id": "obj-jupiter",
+    "slug": "jupiter",
+    "name": "Jupiter",
+    "type": "planet",
+    "subtype": "gas giant",
+    "visibility": "best near opposition",
+    "hemisphere": "both",
+    "summary": "The largest planet in the solar system.",
+    "facts": {
+      "distance_from_sun": "5th planet",
+      "notable": "Great Red Spot and four bright Galilean moons"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "beginner",
+      "telescope"
+    ]
+  },
+  {
+    "id": "obj-saturn",
+    "slug": "saturn",
+    "name": "Saturn",
+    "type": "planet",
+    "subtype": "gas giant",
+    "visibility": "best near opposition",
+    "hemisphere": "both",
+    "summary": "The ringed giant and a favorite telescopic target.",
+    "facts": {
+      "distance_from_sun": "6th planet",
+      "notable": "Prominent ring system"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "beginner",
+      "telescope"
+    ]
+  },
+  {
+    "id": "obj-uranus",
+    "slug": "uranus",
+    "name": "Uranus",
+    "type": "planet",
+    "subtype": "ice giant",
+    "visibility": "requires dark sky/optics",
+    "hemisphere": "both",
+    "summary": "An ice giant with an extreme axial tilt.",
+    "facts": {
+      "distance_from_sun": "7th planet",
+      "notable": "Rotates on its side"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-neptune",
+    "slug": "neptune",
+    "name": "Neptune",
+    "type": "planet",
+    "subtype": "ice giant",
+    "visibility": "requires telescope",
+    "hemisphere": "both",
+    "summary": "The outermost major planet, usually a telescopic target.",
+    "facts": {
+      "distance_from_sun": "8th planet",
+      "notable": "Strong winds and deep blue appearance"
+    },
+    "tags": [
+      "planet",
+      "solar-system",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-pluto",
+    "slug": "pluto",
+    "name": "Pluto",
+    "type": "dwarf-planet",
+    "subtype": "Kuiper Belt dwarf planet",
+    "visibility": "advanced telescopic target",
+    "hemisphere": "both",
+    "summary": "A dwarf planet in the Kuiper Belt.",
+    "facts": {
+      "classification": "officially recognized dwarf planet",
+      "notable": "Visited by New Horizons in 2015"
+    },
+    "tags": [
+      "dwarf-planet",
+      "solar-system",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-ceres",
+    "slug": "ceres",
+    "name": "Ceres",
+    "type": "dwarf-planet",
+    "subtype": "asteroid belt dwarf planet",
+    "visibility": "advanced telescopic target",
+    "hemisphere": "both",
+    "summary": "The only dwarf planet in the inner solar system.",
+    "facts": {
+      "location": "asteroid belt",
+      "notable": "Visited by Dawn"
+    },
+    "tags": [
+      "dwarf-planet",
+      "solar-system",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-eris",
+    "slug": "eris",
+    "name": "Eris",
+    "type": "dwarf-planet",
+    "subtype": "scattered-disc dwarf planet",
+    "visibility": "research/advanced",
+    "hemisphere": "both",
+    "summary": "A distant dwarf planet slightly smaller than Pluto but more massive.",
+    "facts": {
+      "classification": "officially recognized dwarf planet",
+      "notable": "Discovery helped trigger the modern dwarf-planet definition"
+    },
+    "tags": [
+      "dwarf-planet",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-io",
+    "slug": "io",
+    "name": "Io",
+    "type": "moon",
+    "subtype": "Jovian moon",
+    "visibility": "telescope",
+    "hemisphere": "both",
+    "summary": "The most volcanically active world known in the solar system.",
+    "facts": {
+      "host": "Jupiter",
+      "notable": "Strong tidal heating"
+    },
+    "tags": [
+      "moon",
+      "jupiter",
+      "telescope"
+    ]
+  },
+  {
+    "id": "obj-europa",
+    "slug": "europa",
+    "name": "Europa",
+    "type": "moon",
+    "subtype": "Jovian moon",
+    "visibility": "telescope",
+    "hemisphere": "both",
+    "summary": "An icy moon believed to harbor a subsurface ocean.",
+    "facts": {
+      "host": "Jupiter",
+      "notable": "Key astrobiology target"
+    },
+    "tags": [
+      "moon",
+      "jupiter",
+      "telescope",
+      "ocean-world"
+    ]
+  },
+  {
+    "id": "obj-ganymede",
+    "slug": "ganymede",
+    "name": "Ganymede",
+    "type": "moon",
+    "subtype": "Jovian moon",
+    "visibility": "telescope",
+    "hemisphere": "both",
+    "summary": "The largest moon in the solar system.",
+    "facts": {
+      "host": "Jupiter",
+      "notable": "Larger than Mercury"
+    },
+    "tags": [
+      "moon",
+      "jupiter",
+      "telescope"
+    ]
+  },
+  {
+    "id": "obj-callisto",
+    "slug": "callisto",
+    "name": "Callisto",
+    "type": "moon",
+    "subtype": "Jovian moon",
+    "visibility": "telescope",
+    "hemisphere": "both",
+    "summary": "A heavily cratered outer moon of Jupiter.",
+    "facts": {
+      "host": "Jupiter",
+      "notable": "Ancient, icy surface"
+    },
+    "tags": [
+      "moon",
+      "jupiter",
+      "telescope"
+    ]
+  },
+  {
+    "id": "obj-titan",
+    "slug": "titan",
+    "name": "Titan",
+    "type": "moon",
+    "subtype": "Saturnian moon",
+    "visibility": "telescope",
+    "hemisphere": "both",
+    "summary": "Saturn's largest moon, with a thick atmosphere and methane lakes.",
+    "facts": {
+      "host": "Saturn",
+      "notable": "One of the most Earth-like worlds in some surface processes"
+    },
+    "tags": [
+      "moon",
+      "saturn",
+      "telescope",
+      "ocean-world"
+    ]
+  },
+  {
+    "id": "obj-enceladus",
+    "slug": "enceladus",
+    "name": "Enceladus",
+    "type": "moon",
+    "subtype": "Saturnian moon",
+    "visibility": "advanced telescope",
+    "hemisphere": "both",
+    "summary": "An icy moon with active plumes and a subsurface ocean.",
+    "facts": {
+      "host": "Saturn",
+      "notable": "Jets of water vapor and ice"
+    },
+    "tags": [
+      "moon",
+      "saturn",
+      "advanced",
+      "ocean-world"
+    ]
+  },
+  {
+    "id": "obj-triton",
+    "slug": "triton",
+    "name": "Triton",
+    "type": "moon",
+    "subtype": "Neptunian moon",
+    "visibility": "advanced telescope",
+    "hemisphere": "both",
+    "summary": "Neptune's largest moon, likely a captured Kuiper Belt object.",
+    "facts": {
+      "host": "Neptune",
+      "notable": "Retrograde orbit"
+    },
+    "tags": [
+      "moon",
+      "neptune",
+      "advanced"
+    ]
+  },
+  {
+    "id": "obj-sirius",
+    "slug": "sirius",
+    "name": "Sirius",
+    "type": "star",
+    "subtype": "bright main-sequence star system",
+    "visibility": "winter evenings in the north",
+    "hemisphere": "both",
+    "summary": "The brightest star in the night sky.",
+    "facts": {
+      "constellation": "Canis Major",
+      "notable": "Often twinkles strongly near the horizon"
+    },
+    "tags": [
+      "star",
+      "beginner",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-polaris",
+    "slug": "polaris",
+    "name": "Polaris",
+    "type": "star",
+    "subtype": "supergiant multiple-star system",
+    "visibility": "year-round in Northern Hemisphere",
+    "hemisphere": "north",
+    "summary": "The current North Star, lying close to the north celestial pole.",
+    "facts": {
+      "constellation": "Ursa Minor",
+      "notable": "Useful for finding north"
+    },
+    "tags": [
+      "star",
+      "navigation",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-betelgeuse",
+    "slug": "betelgeuse",
+    "name": "Betelgeuse",
+    "type": "star",
+    "subtype": "red supergiant",
+    "visibility": "northern winter",
+    "hemisphere": "both",
+    "summary": "A prominent red supergiant marking Orion's shoulder.",
+    "facts": {
+      "constellation": "Orion",
+      "notable": "Variable brightness"
+    },
+    "tags": [
+      "star",
+      "orion",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-rigel",
+    "slug": "rigel",
+    "name": "Rigel",
+    "type": "star",
+    "subtype": "blue supergiant",
+    "visibility": "northern winter",
+    "hemisphere": "both",
+    "summary": "A brilliant blue-white star in Orion.",
+    "facts": {
+      "constellation": "Orion",
+      "notable": "One of the brightest stars visible from Earth"
+    },
+    "tags": [
+      "star",
+      "orion",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-vega",
+    "slug": "vega",
+    "name": "Vega",
+    "type": "star",
+    "subtype": "main-sequence star",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "A bright summer star in Lyra.",
+    "facts": {
+      "constellation": "Lyra",
+      "notable": "Part of the Summer Triangle"
+    },
+    "tags": [
+      "star",
+      "summer-triangle",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-deneb",
+    "slug": "deneb",
+    "name": "Deneb",
+    "type": "star",
+    "subtype": "blue-white supergiant",
+    "visibility": "northern summer/autumn",
+    "hemisphere": "north",
+    "summary": "A very luminous star in Cygnus.",
+    "facts": {
+      "constellation": "Cygnus",
+      "notable": "Part of the Summer Triangle"
+    },
+    "tags": [
+      "star",
+      "summer-triangle",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-altair",
+    "slug": "altair",
+    "name": "Altair",
+    "type": "star",
+    "subtype": "main-sequence star",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "A bright star in Aquila and part of the Summer Triangle.",
+    "facts": {
+      "constellation": "Aquila",
+      "notable": "Rapidly rotating star"
+    },
+    "tags": [
+      "star",
+      "summer-triangle",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-arcturus",
+    "slug": "arcturus",
+    "name": "Arcturus",
+    "type": "star",
+    "subtype": "red giant",
+    "visibility": "northern spring",
+    "hemisphere": "north",
+    "summary": "A bright orange star in Boötes.",
+    "facts": {
+      "constellation": "Boötes",
+      "notable": "One of the brightest stars in the northern sky"
+    },
+    "tags": [
+      "star",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-capella",
+    "slug": "capella",
+    "name": "Capella",
+    "type": "star",
+    "subtype": "multiple-star system",
+    "visibility": "northern winter",
+    "hemisphere": "north",
+    "summary": "A bright star system in Auriga.",
+    "facts": {
+      "constellation": "Auriga",
+      "notable": "One of the brightest stars in the sky"
+    },
+    "tags": [
+      "star",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-antares",
+    "slug": "antares",
+    "name": "Antares",
+    "type": "star",
+    "subtype": "red supergiant",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "The reddish heart of Scorpius.",
+    "facts": {
+      "constellation": "Scorpius",
+      "notable": "Often compared in color to Mars"
+    },
+    "tags": [
+      "star",
+      "bright-star"
+    ]
+  },
+  {
+    "id": "obj-orion",
+    "slug": "orion",
+    "name": "Orion",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "best in northern winter",
+    "hemisphere": "both",
+    "summary": "One of the most recognizable constellations, known for Orion's Belt.",
+    "facts": {
+      "notable_objects": "Betelgeuse, Rigel, Orion Nebula"
+    },
+    "tags": [
+      "constellation",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-ursa-major",
+    "slug": "ursa-major",
+    "name": "Ursa Major",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "best in northern spring",
+    "hemisphere": "north",
+    "summary": "Home to the Big Dipper asterism.",
+    "facts": {
+      "notable_objects": "Mizar, Alcor, galaxies M81 and M82"
+    },
+    "tags": [
+      "constellation",
+      "beginner",
+      "navigation"
+    ]
+  },
+  {
+    "id": "obj-ursa-minor",
+    "slug": "ursa-minor",
+    "name": "Ursa Minor",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "circumpolar in far north",
+    "hemisphere": "north",
+    "summary": "Contains Polaris and the Little Dipper.",
+    "facts": {
+      "notable_objects": "Polaris"
+    },
+    "tags": [
+      "constellation",
+      "navigation"
+    ]
+  },
+  {
+    "id": "obj-cassiopeia",
+    "slug": "cassiopeia",
+    "name": "Cassiopeia",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern autumn",
+    "hemisphere": "north",
+    "summary": "A W-shaped constellation useful for locating Polaris.",
+    "facts": {
+      "notable_objects": "Open clusters and Milky Way fields"
+    },
+    "tags": [
+      "constellation",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-cygnus",
+    "slug": "cygnus",
+    "name": "Cygnus",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "The Swan, stretched along the Milky Way.",
+    "facts": {
+      "notable_objects": "Deneb, Albireo, North America Nebula"
+    },
+    "tags": [
+      "constellation",
+      "milky-way"
+    ]
+  },
+  {
+    "id": "obj-lyra",
+    "slug": "lyra",
+    "name": "Lyra",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "Small constellation anchored by Vega.",
+    "facts": {
+      "notable_objects": "Vega, Ring Nebula"
+    },
+    "tags": [
+      "constellation",
+      "summer"
+    ]
+  },
+  {
+    "id": "obj-scorpius",
+    "slug": "scorpius",
+    "name": "Scorpius",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern summer / southern winter",
+    "hemisphere": "both",
+    "summary": "A bright zodiac constellation with a distinctive curved tail.",
+    "facts": {
+      "notable_objects": "Antares, rich Milky Way star fields"
+    },
+    "tags": [
+      "constellation",
+      "zodiac"
+    ]
+  },
+  {
+    "id": "obj-sagittarius",
+    "slug": "sagittarius",
+    "name": "Sagittarius",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "The Teapot asterism points toward the center of the Milky Way.",
+    "facts": {
+      "notable_objects": "Lagoon Nebula, Trifid Nebula, dense star clouds"
+    },
+    "tags": [
+      "constellation",
+      "milky-way"
+    ]
+  },
+  {
+    "id": "obj-taurus",
+    "slug": "taurus",
+    "name": "Taurus",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern winter",
+    "hemisphere": "both",
+    "summary": "A zodiac constellation containing Aldebaran and the Pleiades nearby.",
+    "facts": {
+      "notable_objects": "Hyades, Crab Nebula, Pleiades"
+    },
+    "tags": [
+      "constellation",
+      "zodiac",
+      "beginner"
+    ]
+  },
+  {
+    "id": "obj-leo",
+    "slug": "leo",
+    "name": "Leo",
+    "type": "constellation",
+    "subtype": "IAU constellation",
+    "visibility": "northern spring",
+    "hemisphere": "both",
+    "summary": "A zodiac constellation shaped like a lion.",
+    "facts": {
+      "notable_objects": "Regulus and many galaxies"
+    },
+    "tags": [
+      "constellation",
+      "zodiac"
+    ]
+  },
+  {
+    "id": "obj-m31",
+    "slug": "andromeda-galaxy",
+    "name": "Andromeda Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "autumn in the north",
+    "hemisphere": "both",
+    "summary": "The nearest large spiral galaxy to the Milky Way and visible to the naked eye under dark skies.",
+    "facts": {
+      "catalog": "M31",
+      "constellation": "Andromeda"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m42",
+    "slug": "orion-nebula",
+    "name": "Orion Nebula",
+    "type": "nebula",
+    "subtype": "stellar nursery / emission nebula",
+    "visibility": "northern winter",
+    "hemisphere": "both",
+    "summary": "A bright nebula in Orion and one of the best beginner deep-sky targets.",
+    "facts": {
+      "catalog": "M42",
+      "constellation": "Orion"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m45",
+    "slug": "pleiades",
+    "name": "Pleiades",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "northern autumn/winter",
+    "hemisphere": "both",
+    "summary": "A bright and famous open cluster also known as the Seven Sisters.",
+    "facts": {
+      "catalog": "M45",
+      "constellation": "Taurus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m44",
+    "slug": "beehive-cluster",
+    "name": "Beehive Cluster",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "northern spring",
+    "hemisphere": "both",
+    "summary": "A large open cluster visible to the naked eye under dark skies.",
+    "facts": {
+      "catalog": "M44",
+      "constellation": "Cancer"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m13",
+    "slug": "hercules-globular-cluster",
+    "name": "Hercules Globular Cluster",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "A classic globular cluster for small telescopes.",
+    "facts": {
+      "catalog": "M13",
+      "constellation": "Hercules"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m57",
+    "slug": "ring-nebula",
+    "name": "Ring Nebula",
+    "type": "nebula",
+    "subtype": "planetary nebula",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "A famous planetary nebula in Lyra.",
+    "facts": {
+      "catalog": "M57",
+      "constellation": "Lyra"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m27",
+    "slug": "dumbbell-nebula",
+    "name": "Dumbbell Nebula",
+    "type": "nebula",
+    "subtype": "planetary nebula",
+    "visibility": "northern summer",
+    "hemisphere": "north",
+    "summary": "A bright planetary nebula in Vulpecula.",
+    "facts": {
+      "catalog": "M27",
+      "constellation": "Vulpecula"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m8",
+    "slug": "lagoon-nebula",
+    "name": "Lagoon Nebula",
+    "type": "nebula",
+    "subtype": "emission nebula",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "A bright Milky Way nebula in Sagittarius.",
+    "facts": {
+      "catalog": "M8",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m20",
+    "slug": "trifid-nebula",
+    "name": "Trifid Nebula",
+    "type": "nebula",
+    "subtype": "emission/reflection nebula",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "A colorful nebula complex near the Lagoon Nebula.",
+    "facts": {
+      "catalog": "M20",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m51",
+    "slug": "whirlpool-galaxy",
+    "name": "Whirlpool Galaxy",
+    "type": "galaxy",
+    "subtype": "interacting spiral galaxy",
+    "visibility": "northern spring",
+    "hemisphere": "north",
+    "summary": "A famous face-on interacting spiral galaxy.",
+    "facts": {
+      "catalog": "M51",
+      "constellation": "Canes Venatici"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m81",
+    "slug": "bodes-galaxy",
+    "name": "Bode's Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "northern spring",
+    "hemisphere": "north",
+    "summary": "A bright galaxy often viewed together with nearby M82.",
+    "facts": {
+      "catalog": "M81",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m82",
+    "slug": "cigar-galaxy",
+    "name": "Cigar Galaxy",
+    "type": "galaxy",
+    "subtype": "starburst galaxy",
+    "visibility": "northern spring",
+    "hemisphere": "north",
+    "summary": "An edge-on starburst galaxy near M81.",
+    "facts": {
+      "catalog": "M82",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m101",
+    "slug": "pinwheel-galaxy",
+    "name": "Pinwheel Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "northern spring",
+    "hemisphere": "north",
+    "summary": "A large face-on spiral galaxy with low surface brightness.",
+    "facts": {
+      "catalog": "M101",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m1",
+    "slug": "crab-nebula",
+    "name": "Crab Nebula",
+    "type": "nebula",
+    "subtype": "supernova remnant",
+    "visibility": "northern winter",
+    "hemisphere": "both",
+    "summary": "The remnant of the supernova recorded in 1054 CE.",
+    "facts": {
+      "catalog": "M1",
+      "constellation": "Taurus"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m104",
+    "slug": "sombrero-galaxy",
+    "name": "Sombrero Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "northern spring",
+    "hemisphere": "both",
+    "summary": "A bright galaxy famous for its dust lane.",
+    "facts": {
+      "catalog": "M104",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m16",
+    "slug": "eagle-nebula",
+    "name": "Eagle Nebula",
+    "type": "nebula",
+    "subtype": "emission nebula",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "Home to the Pillars of Creation region.",
+    "facts": {
+      "catalog": "M16",
+      "constellation": "Serpens"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m17",
+    "slug": "omega-nebula",
+    "name": "Omega Nebula",
+    "type": "nebula",
+    "subtype": "emission nebula",
+    "visibility": "northern summer",
+    "hemisphere": "both",
+    "summary": "A bright nebula also called the Swan or Horseshoe Nebula.",
+    "facts": {
+      "catalog": "M17",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m33",
+    "slug": "triangulum-galaxy",
+    "name": "Triangulum Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "autumn",
+    "hemisphere": "both",
+    "summary": "A nearby spiral galaxy, best seen under dark skies.",
+    "facts": {
+      "catalog": "M33",
+      "constellation": "Triangulum"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m7",
+    "slug": "ptolemys-cluster",
+    "name": "Ptolemy's Cluster",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "A bright naked-eye open cluster near Scorpius.",
+    "facts": {
+      "catalog": "M7",
+      "constellation": "Scorpius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m6",
+    "slug": "butterfly-cluster",
+    "name": "Butterfly Cluster",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "An open cluster near the stinger of Scorpius.",
+    "facts": {
+      "catalog": "M6",
+      "constellation": "Scorpius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m3",
+    "slug": "messier-3",
+    "name": "Messier 3",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "One of the brightest globular clusters in northern skies.",
+    "facts": {
+      "catalog": "M3",
+      "constellation": "Canes Venatici"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m5",
+    "slug": "messier-5",
+    "name": "Messier 5",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "spring/summer",
+    "hemisphere": "north",
+    "summary": "A prominent globular cluster in Serpens.",
+    "facts": {
+      "catalog": "M5",
+      "constellation": "Serpens"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m15",
+    "slug": "messier-15",
+    "name": "Messier 15",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "autumn",
+    "hemisphere": "north",
+    "summary": "A compact globular cluster in Pegasus.",
+    "facts": {
+      "catalog": "M15",
+      "constellation": "Pegasus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m22",
+    "slug": "messier-22",
+    "name": "Messier 22",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "One of the finest globular clusters for binoculars and small telescopes.",
+    "facts": {
+      "catalog": "M22",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m11",
+    "slug": "wild-duck-cluster",
+    "name": "Wild Duck Cluster",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "north",
+    "summary": "A rich open cluster in Scutum.",
+    "facts": {
+      "catalog": "M11",
+      "constellation": "Scutum"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m36",
+    "slug": "messier-36",
+    "name": "Messier 36",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "north",
+    "summary": "One of Auriga's trio of bright open clusters.",
+    "facts": {
+      "catalog": "M36",
+      "constellation": "Auriga"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m37",
+    "slug": "messier-37",
+    "name": "Messier 37",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "north",
+    "summary": "A rich open cluster in Auriga.",
+    "facts": {
+      "catalog": "M37",
+      "constellation": "Auriga"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m38",
+    "slug": "messier-38",
+    "name": "Messier 38",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "north",
+    "summary": "A broad open cluster in Auriga.",
+    "facts": {
+      "catalog": "M38",
+      "constellation": "Auriga"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m35",
+    "slug": "messier-35",
+    "name": "Messier 35",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A bright open cluster in Gemini.",
+    "facts": {
+      "catalog": "M35",
+      "constellation": "Gemini"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m34",
+    "slug": "messier-34",
+    "name": "Messier 34",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "autumn",
+    "hemisphere": "north",
+    "summary": "A bright open cluster in Perseus.",
+    "facts": {
+      "catalog": "M34",
+      "constellation": "Perseus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m52",
+    "slug": "messier-52",
+    "name": "Messier 52",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "autumn",
+    "hemisphere": "north",
+    "summary": "A rich open cluster in Cassiopeia.",
+    "facts": {
+      "catalog": "M52",
+      "constellation": "Cassiopeia"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m78",
+    "slug": "messier-78",
+    "name": "Messier 78",
+    "type": "nebula",
+    "subtype": "reflection nebula",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A bright reflection nebula in Orion.",
+    "facts": {
+      "catalog": "M78",
+      "constellation": "Orion"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m97",
+    "slug": "owl-nebula",
+    "name": "Owl Nebula",
+    "type": "nebula",
+    "subtype": "planetary nebula",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A planetary nebula in Ursa Major.",
+    "facts": {
+      "catalog": "M97",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m76",
+    "slug": "little-dumbbell-nebula",
+    "name": "Little Dumbbell Nebula",
+    "type": "nebula",
+    "subtype": "planetary nebula",
+    "visibility": "autumn",
+    "hemisphere": "north",
+    "summary": "A compact planetary nebula in Perseus.",
+    "facts": {
+      "catalog": "M76",
+      "constellation": "Perseus"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m64",
+    "slug": "black-eye-galaxy",
+    "name": "Black Eye Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A galaxy famous for its dark dust lane.",
+    "facts": {
+      "catalog": "M64",
+      "constellation": "Coma Berenices"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m63",
+    "slug": "sunflower-galaxy",
+    "name": "Sunflower Galaxy",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A bright spiral galaxy in Canes Venatici.",
+    "facts": {
+      "catalog": "M63",
+      "constellation": "Canes Venatici"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m106",
+    "slug": "messier-106",
+    "name": "Messier 106",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A large bright galaxy in Canes Venatici.",
+    "facts": {
+      "catalog": "M106",
+      "constellation": "Canes Venatici"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m87",
+    "slug": "messier-87",
+    "name": "Messier 87",
+    "type": "galaxy",
+    "subtype": "giant elliptical galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A giant galaxy in Virgo known for its supermassive black hole jet.",
+    "facts": {
+      "catalog": "M87",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m65",
+    "slug": "messier-65",
+    "name": "Messier 65",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "One of the Leo Triplet galaxies.",
+    "facts": {
+      "catalog": "M65",
+      "constellation": "Leo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m66",
+    "slug": "messier-66",
+    "name": "Messier 66",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright member of the Leo Triplet.",
+    "facts": {
+      "catalog": "M66",
+      "constellation": "Leo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m95",
+    "slug": "messier-95",
+    "name": "Messier 95",
+    "type": "galaxy",
+    "subtype": "barred spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A barred spiral galaxy in Leo.",
+    "facts": {
+      "catalog": "M95",
+      "constellation": "Leo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m96",
+    "slug": "messier-96",
+    "name": "Messier 96",
+    "type": "galaxy",
+    "subtype": "spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright galaxy in Leo.",
+    "facts": {
+      "catalog": "M96",
+      "constellation": "Leo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m49",
+    "slug": "messier-49",
+    "name": "Messier 49",
+    "type": "galaxy",
+    "subtype": "elliptical galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright elliptical galaxy in Virgo.",
+    "facts": {
+      "catalog": "M49",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m59",
+    "slug": "messier-59",
+    "name": "Messier 59",
+    "type": "galaxy",
+    "subtype": "elliptical galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "An elliptical galaxy in Virgo.",
+    "facts": {
+      "catalog": "M59",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m60",
+    "slug": "messier-60",
+    "name": "Messier 60",
+    "type": "galaxy",
+    "subtype": "elliptical galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright giant elliptical galaxy in Virgo.",
+    "facts": {
+      "catalog": "M60",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m84",
+    "slug": "messier-84",
+    "name": "Messier 84",
+    "type": "galaxy",
+    "subtype": "lenticular/elliptical galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright member of the Virgo Cluster.",
+    "facts": {
+      "catalog": "M84",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m86",
+    "slug": "messier-86",
+    "name": "Messier 86",
+    "type": "galaxy",
+    "subtype": "lenticular galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A prominent Virgo Cluster galaxy.",
+    "facts": {
+      "catalog": "M86",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m4",
+    "slug": "messier-4",
+    "name": "Messier 4",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "A nearby globular cluster west of Antares.",
+    "facts": {
+      "catalog": "M4",
+      "constellation": "Scorpius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m2",
+    "slug": "messier-2",
+    "name": "Messier 2",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "autumn",
+    "hemisphere": "both",
+    "summary": "A bright globular cluster in Aquarius.",
+    "facts": {
+      "catalog": "M2",
+      "constellation": "Aquarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m39",
+    "slug": "messier-39",
+    "name": "Messier 39",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer/autumn",
+    "hemisphere": "north",
+    "summary": "A large open cluster in Cygnus.",
+    "facts": {
+      "catalog": "M39",
+      "constellation": "Cygnus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m29",
+    "slug": "messier-29",
+    "name": "Messier 29",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "north",
+    "summary": "A small open cluster in Cygnus.",
+    "facts": {
+      "catalog": "M29",
+      "constellation": "Cygnus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m41",
+    "slug": "messier-41",
+    "name": "Messier 41",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A bright open cluster in Canis Major.",
+    "facts": {
+      "catalog": "M41",
+      "constellation": "Canis Major"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m46",
+    "slug": "messier-46",
+    "name": "Messier 46",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "An open cluster that appears near the planetary nebula NGC 2438.",
+    "facts": {
+      "catalog": "M46",
+      "constellation": "Puppis"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m47",
+    "slug": "messier-47",
+    "name": "Messier 47",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A bright open cluster in Puppis.",
+    "facts": {
+      "catalog": "M47",
+      "constellation": "Puppis"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m50",
+    "slug": "messier-50",
+    "name": "Messier 50",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A rich open cluster in Monoceros.",
+    "facts": {
+      "catalog": "M50",
+      "constellation": "Monoceros"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m92",
+    "slug": "messier-92",
+    "name": "Messier 92",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "summer",
+    "hemisphere": "north",
+    "summary": "A bright globular cluster in Hercules.",
+    "facts": {
+      "catalog": "M92",
+      "constellation": "Hercules"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m10",
+    "slug": "messier-10",
+    "name": "Messier 10",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "summer",
+    "hemisphere": "north",
+    "summary": "A globular cluster in Ophiuchus.",
+    "facts": {
+      "catalog": "M10",
+      "constellation": "Ophiuchus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m12",
+    "slug": "messier-12",
+    "name": "Messier 12",
+    "type": "cluster",
+    "subtype": "globular cluster",
+    "visibility": "summer",
+    "hemisphere": "north",
+    "summary": "A globular cluster near M10 in Ophiuchus.",
+    "facts": {
+      "catalog": "M12",
+      "constellation": "Ophiuchus"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m18",
+    "slug": "messier-18",
+    "name": "Messier 18",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "A sparse open cluster in Sagittarius.",
+    "facts": {
+      "catalog": "M18",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m21",
+    "slug": "messier-21",
+    "name": "Messier 21",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "An open cluster near the Trifid Nebula.",
+    "facts": {
+      "catalog": "M21",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m23",
+    "slug": "messier-23",
+    "name": "Messier 23",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "A bright open cluster in Sagittarius.",
+    "facts": {
+      "catalog": "M23",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m24",
+    "slug": "sagittarius-star-cloud",
+    "name": "Sagittarius Star Cloud",
+    "type": "cluster",
+    "subtype": "Milky Way star cloud",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "A rich Milky Way star field rather than a true cluster.",
+    "facts": {
+      "catalog": "M24",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m25",
+    "slug": "messier-25",
+    "name": "Messier 25",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "summer",
+    "hemisphere": "both",
+    "summary": "An open cluster in Sagittarius.",
+    "facts": {
+      "catalog": "M25",
+      "constellation": "Sagittarius"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m43",
+    "slug": "de-mairans-nebula",
+    "name": "De Mairan's Nebula",
+    "type": "nebula",
+    "subtype": "emission nebula",
+    "visibility": "winter",
+    "hemisphere": "both",
+    "summary": "A bright nebula adjoining the Orion Nebula.",
+    "facts": {
+      "catalog": "M43",
+      "constellation": "Orion"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m48",
+    "slug": "messier-48",
+    "name": "Messier 48",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A large open cluster in Hydra.",
+    "facts": {
+      "catalog": "M48",
+      "constellation": "Hydra"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m103",
+    "slug": "messier-103",
+    "name": "Messier 103",
+    "type": "cluster",
+    "subtype": "open star cluster",
+    "visibility": "autumn",
+    "hemisphere": "north",
+    "summary": "A compact open cluster in Cassiopeia.",
+    "facts": {
+      "catalog": "M103",
+      "constellation": "Cassiopeia"
+    },
+    "tags": [
+      "messier",
+      "cluster"
+    ]
+  },
+  {
+    "id": "obj-m58",
+    "slug": "messier-58",
+    "name": "Messier 58",
+    "type": "galaxy",
+    "subtype": "barred spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "both",
+    "summary": "A bright spiral galaxy in Virgo.",
+    "facts": {
+      "catalog": "M58",
+      "constellation": "Virgo"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m102",
+    "slug": "spindle-galaxy",
+    "name": "Spindle Galaxy",
+    "type": "galaxy",
+    "subtype": "lenticular/elliptical system",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A bright galaxy in Draco associated with the historic M102 designation.",
+    "facts": {
+      "catalog": "M102",
+      "constellation": "Draco"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m108",
+    "slug": "messier-108",
+    "name": "Messier 108",
+    "type": "galaxy",
+    "subtype": "edge-on spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "An edge-on galaxy in Ursa Major.",
+    "facts": {
+      "catalog": "M108",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  },
+  {
+    "id": "obj-m109",
+    "slug": "messier-109",
+    "name": "Messier 109",
+    "type": "galaxy",
+    "subtype": "barred spiral galaxy",
+    "visibility": "spring",
+    "hemisphere": "north",
+    "summary": "A barred spiral galaxy in Ursa Major.",
+    "facts": {
+      "catalog": "M109",
+      "constellation": "Ursa Major"
+    },
+    "tags": [
+      "messier",
+      "deep-sky"
+    ]
+  }
+]

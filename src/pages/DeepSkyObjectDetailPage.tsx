@@ -5,20 +5,23 @@
 
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { ArrowLeft, MapPin, Calendar, Eye, Camera, BookOpen } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { StarField } from "@/components/StarField";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { useFavorite } from "@/hooks/use-favorites";
 import { getDeepSkyObjectById } from "@/data/deepSkyObjects";
 import { getConstellationById } from "@/data/constellations";
 import { trackEvent } from "@/lib/analytics";
 import { usePageTitle } from "@/hooks/use-page-title";
-import { useEffect } from "react";
 
 export default function DeepSkyObjectDetailPage() {
   const { id } = useParams<{ id: string }>();
   const object = id ? getDeepSkyObjectById(id) : undefined;
+  const { isSaved: saved, toggle: toggleSaved } = useFavorite("dso", object?.id ?? "");
 
   usePageTitle(
     object ? `${object.name} (${object.id})` : "Deep-Sky Object",
@@ -72,6 +75,13 @@ export default function DeepSkyObjectDetailPage() {
                 <Badge variant="secondary" className="bg-muted/50 border-0 capitalize">
                   {object.type.replace("-", " ")}
                 </Badge>
+                <FavoriteButton
+                  itemType="dso"
+                  itemId={object.id}
+                  isSaved={saved}
+                  onToggle={() => toggleSaved()}
+                  className="ml-auto"
+                />
               </div>
               <p className="text-muted-foreground leading-relaxed">{object.description}</p>
             </div>

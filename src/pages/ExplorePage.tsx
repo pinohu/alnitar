@@ -29,6 +29,27 @@ export default function ExplorePage() {
             transition={{ delay: 0.1 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
+            <Link to="/objects" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Sparkles className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Object explorer</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Planets, stars, constellations, DSOs — filter by type & hemisphere</p>
+              </div>
+            </Link>
+            <Link to="/events/explore" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Sparkles className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Event explorer</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Meteor showers, eclipses, observing seasons</p>
+              </div>
+            </Link>
+            <Link to="/explore/catalog" className="glass-card-hover glass-card p-6 flex items-center gap-4">
+              <Sparkles className="w-10 h-10 text-primary shrink-0" />
+              <div>
+                <h3 className="font-display font-semibold">Unified catalog</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">100+ objects: quick list with search</p>
+              </div>
+            </Link>
             <Link to="/explore/objects" className="glass-card-hover glass-card p-6 flex items-center gap-4">
               <Sparkles className="w-10 h-10 text-primary shrink-0" />
               <div>
